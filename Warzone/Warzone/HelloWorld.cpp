@@ -1,7 +1,14 @@
 #include <iostream>
 using namespace std;
+#include "HelloWorld.h"
+
+
+void HelloWorld::print() {
+	cout << "Hello world";
+}
 
 int main() {
-	cout << "Hello world!";
+	HelloWorld test;
+	test.print();
 	return 0;
 }
