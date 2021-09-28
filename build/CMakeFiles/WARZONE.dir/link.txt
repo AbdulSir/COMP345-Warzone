@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/WARZONE.dir/main.cpp.o  -o WARZONE 
