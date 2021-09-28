@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/pewf/workspace/COMP345-Warzone/main.cpp
+iostream
+-
+main.h
+/home/pewf/workspace/COMP345-Warzone/main.h
+otherClass.cpp
+/home/pewf/workspace/COMP345-Warzone/otherClass.cpp
+
+/home/pewf/workspace/COMP345-Warzone/main.h
+
+/home/pewf/workspace/COMP345-Warzone/otherClass.cpp
+iostream
+-
+
