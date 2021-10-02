@@ -12,9 +12,7 @@ class Card {
 
 class Deck {
     public:
-        static list<Card> deck;
-        // default constructor;
-        Deck();
+        list<Card> deck;
         // randomly generate cards based on deckLength
         Deck(int deckLength);
         // remove card from deck and return the card
@@ -25,7 +23,7 @@ class Deck {
 
 class Hand {
     public:
-        static list<Card> handDeck;
+        list<Card> handDeck;
         // remove card from hand and return the card
         Card discardFromHand();
         // add card to collection of hand
