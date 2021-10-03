@@ -4,6 +4,11 @@ using namespace std;
 #include<string>
 #include<list>
 
+Order::Order() {};
+void OrderList::addToList(Order o) {
+    cout << "Add an order to list" << endl;
+};
+
 Card::Card() {}
 Card::Card(string type) {
     cardType = type;
@@ -16,9 +21,10 @@ Card& Card::operator= (const Card& card) {
     return *this;
 }
 
-string Card::play() {
-    cout << "Playing " << cardType << "card." << endl;
-    return cardType;
+Order Card::play() {
+    Order newOrder;
+    cout << "Playing " << cardType << " card." << endl;
+    return newOrder;
 }
 
 ostream & operator << (ostream &out, const Card &c) {

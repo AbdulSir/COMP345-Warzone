@@ -3,6 +3,17 @@
 #include<list>
 #include <iostream>
 
+//dummy classes
+class Order{
+    public:
+        Order();
+};
+
+class OrderList {
+    public:
+        void addToList(Order o);
+};
+
 class Card {
     public:
         string cardType;
@@ -14,7 +25,7 @@ class Card {
         // overloaded assignment operator
         Card& operator= (const Card& card);
         // play the card
-        string play();
+        Order play();
         // stream insertion operators
         friend ostream & operator << (ostream &out, const Card &c);
         friend istream & operator >> (istream &in,  Card &c);
