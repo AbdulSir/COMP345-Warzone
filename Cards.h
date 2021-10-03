@@ -1,7 +1,10 @@
-#pragma once
+#ifndef Cards_h
+#define Cards_h
+
 #include<string>
 #include<list>
-#include <iostream>
+#include<iostream>
+using namespace std;
 
 //dummy classes
 class Order{
@@ -11,6 +14,7 @@ class Order{
 
 class OrderList {
     public:
+        OrderList();
         void addToList(Order o);
 };
 
@@ -34,12 +38,13 @@ class Card {
 class Deck {
     public:
         list<Card> deck;
+        Deck();
         // copy constructor for Deck
         Deck(const Deck& obj);
-        // overloaded assignment operator
-        Deck& operator= (const Deck& deck);
         // constructor, will randomly generate cards based on deckLength
         Deck(int deckLength);
+        // overloaded assignment operator
+        Deck& operator= (const Deck& deck);
         // remove card from deck and return the card
         Card draw();
         // add card to collection of deck
@@ -65,3 +70,5 @@ class Hand {
         friend ostream & operator << (ostream &out, const Hand &h);
         friend istream & operator >> (istream &in,  Hand &h);
 };
+
+#endif

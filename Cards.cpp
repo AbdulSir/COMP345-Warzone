@@ -1,15 +1,23 @@
+#include "Cards.h"
 #include <iostream>
 using namespace std;
-#include "Cards.h"
-#include<string>
-#include<list>
+#include <string>
+#include <list>
 
+// Order class
 Order::Order() {};
+
+// OrderList class
+
+OrderList::OrderList() {};
+
 void OrderList::addToList(Order o) {
     cout << "Add an order to list" << endl;
 };
 
+// Card class
 Card::Card() {}
+
 Card::Card(string type) {
     cardType = type;
 }
@@ -38,6 +46,7 @@ istream & operator >> (istream &in,  Card &c) {
     return in;
 }
 
+Deck::Deck() {}
 Deck::Deck(const Deck& obj): deck(obj.deck) {}
 
 Deck& Deck::operator= (const Deck& anotherDeck) {
