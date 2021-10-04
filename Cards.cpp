@@ -4,10 +4,8 @@ using namespace std;
 #include <string>
 #include <list>
 
-// Order class
+// dummy classes
 Order::Order() {};
-
-// OrderList class
 
 OrderList::OrderList() {};
 
@@ -45,6 +43,8 @@ istream & operator >> (istream &in,  Card &c) {
     in >> c.cardType;
     return in;
 }
+
+// Deck class
 
 Deck::Deck() {}
 Deck::Deck(const Deck& obj): deck(obj.deck) {}
@@ -112,7 +112,10 @@ Card Deck::draw() {
     return temp;
 };
 
+// Hand class
+
 Hand::Hand() {}
+
 Hand::Hand(const Hand& obj): handDeck(obj.handDeck) {}
 
 Hand& Hand::operator= (const Hand& hand) {
