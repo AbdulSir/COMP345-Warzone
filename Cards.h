@@ -31,8 +31,8 @@ class Card {
         // play the card
         Order play();
         // stream insertion operators
-        friend ostream & operator << (ostream &out, const Card &c);
-        friend istream & operator >> (istream &in,  Card &c);
+        friend ostream & operator<< (ostream &out, const Card &c);
+        friend istream & operator>> (istream &in,  Card &c);
 };
 
 class Deck {
@@ -50,8 +50,8 @@ class Deck {
         // add card to collection of deck
         void addToDeck(Card c);
         // stream insertion operators
-        friend ostream & operator << (ostream &out, const Deck &c);
-        friend istream & operator >> (istream &in,  Deck &c);
+        friend ostream & operator<< (ostream &out, Deck &c);
+        friend istream & operator>> (istream &in,  Deck &c);
 };
 
 class Hand {
@@ -67,8 +67,8 @@ class Hand {
         // add card to collection of hand
         void addToHand(Card c);
         // stream insertion operators
-        friend ostream & operator << (ostream &out, const Hand &h);
-        friend istream & operator >> (istream &in,  Hand &h);
+        friend ostream & operator<< (ostream &out, Hand &h);
+        friend istream & operator>> (istream &in,  Hand &h);
 };
 
 #endif

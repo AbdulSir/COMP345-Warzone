@@ -6,7 +6,7 @@ using namespace std;
 
 int main() {
     // define gameDeck with pointer type
-    Deck* gameDeck = new Deck(40);
+    Deck* gameDeck = new Deck(10);
     // define hand with pointer type
     Hand *hand = new Hand();
     // define dummy order list class with pointer type
@@ -16,19 +16,24 @@ int main() {
     // define a temp order class for copying later
     Order *newOrder;
 
+    cout << "cards in game deck now:" << endl << *gameDeck << endl;
     // draw 5 cards from game deck and add to hand
     for (int i=0; i<5; i++) {
         hand->addToHand(gameDeck->draw());
+        cout << "cards in game deck now:" << endl << *gameDeck << endl;
+        cout << "cards in hand now" << endl << *hand << endl;
     }
 
     // play 5 cards from hand
     for (int i=0; i<5; i++) {
         // remove card from hand and get a copy of the card
         temp = new Card(hand->discardFromHand());
+        cout << "cards in hand now" << endl << *hand << endl;
         // call play(), get the order, add order to the order list, add the card to the deck
         newOrder = new Order(temp->play());
         orderList->addToList(*newOrder);
         gameDeck->addToDeck(*temp);
+        // cout << "cards in game deck now" << *gameDeck << endl;
     }
 
     // delete pointers

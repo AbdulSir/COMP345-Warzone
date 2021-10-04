@@ -33,12 +33,12 @@ Order Card::play() {
     return newOrder;
 }
 
-ostream & operator << (ostream &out, const Card &c) {
+ostream & operator<< (ostream &out, const Card &c) {
     out << c.cardType << endl;
     return out;
 }
  
-istream & operator >> (istream &in,  Card &c) {
+istream & operator>> (istream &in,  Card &c) {
     cout << "Enter card type ";
     in >> c.cardType;
     return in;
@@ -83,15 +83,14 @@ void Deck::addToDeck(Card c) {
     deck.push_back(c);
 };
 
-ostream & operator << (ostream &out, Deck &c) {
-
+ostream & operator<< (ostream &out, Deck &c) {
     for (list<Card>::iterator it = c.deck.begin(); it!= c.deck.end(); ++it) {
         out << it->cardType << endl;
     }
     return out;
 }
  
-istream & operator >> (istream &in,  Deck &c) {
+istream & operator>> (istream &in,  Deck &c) {
     while (true) {
         string type;
         cout << "Type end to exit" << endl;
@@ -133,7 +132,7 @@ void Hand::addToHand(Card c) {
     handDeck.push_back(c);
 }
 
-ostream & operator << (ostream &out, Hand &h) {
+ostream & operator<< (ostream &out, Hand &h) {
 
     for (list<Card>::iterator it = h.handDeck.begin(); it!= h.handDeck.end(); ++it) {
         out << it->cardType << endl;
@@ -141,7 +140,7 @@ ostream & operator << (ostream &out, Hand &h) {
     return out;
 }
  
-istream & operator >> (istream &in,  Hand &h) {
+istream & operator>> (istream &in,  Hand &h) {
     while (true) {
         string type;
         cout << "Type end to exit" << endl;
