@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <bits/stdc++.h>
+#include <boost/algorithm/string.hpp>
 #ifndef MAP_H
 #define MAP_H
 
@@ -16,17 +18,51 @@ using namespace std;
 3) each country belongs to one and only one continent.
 */
 
+class Player
+{
+    public:
+        Player();
+};
+
+class Territory
+{
+    public:
+        Territory();
+        Territory (string terr_name, int num_of_armies);
+        Territory (const Territory &t1); //Copy constructor
+        string getName();
+    private:
+        string player; //Needs to be changed to Player object
+        string territory_name;
+        Player* player1;
+        int army_nb;
+};
+
 class Map
 {
     public:
         Map();
         Map(string text_contents);
         Map (const Map &m1); //Copy constructor
+        vector<string> load_continents(string text_contents);
+        vector<string> load_countries(string text_contents);
+        vector<string> load_borders(string text_contents);
+        void createTerritories(string text_contents);
+        void createMap(string text_contents);
+        void displayMap();
+        void addEdge(int u, int v);
         bool validate();
         bool map_is_connected(Map m1);
         bool continents_are_connected(Map m1);
 
     private:
+        vector<string> continents;
+        vector<string> countries;
+        vector<string> borders;
+        vector<Territory*> territories;
+        // To keep correct and reverse direction
+        vector<Territory*> gr1[100], gr2[100];
+        //bool vis1[100], vis2[100];
 };
 
 /*
@@ -47,22 +83,6 @@ class Continent
 };
 
 /*
-	• Territory
-		Owned by a player
-        Contain a number of armies
-*/
-class Territory
-{
-    public:
-        Territory();
-        Territory (const Territory &t1); //Copy constructor
-
-    protected:
-
-    private:
-};
-
-/*
 	• MapLoader
 		read any map file
 		creates a map object as a graph data structure
@@ -74,9 +94,6 @@ class MapLoader
         MapLoader();
         MapLoader(string file_name);
         MapLoader (const MapLoader &mL1); //Copy constructor
-        string read_map(string file_name);
-        Map create_map();
-        string getText_contents();
 
     private:
         string text_contents;
