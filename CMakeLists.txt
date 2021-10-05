@@ -4,3 +4,4 @@ project(WARZONE)
 
 add_executable(CardsDriver CardsDriver.cpp Cards.cpp)
 # add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0)
+add_executable(GameEngine GameEngineDriver.cpp GameEngine.cpp)
