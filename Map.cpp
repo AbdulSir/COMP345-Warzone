@@ -20,10 +20,93 @@ using namespace std;
 3) each country belongs to one and only one continent.
 */
 
+// Territory CLASS
+Territory::Territory ()
+{
+
+}
+//Copy constructor
+Territory::Territory(const Territory& obj)
+{
+    territory_name = obj.territory_name;
+    army_nb = obj.army_nb;
+}
+
+// Overloaded assignment operator
+Territory& Territory::operator= (const Territory& terr) {
+    territory_name = terr.territory_name;
+    army_nb = terr.army_nb;
+    return *this;
+}
+
+// Stream insertion operators
+ostream & operator << (ostream &out, const Territory &terr) {
+    out << terr.territory_name << endl;
+    return out;
+}
+
+istream & operator >> (istream &in,  Territory &terr) {
+    cout << "Enter territory name ";
+    in >> terr.territory_name;
+    cout << "Enter number of armies for that territory ";
+    in >> terr.army_nb;
+    return in;
+}
+
+Territory::Territory (string terr_name, int nb_of_armies)
+{
+    player1 = new Player();
+    territory_name = terr_name;
+    army_nb = nb_of_armies;
+}
+
+string Territory::getName()
+{
+    return territory_name;
+}
+
+// Map CLASS
 
 Map::Map()
 {
 
+}
+
+//Copy constructor
+Map::Map(const Map& obj): territories(obj.territories) {}
+
+// Overloaded assignment operator
+Map& Map::operator= (const Map& map1) {
+    territories = map1.territories;
+    return *this;
+}
+
+// Stream insertion operators
+ostream & operator << (ostream &out, Map &m1) {
+
+    for (int i=0; i< m1.territories.size(); i++)
+    {
+        cout << "Territory " << m1.territories[i]->territory_name << endl;
+    }
+    return out;
+}
+
+istream & operator >> (istream &in,  Map &m1) {
+    while (true) {
+        string name;
+        int army_nb;
+        cout << "Type end to exit" << endl;
+        cout << "Enter territory name ";
+        in >> name;
+        if (name.compare("end") == 0) {
+            break;
+        } else {
+            cout << "Enter number of armies for that territory ";
+            in >> army_nb;
+            m1.territories.push_back(new Territory(name, army_nb));
+        }
+    }
+    return in;
 }
 
 Map::Map(string text_contents)
@@ -68,6 +151,7 @@ void Map::createTerritories(string text_contents)
     continents = Map::load_continents(text_contents);
     countries = Map::load_countries(text_contents);
 
+    //Accessing the army numbers for each continent and storing them in a vector<int>
     vector<int> army_numbers;
     for (int i=0; i < continents.size(); i++) {
         vector<string> continents_temp_vector;
@@ -75,7 +159,6 @@ void Map::createTerritories(string text_contents)
         army_numbers.push_back(stoi(continents_temp_vector[1]));
     }
 
-    vector<string> countries_temp_vector;
     for (int i=0; i < countries.size(); i++) {
         //Getting the country names
         size_t start_index = countries[i].find(" ");
@@ -122,7 +205,9 @@ void Map::displayMap()
 {
     for (int i=0; i< territories.size() -1; i++)
     {
-        cout << "Vertex " << i + 1 << "->";
+        Territory* t1 = territories[i+1];
+        //cout << (t1)->getName() << endl;
+        cout << (t1)->getName()<< " -> ";
         for (Territory* nbr:gr1[i])
         {
             cout << nbr->getName() <<"->";
@@ -131,9 +216,40 @@ void Map::displayMap()
     }
 }
 
+// MapLoader CLASS
+
 MapLoader::MapLoader()
 {
     //ctor
+}
+
+//Copy constructor
+MapLoader::MapLoader(const MapLoader& obj)
+{
+    text_contents = obj.text_contents;
+    map_object = obj.map_object;
+}
+
+// Overloaded assignment operator
+MapLoader& MapLoader::operator= (const MapLoader& ml1)
+{
+    text_contents = ml1.text_contents;
+    map_object = ml1.map_object;
+    return *this;
+}
+
+// Stream insertion operators
+ostream & operator << (ostream &out, const MapLoader &ml1)
+{
+    out << ml1.text_contents << endl;
+    return out;
+}
+
+istream & operator >> (istream &in,  MapLoader &ml1)
+{
+    cout << "Enter map file contents ";
+    in >> ml1.text_contents;
+    return in;
 }
 
 MapLoader::MapLoader(string file_name)
@@ -142,45 +258,32 @@ MapLoader::MapLoader(string file_name)
     string myText;
     // Read from the text file
     ifstream MyReadFile("Resources/" + file_name);
-
+    if(MyReadFile.fail())
+    {
+        cout << "An error happened while attempting to read the file" << endl;
+        return;
+    }
     // Use a while loop together with the getline() function to read the file line by line
     text_contents = "";
-
     while (getline (MyReadFile, myText)) {
       // Output the text from the file
       text_contents += myText + "\n";
     }
-
     //creating a map object
     Map map_object(text_contents);
     // Close the file
     MyReadFile.close();
 }
 
+// Continent CLASS
+
 Continent::Continent()
 {
 
 }
 
+//Dummy Player CLASS
 Player::Player ()
 {
 
-}
-
-Territory::Territory ()
-{
-
-}
-
-
-Territory::Territory (string terr_name, int nb_of_armies)
-{
-    player1 = new Player();
-    territory_name = terr_name;
-    army_nb = nb_of_armies;
-}
-
-string Territory::getName()
-{
-    return territory_name;
 }
