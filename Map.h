@@ -18,6 +18,7 @@ using namespace std;
 3) each country belongs to one and only one continent.
 */
 
+//Dummy class
 class Player
 {
     public:
@@ -30,9 +31,11 @@ class Territory
         Territory();
         Territory (string terr_name, int num_of_armies);
         Territory (const Territory &t1); //Copy constructor
+        Territory& operator= (const Territory& t1); // overloaded assignment operator
+        // stream insertion operators
+        friend ostream & operator << (ostream &out, const Territory &t1);
+        friend istream & operator >> (istream &in,  Territory &t1);
         string getName();
-    private:
-        string player; //Needs to be changed to Player object
         string territory_name;
         Player* player1;
         int army_nb;
@@ -44,6 +47,10 @@ class Map
         Map();
         Map(string text_contents);
         Map (const Map &m1); //Copy constructor
+        Map& operator= (const Map& m1); // overloaded assignment operator
+        // stream insertion operators
+        friend ostream & operator << (ostream &out, const Map &m1);
+        friend istream & operator >> (istream &in,  Map &m1);
         vector<string> load_continents(string text_contents);
         vector<string> load_countries(string text_contents);
         vector<string> load_borders(string text_contents);
@@ -54,8 +61,6 @@ class Map
         bool validate();
         bool map_is_connected(Map m1);
         bool continents_are_connected(Map m1);
-
-    private:
         vector<string> continents;
         vector<string> countries;
         vector<string> borders;
@@ -76,10 +81,10 @@ class Continent
     public:
         Continent();
         Continent (const Continent &c1); //Copy constructor
-
-    protected:
-
-    private:
+        Continent& operator= (const Continent& c1); // overloaded assignment operator
+        // stream insertion operators
+        friend ostream & operator << (ostream &out, const Continent &c1);
+        friend istream & operator >> (istream &in,  Continent &c1);
 };
 
 /*
@@ -94,8 +99,10 @@ class MapLoader
         MapLoader();
         MapLoader(string file_name);
         MapLoader (const MapLoader &mL1); //Copy constructor
-
-    private:
+        MapLoader& operator= (const MapLoader& mL1); // overloaded assignment operator
+        // stream insertion operators
+        friend ostream & operator << (ostream &out, const MapLoader &mL1);
+        friend istream & operator >> (istream &in,  MapLoader &mL1);
         string text_contents;
         Map map_object;
 };
