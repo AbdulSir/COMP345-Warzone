@@ -1,9 +1,7 @@
 //
 //  GameEngine.cpp
-//  Warzone Game Engine
-//
-//  Created by Vanessa Razon on 2021-09-24.
-//  Copyright © 2021 Vanessa Razon. All rights reserved.
+//  COMP 345 - Assignment 1 - Team DN02
+//  Warzone Game Engine: controls the flow of the game using the user's keyboard inputs as commands
 //
 
 #include "GameEngine.h"
@@ -34,6 +32,9 @@ GameEngine& GameEngine::operator=(const GameEngine& g) {
 std::ostream& operator<<(std::ostream &strm, const GameEngine &g) {
     return strm << "\nCurrent state: " << g.state << endl;
 }
+
+
+//Transitions of the game
 
 //Transition to load the map
 void GameEngine::loadMap() {
@@ -95,116 +96,96 @@ void GameEngine::play() {
 }
 
 void GameEngine::end() {
-    std::cout << "END OF PROGRAM: Thank you for playing Warzone" <<endl;
+    std::cout << "--END OF PROGRAM: Thank you for playing Warzone--" <<endl;
     state = "end";
 }
 
 
+// States of the game: In all states, if the command is not valid, user will be
+//prompted for another command
 
-// Start state: includes new game message and determines if user's command is valid to load a map
-// (if valid, map is loaded and  game transitions to map loaded state)
+// Start state: determines if user's command is valid to load a map
+// (if valid, game transitions to map loaded state)
 void GameEngine::start()  {
     if (command == "loadMap") {
         loadMap();
     }
     else {
-            std::cout << "ERROR: Invalid command for " << state << endl;
+        std::cout << "ERROR: Invalid command for " << state << " state" << endl;
     }
-    
-    }
+}
 
 // Map loaded state: determines if user's command is valid to load another map (stays in map loaded state)
-// or to validate the map (map is validated and game transitions to map validated state)
+// or to validate the map (game transitions to map validated state)
 void GameEngine::mapLoaded() {
     
     if (command == "loadMap") {
         loadMap();
-        std::cout << "\nCurrent state: " << state << endl;
+        std::cout << "\nCurrent state: " << state << " state" << endl;
     }
-        else if (command == "validateMap")
-            validateMap();
+    else if (command == "validateMap")
+        validateMap();
     else
-        std::cout << "ERROR: Invalid command for " << state << endl;
-    
+        std::cout << "ERROR: Invalid command for " << state << " state" << endl;
 }
 
 // Map validated state: determines if user's command is valid to add a player
-// (player is added and game transitions to player added state)
+// (game transitions to player added state)
 void GameEngine::mapValidated() {
     
     if (command == "addPlayer")
         addPlayer();
     else
-        std::cout << "ERROR: Invalid command for " << state << endl;
+        std::cout << "ERROR: Invalid command for " << state << " state" << endl;
 }
 
 // Players added state: determines if user's command is valid to add another player (stays in players added state)
-// or to move on to assign countries (countries are assigned and game transitions to assign reinforcement state)
+// or to move on to assign countries (game transitions to assign reinforcement state)
 void GameEngine::playersAdded() {
     if (command == "addPlayer") {
         addPlayer();
-        std::cout << "\nCurrent state: " << state << endl;
+        std::cout << "\nCurrent state: " << state << " state" << endl;
     }
     else if (command == "assignCountries")
         assignCountries();
     else
-        std::cout << "ERROR: Invalid command for " << state << endl;
+        std::cout << "ERROR: Invalid command for " << state << " state" << endl;
 }
 
+// Assign reinforcement state: determines if user's command is valid to issue an order (game
+// transistions to issue order state)
 void GameEngine::assignReinforcement() {
     if (command == "issueOrder")
         issueOrder();
     else
-        std::cout << "ERROR: Invalid command for " << state << endl;
+        std::cout << "ERROR: Invalid command for " << state << " state" << endl;
 }
 
+// Issue orders state: determines if user's command is valid to issue an order (game
+// stays in issue order state) or to end issued orders (game transitions to execute orders state)
 void GameEngine::issueOrders() {
     if (command == "issueOrder") {
         issueOrder();
-        std::cout << "\nCurrent state: " << state << endl;
+        std::cout << "\nCurrent state: " << state << " state" << endl;
     }
     else if (command == "endIssueOrders")
         endIssueOrders();
     else
-        std::cout << "ERROR: Invalid command for " << state << endl;
+        std::cout << "ERROR: Invalid command for " << state << " state" << endl;
 }
 
+// Execute orders state: determines if user's command is valid to execute an order (game
+// stays in execute order state), to end executed orders (game transitions to assign reinforcement state)
+// or to declare the winner (transition to the win state)
 void GameEngine::executeOrders() {
     if (command == "execOrder") {
         execOrder();
-        std::cout << "\nCurrent state: " << state << endl;
+        std::cout << "\nCurrent state: " << state << " state" << endl;
     }
     else if (command == "endExecOrders")
         endExecOrders();
+    else if (command == "win")
+        win();
     else
-        std::cout << "ERROR: Invalid command for " << state << endl;
+        std::cout << "ERROR: Invalid command for " << state << " state" << endl;
 }
-
-/* PUBLIC FCTS TO ADD?
- 
-
-
-// Win state: Ends the game and determines if user's command is valid to start a new game
-// (game transitions back to start and a new game begins) or to end the program
-void GameEngine:: win() {
-    std::cout << "END OF GAME: Congratulations to the winner!" << endl;
-    // Code relevant to the win state
-    state = "win";
-    
-    std::cout << "\nCurrent state: " << state << endl;
-    std::cout << "Choose one of the following:\n\t1. play\n\t2. end" << endl;
-    std::cin >> command;
-    
-    while (command != "play" && command != "end") {
-        std::cout << "ERROR: Invalid command for " << state << endl;
-        std::cout << "Choose one of the following:\n\t1. play\n\t2. end" << endl;
-        std::cin >> command;
-    }
-    if (command == "play") {
-        play();
-    }
-    else
-        end();
-}
-
-*/

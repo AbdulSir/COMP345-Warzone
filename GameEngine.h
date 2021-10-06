@@ -1,10 +1,9 @@
 //
 //  GameEngine.h
-//  Warzone Game Engine
+//  COMP 345 - Assignment 1 - Team DN02
+//  Warzone Game Engine: controls the flow of the game using the user's keyboard inputs as commands
 //
-//  Created by Vanessa Razon on 2021-09-24.
-//  Copyright © 2021 Vanessa Razon. All rights reserved.
-//
+
 
 #include <string>
 using namespace std;
@@ -27,6 +26,11 @@ public:
     //Insertion stream operator
     friend std::ostream& operator<<(std::ostream& stream, const GameEngine& g);
     
+    //Transitions in the startup phase
+    void loadMap();
+    void validateMap();
+    void addPlayer();
+    void assignCountries();
     
     //Transitions in the play phase
     void issueOrder();
@@ -39,25 +43,14 @@ public:
     void play();
     void end();
     
-    //States to add?
+    //States of the game
     void start();
     void mapLoaded();
     void mapValidated();
     void playersAdded();
-    void ordersLoop();
     void assignReinforcement();
     void issueOrders();
     void executeOrders();
-    
-    //Transitions in the startup phase
-private:
-    void loadMap();
-    void validateMap();
-    void addPlayer();
-    void assignCountries();
-
-    
-    
     
 };
 
