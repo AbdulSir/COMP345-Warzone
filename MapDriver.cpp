@@ -21,8 +21,19 @@ using namespace std;
 
 int main()
 {
-    cout << "Testing if we can read the file \n";
-    MapLoader map_loader("europe.txt");
+    string file_name = "";
+    cout << "Please enter the map file name: \n";
+    cin >> file_name;
+
+    if (file_name.find(".map") != string::npos)
+    {
+        cout << endl;
+        MapLoader map_loader(file_name);
+    }
+
+    else
+        cout <<"Sorry, wrong file format." << endl;
+
     return 0;
 }
 
