@@ -29,7 +29,7 @@ class Territory
 {
     public:
         Territory();
-        Territory (string terr_name, int num_of_armies);
+        Territory (string terr_name, int contin_ref, int num_of_armies);
         Territory (const Territory &t1); //Copy constructor
         Territory& operator= (const Territory& t1); // overloaded assignment operator
         // stream insertion operators
@@ -37,6 +37,7 @@ class Territory
         friend istream & operator >> (istream &in,  Territory &t1);
         string getName();
         string territory_name;
+        int continent_ref;
         Player* player1;
         int army_nb;
 };
@@ -104,7 +105,7 @@ class MapLoader
         friend ostream & operator << (ostream &out, const MapLoader &mL1);
         friend istream & operator >> (istream &in,  MapLoader &mL1);
         string text_contents;
-        Map map_object;
+        Map* map_object;
 };
 
 #endif // MAP_H
