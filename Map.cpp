@@ -29,12 +29,14 @@ Territory::Territory ()
 Territory::Territory(const Territory& obj)
 {
     territory_name = obj.territory_name;
+    continent_ref = obj.continent_ref;
     army_nb = obj.army_nb;
 }
 
 // Overloaded assignment operator
 Territory& Territory::operator= (const Territory& terr) {
     territory_name = terr.territory_name;
+    continent_ref = terr.continent_ref;
     army_nb = terr.army_nb;
     return *this;
 }
@@ -48,15 +50,18 @@ ostream & operator << (ostream &out, const Territory &terr) {
 istream & operator >> (istream &in,  Territory &terr) {
     cout << "Enter territory name ";
     in >> terr.territory_name;
+    cout << "Enter continent ref ";
+    in >> terr.continent_ref;
     cout << "Enter number of armies for that territory ";
     in >> terr.army_nb;
     return in;
 }
 
-Territory::Territory (string terr_name, int nb_of_armies)
+Territory::Territory (string terr_name, int contin_ref, int nb_of_armies)
 {
     player1 = new Player();
     territory_name = terr_name;
+    continent_ref = contin_ref;
     army_nb = nb_of_armies;
 }
 
@@ -94,6 +99,7 @@ ostream & operator << (ostream &out, Map &m1) {
 istream & operator >> (istream &in,  Map &m1) {
     while (true) {
         string name;
+        int contin_ref;
         int army_nb;
         cout << "Type end to exit" << endl;
         cout << "Enter territory name ";
@@ -101,9 +107,11 @@ istream & operator >> (istream &in,  Map &m1) {
         if (name.compare("end") == 0) {
             break;
         } else {
+            cout << "Enter continent ref ";
+            in >> contin_ref;
             cout << "Enter number of armies for that territory ";
             in >> army_nb;
-            m1.territories.push_back(new Territory(name, army_nb));
+            m1.territories.push_back(new Territory(name, contin_ref, army_nb));
         }
     }
     return in;
@@ -130,7 +138,7 @@ vector<string> Map::load_countries(string text_contents)
 {
     size_t starting_index = text_contents.find("[countries]");
     size_t end_index = text_contents.find("\n\n", starting_index);
-    string countries_str = text_contents.substr (starting_index + 11, (end_index - starting_index - 11));
+    string countries_str = text_contents.substr (starting_index + 12, (end_index - starting_index - 12));
     vector<string> countries_vector;
     boost::split(countries_vector, countries_str, boost::is_any_of("\n"));
     return countries_vector;
@@ -140,7 +148,7 @@ vector<string> Map::load_borders(string text_contents)
 {
     size_t starting_index = text_contents.find("[borders]");
     size_t end_index = text_contents.find("\n\n", starting_index);
-    string borders_str = text_contents.substr (starting_index + 10, (end_index - starting_index - 4));
+    string borders_str = text_contents.substr (starting_index + 10, (end_index - starting_index - 10));
     vector<string> borders_vector;
     boost::split(borders_vector, borders_str, boost::is_any_of("\n"));
     return borders_vector;
@@ -148,33 +156,28 @@ vector<string> Map::load_borders(string text_contents)
 
 void Map::createTerritories(string text_contents)
 {
+    //memebers of the Map class
     continents = Map::load_continents(text_contents);
     countries = Map::load_countries(text_contents);
 
     //Accessing the army numbers for each continent and storing them in a vector<int>
     vector<int> army_numbers;
+    vector<string> continent_names;
     for (int i=0; i < continents.size(); i++) {
         vector<string> continents_temp_vector;
         boost::split(continents_temp_vector, continents[i], boost::is_any_of(" "));
+        continent_names.push_back(continents_temp_vector[0]);
         army_numbers.push_back(stoi(continents_temp_vector[1]));
     }
 
     for (int i=0; i < countries.size(); i++) {
         //Getting the country names
-        size_t start_index = countries[i].find(" ");
-        size_t end_index = countries[i].find(" ", start_index + 1);
-        string country_name = countries[i].substr(start_index +1, (end_index - start_index));
-        //Getting the Army numbers from the continent
-        size_t continent_start_index = countries[i].find(" ", end_index);
-        string continent_num = countries[i].substr(continent_start_index +1,1);
-        //Converting the army number from string to int
-        int continent_ref = 0;
-        stringstream get_int(continent_num);
-        get_int >> continent_ref;
-
+        vector<string> countries_temp_vector;
+        boost::split(countries_temp_vector, countries[i], boost::is_any_of(" "));
+        int contin_ref = stoi(countries_temp_vector[2]) - 1;
         //accessing the army numbers vector to get the corrosponding army number for each territory then pushing it to the territories data member (vector of territory pointers)
-        int army_nb = army_numbers[continent_ref -1];
-        territories.push_back(new Territory(country_name, army_nb));
+        int army_nb = army_numbers[contin_ref];
+        territories.push_back(new Territory(countries_temp_vector[1],contin_ref, army_nb));
     }
 }
 
@@ -189,13 +192,13 @@ void Map::addEdge(int u, int v)
 
 void Map::createMap(string text_contents)
 {
-    //Creating edges between territory nodes
+    //Creating edges between territory nodes by iterating over the vector<string> borders
     borders = Map::load_borders(text_contents);
     for (int i=0; i < borders.size() -1; i++) {
         vector<string> borders_temp_vector;
         boost::split(borders_temp_vector, borders[i], boost::is_any_of(" "));
         for (int j=1; j<borders_temp_vector.size(); j++){
-            addEdge(i, stoi(borders_temp_vector[j]));
+            addEdge(i, stoi(borders_temp_vector[j]) - 1);
         }
     }
 }
@@ -203,9 +206,9 @@ void Map::createMap(string text_contents)
 //A function that displays the map
 void Map::displayMap()
 {
-    for (int i=0; i< territories.size() -1; i++)
+    for (int i=0; i< territories.size(); i++)
     {
-        Territory* t1 = territories[i+1];
+        Territory* t1 = territories[i];
         //cout << (t1)->getName() << endl;
         cout << (t1)->getName()<< " -> ";
         for (Territory* nbr:gr1[i])
@@ -270,7 +273,7 @@ MapLoader::MapLoader(string file_name)
       text_contents += myText + "\n";
     }
     //creating a map object
-    Map map_object(text_contents);
+    map_object = new Map(text_contents);
     // Close the file
     MyReadFile.close();
 }
