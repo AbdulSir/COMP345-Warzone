@@ -113,6 +113,7 @@ void GameEngine::start()  {
     else {
         std::cout << "ERROR: Invalid command for " << state << " state" << endl;
     }
+    
 }
 
 // Map loaded state: determines if user's command is valid to load another map (stays in map loaded state)
@@ -121,12 +122,13 @@ void GameEngine::mapLoaded() {
     
     if (command == "loadMap") {
         loadMap();
-        std::cout << "\nCurrent state: " << state << " state" << endl;
+        std::cout << "\nCurrent state: " << state << endl;
     }
     else if (command == "validateMap")
         validateMap();
     else
         std::cout << "ERROR: Invalid command for " << state << " state" << endl;
+    
 }
 
 // Map validated state: determines if user's command is valid to add a player
@@ -144,7 +146,7 @@ void GameEngine::mapValidated() {
 void GameEngine::playersAdded() {
     if (command == "addPlayer") {
         addPlayer();
-        std::cout << "\nCurrent state: " << state << " state" << endl;
+        std::cout << "\nCurrent state: " << state  << endl;
     }
     else if (command == "assignCountries")
         assignCountries();
@@ -166,7 +168,7 @@ void GameEngine::assignReinforcement() {
 void GameEngine::issueOrders() {
     if (command == "issueOrder") {
         issueOrder();
-        std::cout << "\nCurrent state: " << state << " state" << endl;
+        std::cout << "\nCurrent state: " << state << endl;
     }
     else if (command == "endIssueOrders")
         endIssueOrders();
@@ -180,7 +182,7 @@ void GameEngine::issueOrders() {
 void GameEngine::executeOrders() {
     if (command == "execOrder") {
         execOrder();
-        std::cout << "\nCurrent state: " << state << " state" << endl;
+        std::cout << "\nCurrent state: " << state << endl;
     }
     else if (command == "endExecOrders")
         endExecOrders();
