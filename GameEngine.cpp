@@ -93,6 +93,7 @@ void GameEngine:: win() {
 
 void GameEngine::play() {
     std::cout << "Starting a new game...\n" <<endl;
+    state = "start";
 }
 
 void GameEngine::end() {
