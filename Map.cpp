@@ -2,23 +2,11 @@
 #include <fstream>
 #include <string>
 #include <list>
-#include <bits/stdc++.h>
+#include <vector>
 #include <boost/algorithm/string.hpp>
 #include "Map.h"
 
 using namespace std;
-
-/*
-	• Map
-		○ can be used to represent any map graph configuration
-		○ implemented as a connected graph
-		○ The graph’s nodes represents a territory
-		○ Edges between nodes represent adjacency between territories.
-		○ validate() method that makes the following checks:
-			§ 1) the map is a connected graph
-			§ 2) continents are connected subgraphs
-3) each country belongs to one and only one continent.
-*/
 
 // Territory CLASS
 Territory::Territory ()
@@ -122,11 +110,40 @@ Map::Map(string text_contents)
     Map::createTerritories(text_contents);
     Map::createMap(text_contents);
     Map::displayMap();
+    Map::displayContinents();
+    if(Map::validate())
+        cout << "\nThe Map is a valid map" << endl;
+    else
+        cout << "\nThe Map is NOT a valid map" << endl;
+    Map::delete_pointers();
+}
+
+bool Map::validate()
+{
+    if (Map::map_is_connected())
+        cout << "\nThe map is a connected graph" << endl;
+    else
+        cout << "\nThe map is NOT a connected graph" << endl;
+
+    if (Map::continents_are_connected())
+        cout << "\nContinents are connected subgraphs" << endl;
+    else
+        cout << "\nContinents are NOT connected subgraphs" << endl;
+
+    if (Map::territory_belongs_to_one_continent())
+        cout << "\nTerritories belong to only one continent" << endl;
+    else
+        cout << "\nTerritories DO NOT belong to only one continent" << endl;
+
+    if (Map::map_is_connected()==true && Map::continents_are_connected()==true && Map::territory_belongs_to_one_continent()==true)
+        return true;
+    else
+        return false;
 }
 
 vector<string> Map::load_continents(string text_contents)
 {
-    size_t starting_index = text_contents.find("[continents]");
+    size_t starting_index = text_contents.find("[continents]"); //
     size_t end_index = text_contents.find("\n\n", starting_index);
     string continents_str = text_contents.substr (starting_index + 13, (end_index - starting_index - 13));
     vector<string> continents_vector;
@@ -159,7 +176,7 @@ void Map::createTerritories(string text_contents)
     //memebers of the Map class
     continents = Map::load_continents(text_contents);
     countries = Map::load_countries(text_contents);
-
+    num_of_continents = continents.size();
     //Accessing the army numbers for each continent and storing them in a vector<int>
     vector<int> army_numbers;
     vector<string> continent_names;
@@ -169,7 +186,6 @@ void Map::createTerritories(string text_contents)
         continent_names.push_back(continents_temp_vector[0]);
         army_numbers.push_back(stoi(continents_temp_vector[1]));
     }
-
     for (int i=0; i < countries.size(); i++) {
         //Getting the country names
         vector<string> countries_temp_vector;
@@ -178,17 +194,16 @@ void Map::createTerritories(string text_contents)
         //accessing the army numbers vector to get the corrosponding army number for each territory then pushing it to the territories data member (vector of territory pointers)
         int army_nb = army_numbers[contin_ref];
         territories.push_back(new Territory(countries_temp_vector[1],contin_ref, army_nb));
+        continent_graph[contin_ref].push_back(territories[i]);
     }
 }
 
 // Function to add edges
-
 void Map::addEdge(int u, int v)
 {
-    gr1[u].push_back(territories[v]);
-    gr2[v].push_back(territories[u]);
+    territory_graph[u].push_back(territories[v]);
+    territories_border_list.push_back(v);
 }
-
 
 void Map::createMap(string text_contents)
 {
@@ -208,22 +223,119 @@ void Map::displayMap()
 {
     for (int i=0; i< territories.size(); i++)
     {
-        Territory* t1 = territories[i];
-        //cout << (t1)->getName() << endl;
-        cout << (t1)->getName()<< " -> ";
-        for (Territory* nbr:gr1[i])
+        cout << (territories[i])->getName()<< " -> ";
+        for (Territory* terr:territory_graph[i])
         {
-            cout << nbr->getName() <<"->";
+            cout << terr->getName() <<"->";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
+}
+
+void Map::displayContinents()
+{
+    for (int i=0; i< num_of_continents; i++)
+    {
+        cout << "Continent " << i << ": ";
+        for (Territory* terr:continent_graph[i])
+        {
+            cout << terr->getName() <<"->";
         }
         cout<<endl;
     }
 }
 
-// MapLoader CLASS
+bool Map::map_is_connected()
+{
+    bool vis[territories.size()];
+    //set the array to false. i.e. no node has been visited yet
+    memset(vis, false, sizeof(vis));
+    //iterate through the borders list and mark node visited if this is the first time visiting it, if it is already visited we skip it
+    for (int i=0; i < territories_border_list.size(); i++)
+    {
+        if (!vis[territories_border_list[i]])
+            vis[territories_border_list[i]]=true;
+    }
+    //check if all nodes have been visited
+    for (int i=0; i < sizeof(vis); i++)
+    {
+        if (!vis[i])
+            return false;
+    }
+    //we return true because the previous loop did not find a node that was not visited
+    return true;
+}
 
+bool Map::continents_are_connected()
+{
+    bool vis[num_of_continents];
+    //set the array to false. i.e. no node has been visited yet
+    memset(vis, false, sizeof(vis));
+    for (int i=0; i < territories.size(); i++)
+    {
+        if (!vis[(territories[i])->continent_ref])
+            vis[(territories[i])->continent_ref]=true;
+    }
+    //check if all nodes have been visited
+    for (int i=0; i < sizeof(vis); i++)
+    {
+        if (!vis[i])
+            return false;
+    }
+    //we return true because the previous loop did not find a node that was not visited
+    return true;
+}
+
+bool Map::territory_belongs_to_one_continent()
+{
+    for (int i=0; i<territories.size(); i++)
+    {
+        int contin_num = (territories[i])->continent_ref;
+        for (int j=0; j<num_of_continents; j++)
+        {
+            if (j!= contin_num)
+            {
+                for (Territory* terr:continent_graph[j])
+                {
+                    if ( terr==territories[i])
+                        return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+void Map::delete_pointers()
+{
+    for (int i=0; i < territories.size(); i++)
+    {
+        for (Territory* terr:continent_graph[i])
+        {
+            delete(terr->player1);
+            terr->player1=NULL;
+            delete(terr);
+            terr = NULL;
+        }
+        for (Territory* terr1:territory_graph[i])
+        {
+            delete(terr1->player1);
+            terr1->player1=NULL;
+            delete(terr1);
+            terr1 = NULL;
+        }
+        delete(territories[i]->player1);
+        territories[i]->player1 = NULL;
+        delete(territories[i]);
+        territories[i]=NULL;
+    }
+}
+
+// MapLoader CLASS
 MapLoader::MapLoader()
 {
-    //ctor
+
 }
 
 //Copy constructor
@@ -276,13 +388,6 @@ MapLoader::MapLoader(string file_name)
     map_object = new Map(text_contents);
     // Close the file
     MyReadFile.close();
-}
-
-// Continent CLASS
-
-Continent::Continent()
-{
-
 }
 
 //Dummy Player CLASS
