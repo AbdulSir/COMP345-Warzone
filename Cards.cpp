@@ -47,6 +47,13 @@ istream & operator>> (istream &in,  Card &c) {
 // Deck class
 
 Deck::Deck() {}
+
+Deck::~Deck() {
+    for(Card *ptr : deck) {
+        delete ptr;
+    }
+}
+
 Deck::Deck(const Deck& obj): deck(obj.deck) {}
 
 Deck& Deck::operator= (const Deck& anotherDeck) {
@@ -55,6 +62,7 @@ Deck& Deck::operator= (const Deck& anotherDeck) {
 }
 
 Deck::Deck(int deckLength) {
+    Card* cardToAdd;
     for (int i=0; i<deckLength; i++) {
         int random = rand() % 5;
         string cardType;
@@ -74,39 +82,26 @@ Deck::Deck(int deckLength) {
             default:
                 cardType = "diplomacy";
         }
-        Card cardToAdd(cardType);
+        cardToAdd = new Card(cardType);
         deck.push_back(cardToAdd);
     }
+    delete cardToAdd;
+    cardToAdd = NULL;
 }
 
-void Deck::addToDeck(Card c) {
+void Deck::addToDeck(Card* c) {
     deck.push_back(c);
 };
 
 ostream & operator<< (ostream &out, Deck &c) {
-    for (list<Card>::iterator it = c.deck.begin(); it!= c.deck.end(); ++it) {
-        out << it->cardType << endl;
+    for (auto it = c.deck.cbegin(); it != c.deck.cend(); ++it) {
+        out << *it << endl;
     }
     return out;
 }
- 
-istream & operator>> (istream &in,  Deck &c) {
-    while (true) {
-        string type;
-        cout << "Type end to exit" << endl;
-        cout << "Enter card type ";
-        in >> type;
-        if (type.compare("end") == 0) {
-            break;
-        } else {
-            c.addToDeck(Card(type));
-        }
-    }
-    return in;
-}
 
-Card Deck::draw() {
-    Card temp(deck.front());
+Card* Deck::draw() {
+    Card* temp(deck.front());
     deck.pop_front();
     return temp;
 };
@@ -114,6 +109,12 @@ Card Deck::draw() {
 // Hand class
 
 Hand::Hand() {}
+
+Hand::~Hand() {
+    for(Card *ptr : handDeck) {
+        delete ptr;
+    }
+}
 
 Hand::Hand(const Hand& obj): handDeck(obj.handDeck) {}
 
@@ -123,34 +124,19 @@ Hand& Hand::operator= (const Hand& hand) {
 }
 
 Card Hand::discardFromHand() {
-    Card temp(handDeck.front());
+    Card temp(*handDeck.front());
     handDeck.pop_front();
     return temp;
 };
 
-void Hand::addToHand(Card c) {
+void Hand::addToHand(Card* c) {
     handDeck.push_back(c);
 }
 
 ostream & operator<< (ostream &out, Hand &h) {
-
-    for (list<Card>::iterator it = h.handDeck.begin(); it!= h.handDeck.end(); ++it) {
-        out << it->cardType << endl;
+    for (auto it = h.handDeck.cbegin(); it != h.handDeck.cend(); ++it) {
+        out << *it << endl;
     }
     return out;
 }
  
-istream & operator>> (istream &in,  Hand &h) {
-    while (true) {
-        string type;
-        cout << "Type end to exit" << endl;
-        cout << "Enter card type ";
-        in >> type;
-        if (type.compare("end") == 0) {
-            break;
-        } else {
-            h.addToHand(Card(type));
-        }
-    }
-    return in;
-}

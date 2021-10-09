@@ -19,7 +19,8 @@ int main() {
     cout << "cards in game deck now:" << endl << *gameDeck << endl;
     // draw 5 cards from game deck and add to hand
     for (int i=0; i<5; i++) {
-        hand->addToHand(gameDeck->draw());
+        temp = gameDeck->draw();
+        hand->addToHand(temp);
         cout << "cards in game deck now:" << endl << *gameDeck << endl;
         cout << "cards in hand now" << endl << *hand << endl;
     }
@@ -32,20 +33,17 @@ int main() {
         // call play(), get the order, add order to the order list, add the card to the deck
         newOrder = new Order(temp->play());
         orderList->addToList(*newOrder);
-        gameDeck->addToDeck(*temp);
-        // cout << "cards in game deck now" << *gameDeck << endl;
+        cout << endl;
+        gameDeck->addToDeck(temp);
+        cout << "cards in game deck now:"<< endl << *gameDeck << endl;
     }
 
     // delete pointers
-    delete hand;
-    delete gameDeck;
     delete orderList;
     delete temp;
     delete newOrder;
     temp = NULL;
     newOrder = NULL;
-    gameDeck = NULL;
-    hand = NULL;
     orderList = NULL;
 
     return 0;

@@ -37,8 +37,10 @@ class Card {
 
 class Deck {
     public:
-        list<Card> deck;
+        list<Card*> deck;
         Deck();
+        // desctructor
+        ~Deck();
         // copy constructor for Deck
         Deck(const Deck& obj);
         // constructor, will randomly generate cards based on deckLength
@@ -46,18 +48,19 @@ class Deck {
         // overloaded assignment operator
         Deck& operator= (const Deck& deck);
         // remove card from deck and return the card
-        Card draw();
+        Card* draw();
         // add card to collection of deck
-        void addToDeck(Card c);
+        void addToDeck(Card* c);
         // stream insertion operators
         friend ostream & operator<< (ostream &out, Deck &c);
-        friend istream & operator>> (istream &in,  Deck &c);
 };
 
 class Hand {
     public:
-        list<Card> handDeck;
+        list<Card*> handDeck;
         Hand();
+        // destructor
+        ~Hand();
         // copy constructor for Hand
         Hand(const Hand& obj);
         // overloaded assignment operator
@@ -65,10 +68,9 @@ class Hand {
         // remove card from hand and return the card
         Card discardFromHand();
         // add card to collection of hand
-        void addToHand(Card c);
+        void addToHand(Card* c);
         // stream insertion operators
         friend ostream & operator<< (ostream &out, Hand &h);
-        friend istream & operator>> (istream &in,  Hand &h);
 };
 
 #endif
