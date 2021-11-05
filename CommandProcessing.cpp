@@ -47,7 +47,7 @@ void Command::saveEffect(string c) {
         //map is valid
         effect = mapName + " has been loaded";
         //map is invaid
-        effect = mapName + "is an invalid map";
+        effect = mapName + " is an invalid map";
     }
     else if (c.find("validatemap") != string::npos) {
         effect =  "The map has been validated";
@@ -116,23 +116,23 @@ void CommandProcessor::getCommand(string gameState) {
     else {
         cout << commandStr << " is not a valid command for the " << gameState << " state\n" << endl;
         Command* c = new Command(commandStr);
-        c->effect = "No effect (Invalid command for " + gameState + " state)\n";
+        c->effect = "No effect (Invalid command for " + gameState + " state)";
         saveCommand(c);
     }
 }
 
 //Validates if command is valid in current game state
 bool CommandProcessor::validate(string c, string gameState) {
-    if (c.substr(0,9) == "loadmap " && (gameState == "start" || gameState == "mapLoaded")) {
-//        if (c.substr(c.length()-4) == ".txt")
-            return true;
-//        else
-//           return false;
+    if (c.substr(0,8) == "loadmap " && (gameState == "start" || gameState == "mapLoaded")) {
+        //        if (c.substr(c.length()-4) == ".map")
+        return true;
+        //        else
+        //           return false;
     }
     else if (c == "validatemap" && gameState == "mapLoaded") {
         return true;
     }
-    else if (c.substr(0,10) == "addplayer " && (gameState == "mapValidated" || gameState == "playerAdded")) {
+    else if (c.substr(0,10) == "addplayer " && (gameState == "mapValidated" || gameState == "playersAdded")) {
         return true;
     }
     else if (c == "gamestart" && gameState == "playersAdded") {
@@ -168,8 +168,11 @@ void FileCommandProcessorAdapter::readFile(string file) {
 }
 
 
-
 int main() {
+    
+    //    cout << "Please enter one of the following:" << endl
+    //    << "\t-console to enter commands in the console" << endl
+    //    << "\t-file <file name> to read commands from a file";
     
     CommandProcessor* cp = new CommandProcessor();
     cp->getCommand("start");
@@ -178,13 +181,7 @@ int main() {
     cp->getCommand("playersAdded");
     cp->getCommand("win");
     cout << *cp;
-
+    
     delete cp;
-    
-//    cout << "Please enter one of the following:" << endl
-//    << "\t-console to enter commands in the console" << endl
-//    << "\t-file <file name> to read commands from a file";
-    
-    
 }
 
