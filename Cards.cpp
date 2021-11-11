@@ -22,6 +22,12 @@ Order* Card::play() {
     if (cardType == "airlift") {
         return new Airlift();
     }
+    if (cardType == "bomb") {
+        return new Bomb();
+    }
+    if (cardType == "blockade") {
+        return new Blockade();
+    }
     return NULL;
 }
 

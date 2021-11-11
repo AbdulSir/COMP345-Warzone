@@ -100,7 +100,6 @@ class Airlift: public Order {
 class Bomb: public Order {
     public:
         // attributes
-        Territory* from;
         Territory* target;
         //default constructor
         Bomb();
@@ -110,6 +109,8 @@ class Bomb: public Order {
         Bomb(const Bomb& b);
         //asssignment operator
         Bomb& operator= (const Bomb& b);
+        //setters
+        void setTarget(Territory* target);
         bool validate();
         void execute();
         //stream insertion operators
@@ -130,6 +131,8 @@ class Blockade: public Order {
         Blockade& operator= (const Blockade& bl);
         bool validate();
         void execute();
+        //setters
+        void setTarget(Territory* target);
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Blockade &order);
 };

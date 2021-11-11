@@ -86,7 +86,7 @@ Deploy& Deploy::operator=(const Deploy& d) {
 }
 
 bool Deploy::validate() {
-    return isTerritoryOwnedByPlayer(orderIssuer, target);
+    return isTerritoryOwnedByPlayer(orderIssuer, target) && orderIssuer->getReinforcementPool() > numberOfUnits;
 };
 
 void Deploy::execute() {
@@ -94,6 +94,7 @@ void Deploy::execute() {
         vector <Territory*> territories = orderIssuer->getTerritories();
         for (auto t: territories) {
             if (t->territory_name == target->territory_name) {
+                orderIssuer->setReinforcementPool(orderIssuer->getReinforcementPool() - numberOfUnits);
                 t->setArmy(target->army_nb + numberOfUnits);
             }
         }
@@ -138,7 +139,8 @@ Advance& Advance::operator=(const Advance& a){
 
 bool Advance::validate() {
     bool isSourceOwnedByIssuer = isTerritoryOwnedByPlayer(orderIssuer, from);
-    // hard code true for now
+    // TODO: modify territory class
+    // hard code to true for now
     bool areTerritoriesAdjacent = true;
 
     return isSourceOwnedByIssuer && areTerritoriesAdjacent;
@@ -146,7 +148,7 @@ bool Advance::validate() {
 
 void Advance::execute() {
     if (validate()) {
-        // Incomplete, need to write order execution
+        // TODO: complete this code
         cout << "Advance order executed" << endl;
     } else {
         cout << "Advance order invalid" << endl;
@@ -218,16 +220,12 @@ Bomb::Bomb():Order() {};
 
 //constructor
 Bomb::Bomb(Player* player, Territory* t1, Territory* t2) : Order(player){
-    this->from = new Territory;
-    *from = *t1;
     this->target = new Territory;
     *target = *t2;
 }
 
 //copy constructor
 Bomb::Bomb(const Bomb& b) : Order(b){
-    this->from = new Territory;
-    *target = *b.from;
     this->target = new Territory;
     *target = *b.target;
 }
@@ -235,14 +233,17 @@ Bomb::Bomb(const Bomb& b) : Order(b){
 //assignment operator
 Bomb& Bomb::operator=(const Bomb& b){
     Order::operator= (b);
-    this->from = new Territory;
-    *from = *b.from;
     this->target = new Territory;
     *target = *b.target;
     return *this;
 }
 
+void Bomb::setTarget(Territory* t) {
+    target = t;
+};
+
 bool Bomb::validate(){
+    // TODO: modify territory class
     // hard code to true for now
     bool areTerritoriesAdjacent = true;
     return !isTerritoryOwnedByPlayer(orderIssuer, target) && areTerritoriesAdjacent;
@@ -280,20 +281,23 @@ Blockade& Blockade::operator=(const Blockade& b){
     return *this;
 }
 
+void Blockade::setTarget(Territory* t) {
+    target = t;
+};
+
 bool Blockade::validate(){
-    return !isTerritoryOwnedByPlayer(orderIssuer, target);
+    return isTerritoryOwnedByPlayer(orderIssuer, target);
 };
 
 void Blockade::execute(){
     if (validate()) {
         target->setArmy(target->army_nb *2);
-        // transfer ownership to neutral
+        // TODO: transfer ownership to neutral
         cout << "Blockade order executed" << endl;
     } else {
         cout << "Blockade order invalid" << endl;
     }
 }
-
 
 //Negotiate Class
 //default constructor
@@ -327,7 +331,7 @@ bool Negotiate::validate(){
 
 void Negotiate::execute(){
     if (validate()) {
-        // any attack that may be declared between territories of the player issuing the negotiate order and the target player will result in invalid order
+        // TODO: complete this code
         cout << "Negotiate order executed" << endl;
     } else {
         cout << "Negotiate order invalid" << endl;
@@ -438,7 +442,6 @@ ostream& operator <<(ostream &out, const Airlift &order) {
 
 ostream& operator <<(ostream &out, const Bomb &order) {
     out << static_cast<const Order&>(order) << endl;
-    out << "From: " << order.from->territory_name << endl;
     out << "Target: " << order.target->territory_name << endl;
     return out;
 }

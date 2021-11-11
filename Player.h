@@ -38,17 +38,19 @@ public:
     ~Player(); //destructor
     Player& operator =(const Player& p); // assignment operator
     friend ostream& operator << (ostream &out, const Player& p); // stream insertion operator
-    friend istream& operator >> (istream &in , Player& p); // stream extraction operator
     vector <Territory*> toDefend();
     vector <Territory*> toAttack();
     void issueOrder();
     vector <Territory*> getTerritories();
     OrderList* getOrders();
     string getName();
+    int getReinforcementPool();
+    void setReinforcementPool(int number);
 
 private:
     string name;
     Hand * hand;
     vector <Territory*> territories;
     OrderList* orders;
+    int reinforcementPool;
 };

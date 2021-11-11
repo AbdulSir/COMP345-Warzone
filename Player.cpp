@@ -23,13 +23,6 @@ Territory::Territory(string terr_name, int contin_ref, int num_of_armies){
     this->army_nb=num_of_armies;
 }
 
-Territory& Territory::operator=(const Territory& t) {
-    territory_name = t.territory_name;
-    continent_ref = t.continent_ref;
-    army_nb = t.army_nb;
-    return *this;
-}
-
 void Territory::setArmy(int numberOfArmy) {
     army_nb = numberOfArmy;
 }
@@ -46,6 +39,7 @@ Player::Player(){
     this->territories={};
     this->orders= new OrderList();
     this->name = "Anonymous";
+    this->reinforcementPool = 50;
 }
 
 //Constructor
@@ -54,6 +48,7 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories){
     this->hand = hand;
     this->territories = territories;
     this->orders= new OrderList();
+    this->reinforcementPool = 50;
 }
 
 //Copy constructor
@@ -93,30 +88,6 @@ Player& Player::operator=(const Player& p){
     return *this;
 }
 
-//stream insertion operator
-ostream& operator<<(ostream& out, const Player& p)
-{
-    out << "Player " << p.name<<" details:"<<endl ;
-    out << "-----------------------"<<endl;
-    out<< "Hand: "<<p.hand<<endl;
-    out<< "List of orders: "<<p.orders<<endl;
-    out<< "List of territories: ";
-    string separator;
-    for (auto territory : p.territories) {
-        out << separator << territory->territory_name;
-        separator = ", ";
-    }
-    out<<endl;
-    return out;
-}
-
-// stream extraction operator
-istream& operator>>(istream &in, Player& p) {
-    cout << "Enter Player Name ";
-    in >> p.name;
-    return in;
-}
-
 vector <Territory*> Player::toDefend(){
     cout << "Inside toDefend of Player" << endl;
     Territory * tt1=new Territory("United Kingdome",0,5);
@@ -148,4 +119,36 @@ OrderList* Player::getOrders(){
 
 string Player::getName() {
     return name;
+}
+
+void Player::setReinforcementPool(int number) {
+    reinforcementPool = number;
+};
+
+int Player::getReinforcementPool() {
+    return reinforcementPool;
+}
+
+//stream insertion operator
+ostream& operator<<(ostream& out, const Player& p)
+{
+    out << "Player " << p.name<<" details:"<<endl ;
+    out<< "Hand: "<<p.hand<<endl;
+    out<< "List of orders: "<< *p.orders <<endl;
+    out<< "List of territories: ";
+    string separator;
+    for (auto territory : p.territories) {
+        out << separator << territory->territory_name;
+        separator = ", ";
+    }
+    out<<endl;
+    out << "Number of reinforcement armies: " << p.reinforcementPool << endl;
+    return out;
+}
+
+Territory& Territory::operator=(const Territory& t) {
+    territory_name = t.territory_name;
+    continent_ref = t.continent_ref;
+    army_nb = t.army_nb;
+    return *this;
 }
