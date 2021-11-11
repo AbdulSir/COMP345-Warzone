@@ -1,19 +1,14 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <boost/algorithm/string.hpp>
-#ifndef MAP_H
-#define MAP_H
+#include "Player.h"
 
 using namespace std;
 
-//Dummy class
-class Player
-{
-    public:
-        Player();
-};
-
+class Player;
 class Territory
 {
     public:
@@ -21,14 +16,13 @@ class Territory
         Territory (string terr_name, int contin_ref, int num_of_armies);
         Territory (const Territory &t1); //Copy constructor
         Territory& operator= (const Territory& t1); // overloaded assignment operator
-        // stream insertion operators
-        friend ostream & operator << (ostream &out, const Territory &t1);
-        friend istream & operator >> (istream &in,  Territory &t1);
+        friend ostream & operator << (ostream &out, const Territory &t1);// stream insertion operator
         string getName();
+        void setArmy(int numberOfArmy);
         string territory_name;
         int continent_ref;
-        Player* player1;
         int army_nb;
+        Player* player1;
 };
 
 class Map
@@ -78,5 +72,3 @@ class MapLoader
         string text_contents;
         Map* map_object;
 };
-
-#endif // MAP_H

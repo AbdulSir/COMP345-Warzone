@@ -6,28 +6,14 @@
 #include <vector>
 #include "Orders.h"
 #include "Cards.h"
+#include "Map.h"
 using namespace std;
 
 class Order;
 class OrderList;
 class Card;
 class Hand;
-
-//Territory dummy class declaration
-class Territory
-{
-    public:
-        Territory();
-        Territory (string terr_name, int contin_ref, int num_of_armies);
-        Territory (const Territory &t1); //Copy constructor
-        Territory& operator= (const Territory& t1); // overloaded assignment operator
-        friend ostream & operator << (ostream &out, const Territory &t1);// stream insertion operator
-        string getName();
-        void setArmy(int numberOfArmy);
-        string territory_name;
-        int continent_ref;
-        int army_nb;
-};
+class Territory;
 
 //Player class declaration
 class Player{

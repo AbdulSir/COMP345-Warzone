@@ -400,7 +400,6 @@ void OrderList::remove(Order* order){
 ostream& operator<<(ostream& out, const OrderList& o)
 {
     out << "OrderList has the following orders:"<<endl ;
-    out << "-------------------------------"<<endl;
     for(int i =0; i<o.orderList.size();i++){
         out << endl ;
         out<< *o.orderList[i] <<endl;

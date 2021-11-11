@@ -8,31 +8,6 @@
 #include <string>
 using namespace std;
 
-Territory::Territory() {};
-//Territorry dummy copy constructor
-Territory::Territory (const Territory &t1){
-    this->territory_name = t1.territory_name;
-    this->continent_ref=t1.continent_ref;
-    this->army_nb=t1.army_nb;
-}
-
-//Territorry dummy constructor
-Territory::Territory(string terr_name, int contin_ref, int num_of_armies){
-    this->territory_name=terr_name;
-    this->continent_ref=contin_ref;
-    this->army_nb=num_of_armies;
-}
-
-void Territory::setArmy(int numberOfArmy) {
-    army_nb = numberOfArmy;
-}
-
-ostream & operator << (ostream &out, const Territory &t1) {
-    out << "Territory name " << t1.territory_name << endl;
-    out << "Number of armies: " << t1.army_nb << endl;
-    return out;
-}
-
 //Default constructor
 Player::Player(){
     this->hand = new Hand();
@@ -133,22 +108,13 @@ int Player::getReinforcementPool() {
 ostream& operator<<(ostream& out, const Player& p)
 {
     out << "Player " << p.name<<" details:"<<endl ;
-    out<< "Hand: "<<p.hand<<endl;
+    out<< "Hand: "<< *p.hand <<endl;
     out<< "List of orders: "<< *p.orders <<endl;
     out<< "List of territories: ";
-    string separator;
     for (auto territory : p.territories) {
-        out << separator << territory->territory_name;
-        separator = ", ";
+        out << *territory << endl;
     }
     out<<endl;
     out << "Number of reinforcement armies: " << p.reinforcementPool << endl;
     return out;
-}
-
-Territory& Territory::operator=(const Territory& t) {
-    territory_name = t.territory_name;
-    continent_ref = t.continent_ref;
-    army_nb = t.army_nb;
-    return *this;
 }
