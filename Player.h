@@ -1,16 +1,14 @@
-/**
- Part 2: Player.h
- */
-
-#ifndef Player_h
-#define Player_h
+#pragma once
 
 #include <vector>
 #include <string>
 #include <iostream>
 #include <vector>
+#include "Orders.h"
 using namespace std;
 
+class Order;
+class OrderList;
 //Territory dummy class declaration
 class Territory
 {
@@ -20,8 +18,8 @@ class Territory
         Territory (const Territory &t1); //Copy constructor
         Territory& operator= (const Territory& t1); // overloaded assignment operator
         friend ostream & operator << (ostream &out, const Territory &t1);// stream insertion operator
-        friend istream & operator >> (istream &in,  Territory &t1);// stream extraction operator
         string getName();
+        void addArmy(int numberOfArmy);
         string territory_name;
         int continent_ref;
         int army_nb;
@@ -29,21 +27,6 @@ class Territory
 
 //Card dummy class declaration
 class Card{
-    
-};
-
-//Order dummy class declaration
-class Order{
-public:
-    Order();
-    string description;
-    
-};
-
-//OrdersList dummy class declaration
-class OrdersList{
-public:
-    vector <Order*> list_orders;
     
 };
 
@@ -65,15 +48,12 @@ public:
     vector <Territory*> toDefend();
     vector <Territory*> toAttack();
     void issueOrder();
-    OrdersList* getOrders();
-    
+    vector <Territory*> getTerritories();
+    OrderList* getOrders();
+
 private:
     string name;
     Hand * hand;
     vector <Territory*> territories;
-    OrdersList* orders;
-    
+    OrderList* orders;
 };
-
-
-#endif /* Player_h */

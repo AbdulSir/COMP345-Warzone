@@ -8,12 +8,7 @@
 #include <string>
 using namespace std;
 
-//Order dummy default constructor
-Order::Order (){
-    this->description="order 1";
-    cout << "Order default constructor was called" << endl;
-}
-
+Territory::Territory() {};
 //Territorry dummy copy constructor
 Territory::Territory (const Territory &t1){
     this->territory_name = t1.territory_name;
@@ -29,11 +24,22 @@ Territory::Territory(string terr_name, int contin_ref, int num_of_armies){
     this->army_nb=num_of_armies;
 }
 
+Territory& Territory::operator=(const Territory& t) {
+    territory_name = t.territory_name;
+    continent_ref = t.continent_ref;
+    army_nb = t.army_nb;
+    return *this;
+}
+
+void Territory::addArmy(int numberOfArmy) {
+    army_nb += numberOfArmy;
+}
+
 //Default constructor
 Player::Player(){
     this->hand = new Hand();
     this->territories={};
-    this->orders= new OrdersList();
+    this->orders= new OrderList();
     this->name = "Anonymous";
     cout << "Player created inside default constructor" << endl;
 }
@@ -43,7 +49,7 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories){
     this->name = name;
     this->hand = hand;
     this->territories = territories;
-    this->orders= new OrdersList();
+    this->orders= new OrderList();
     cout << "Player created inside constructor" << endl;
 }
 
@@ -53,7 +59,7 @@ Player::Player(const Player& p){
     this->name = p.name;
     this->hand = new Hand;
     *hand= *p.hand;
-    this->orders = new OrdersList;
+    this->orders = new OrderList;
     *orders= *p.orders;
     vector<Territory*> temp_t(p.territories.size());
     this->territories= temp_t;
@@ -77,7 +83,7 @@ Player& Player::operator=(const Player& p){
     this->name = p.name;
     this->hand = new Hand();
     *hand = *p.hand;
-    this->orders = new OrdersList();
+    this->orders = new OrderList();
     *orders = *p.orders;
     vector<Territory*> temp_t(p.territories.size());
     this->territories= temp_t;
@@ -128,10 +134,14 @@ vector <Territory*> Player::toAttack(){
 void Player::issueOrder(){
     cout << "Inside issueOrder of Player" << endl;
     Order * order = new Order();
-    this->orders->list_orders.push_back(order);
+    this->orders->orderList.push_back(order);
 }
 
-OrdersList* Player::getOrders(){
+vector <Territory*> Player::getTerritories() {
+    return this->territories;
+}
+
+OrderList* Player::getOrders(){
     return orders;
 }
 
