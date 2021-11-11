@@ -16,12 +16,18 @@ int main() {
 
     Player* player1 = new Player("testName", h, v);
     Territory* test = new Territory("1", 0, 0);
+    Territory* test2 = new Territory("2", 0, 0);
 
     OrderList* orderList = new OrderList();
 
-    Deploy* order2=new Deploy("2", player1, test, 3);
+    Deploy* order1=new Deploy("2", player1, test, 3);
+    order1->execute();
+
+    Advance* order2 = new Advance("3", player1, test, test2, 3);
     order2->execute();
 
+    Airlift* order3 = new Airlift("4", player1, test, test2, 3);
+    order3->execute();
 
     //delete all pointers
     delete orderList;

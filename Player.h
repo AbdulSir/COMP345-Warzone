@@ -19,7 +19,7 @@ class Territory
         Territory& operator= (const Territory& t1); // overloaded assignment operator
         friend ostream & operator << (ostream &out, const Territory &t1);// stream insertion operator
         string getName();
-        void addArmy(int numberOfArmy);
+        void setArmy(int numberOfArmy);
         string territory_name;
         int continent_ref;
         int army_nb;

@@ -7,6 +7,17 @@
 
 using namespace std;
 
+bool isTerritoryOwnedByPlayer(Player* p, Territory* t) {
+    vector <Territory*> territories = p->getTerritories();
+    bool returnValue = false;
+    for (auto t: territories) {
+        if (t->territory_name == t->territory_name) {
+            returnValue = true;
+        }
+    }
+    return returnValue;
+};
+
 // Order Class
 // default constructor
 Order::Order() {
@@ -56,57 +67,48 @@ ostream& operator<<(ostream& out, const Order& o)
     return out;
 }
 
-
 //Deploy Class
 Deploy::Deploy() : Order() {}
 
 //constructor
-Deploy::Deploy(string orderID, Player* player, Territory* territory, int number_of_army) : Order(orderID) {
-    this->orderPlayer = new Player;
-    *orderPlayer = *player;
-    this->targetTerritory = new Territory;
-    *targetTerritory = *territory;
-    number_of_deployed_army = number_of_army;
+Deploy::Deploy(string orderID, Player* player, Territory* territory, int number) : Order(orderID) {
+    this->orderIssuer = new Player;
+    *orderIssuer = *player;
+    this->target = new Territory;
+    *target = *territory;
+    numberOfUnits = number;
 }
 
 //copy constructor
 Deploy::Deploy(const Deploy& d) : Order(d) {
-    this->orderPlayer = new Player;
-    *orderPlayer = *d.orderPlayer;
-    this->targetTerritory = new Territory;
-    *targetTerritory = *d.targetTerritory;
-    number_of_deployed_army = d.number_of_deployed_army;
+    this->orderIssuer = new Player;
+    *orderIssuer = *d.orderIssuer;
+    this->target = new Territory;
+    *target = *d.target;
+    numberOfUnits = d.numberOfUnits;
 }
 
 //assignment operator
 Deploy& Deploy::operator=(const Deploy& d) {
     Order::operator= (d);
-    this->orderPlayer = new Player;
-    *orderPlayer = *d.orderPlayer;
-    this->targetTerritory = new Territory;
-    *targetTerritory = *d.targetTerritory;
-    number_of_deployed_army = d.number_of_deployed_army;
+    this->orderIssuer = new Player;
+    *orderIssuer = *d.orderIssuer;
+    this->target = new Territory;
+    *target = *d.target;
+    numberOfUnits = d.numberOfUnits;
     return *this;
 }
 
 bool Deploy::validate() {
-    vector <Territory*> territories = orderPlayer->getTerritories();
-    bool isValidateOrder = false;
-    for (auto t: territories) {
-        cout << t->territory_name << endl;
-        if (t->territory_name == targetTerritory->territory_name) {
-            isValidateOrder = true;
-        }
-    }
-    return isValidateOrder;
+    return isTerritoryOwnedByPlayer(orderIssuer, target);
 };
 
 void Deploy::execute() {
     if (validate()) {
-        vector <Territory*> territories = orderPlayer->getTerritories();
+        vector <Territory*> territories = orderIssuer->getTerritories();
         for (auto t: territories) {
-            if (t->territory_name == targetTerritory->territory_name) {
-                t->addArmy(number_of_deployed_army);
+            if (t->territory_name == target->territory_name) {
+                t->setArmy(target->army_nb + numberOfUnits);
             }
         }
         cout << "Deploy order executed" << endl;
@@ -115,65 +117,168 @@ void Deploy::execute() {
     }
 }
 
-/*
 //Advance Class
 //default constructor
 Advance::Advance() : Order() {};
 
 //constructor
-Advance::Advance(string orderID) : Order(orderID) {
-
+Advance::Advance(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID) {
+    this->orderIssuer = new Player;
+    *orderIssuer = *player;
+    this->from = new Territory;
+    *from = *t1;
+    this->target = new Territory;
+    *target = *t2;
+    numberOfUnits = number;
 }
 
 //copy constructor
 Advance::Advance(const Advance& a) : Order(a){
-
+    this->orderIssuer = new Player;
+    *orderIssuer = *a.orderIssuer;
+    this->from = new Territory;
+    *target = *a.from;
+    this->target = new Territory;
+    *target = *a.target;
+    numberOfUnits = a.numberOfUnits;
 }
 
 //assignment operator
-Advance& Advance::operator=(const Advance& ad){
-  Order::operator= (ad);
-  return *this;
+Advance& Advance::operator=(const Advance& a){
+    Order::operator= (a);
+    this->orderIssuer = new Player;
+    *orderIssuer = *a.orderIssuer;
+    this->from = new Territory;
+    *from = *a.from;
+    this->target = new Territory;
+    *target = *a.target;
+    numberOfUnits = a.numberOfUnits;
+    return *this;
 }
 
 bool Advance::validate() {
+    bool isSourceOwnedByIssuer = isTerritoryOwnedByPlayer(orderIssuer, from);
+    // hard code true for now
+    bool areTerritoriesAdjacent = true;
 
+    return isSourceOwnedByIssuer && areTerritoriesAdjacent;
 };
 
 void Advance::execute() {
-
+    if (validate()) {
+        // Incomplete, need to write order execution
+        cout << "Advance order executed" << endl;
+    } else {
+        cout << "Advance order invalid" << endl;
+    }
 };
 
+//Airlift Class
+//default constructor
+Airlift::Airlift():Order(){};
+
+//constructor
+Airlift::Airlift(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID){
+    this->orderIssuer = new Player;
+    *orderIssuer = *player;
+    this->from = new Territory;
+    *from = *t1;
+    this->target = new Territory;
+    *target = *t2;
+    numberOfUnits = number;
+}
+
+//copy constructor
+Airlift::Airlift(const Airlift& a) : Order(a) {
+    this->orderIssuer = new Player;
+    *orderIssuer = *a.orderIssuer;
+    this->from = new Territory;
+    *target = *a.from;
+    this->target = new Territory;
+    *target = *a.target;
+    numberOfUnits = a.numberOfUnits;
+}
+
+//assignment operator
+Airlift& Airlift::operator=(const Airlift& a) {
+    Order::operator= (a);
+    this->orderIssuer = new Player;
+    *orderIssuer = *a.orderIssuer;
+    this->from = new Territory;
+    *from = *a.from;
+    this->target = new Territory;
+    *target = *a.target;
+    numberOfUnits = a.numberOfUnits;
+    return *this;
+}
+
+bool Airlift::validate() {
+    return isTerritoryOwnedByPlayer(orderIssuer, from) && isTerritoryOwnedByPlayer(orderIssuer, target);
+};
+
+void Airlift::execute(){
+    if (validate()) {
+        from->setArmy(from->army_nb - numberOfUnits);
+        target->setArmy(target->army_nb + numberOfUnits);
+        cout << "Airlife order executed" << endl;
+    } else {
+        cout << "Airlife order invalid" << endl;
+    }
+}
 
 //Bomb Class
 //default constructor
 Bomb::Bomb():Order() {};
 
 //constructor
-Bomb::Bomb(string orderID) : Order(orderID){
-
+Bomb::Bomb(string orderID, Player* player, Territory* t1, Territory* t2) : Order(orderID){
+    this->orderIssuer = new Player;
+    *orderIssuer = *player;
+    this->from = new Territory;
+    *from = *t1;
+    this->target = new Territory;
+    *target = *t2;
 }
 
 //copy constructor
 Bomb::Bomb(const Bomb& b) : Order(b){
-
+    this->orderIssuer = new Player;
+    *orderIssuer = *b.orderIssuer;
+    this->from = new Territory;
+    *target = *b.from;
+    this->target = new Territory;
+    *target = *b.target;
 }
 
 //assignment operator
 Bomb& Bomb::operator=(const Bomb& b){
-  Order::operator= (b);
-  return *this;
+    Order::operator= (a);
+    this->orderIssuer = new Player;
+    *orderIssuer = *b.orderIssuer;
+    this->from = new Territory;
+    *from = *b.from;
+    this->target = new Territory;
+    *target = *b.target;
+    numberOfUnits = b.numberOfUnits;
+    return *this;
 }
 
 bool Bomb::validate(){
-
+    // hard code to true for now
+    bool areTerritoriesAdjacent = true;
+    return !isTerritoryOwnedByPlayer(orderIssuer, target) && areTerritoriesAdjacent;
 };
 
 void Bomb::execute(){
-
+    if (validate()) {
+        target->setArmy(target->army_nb / 2)
+        cout << "Bomb order executed" << endl;
+    } else {
+        cout << "Bomb order invalid" << endl;
+    }
 }
 
-
+/*
 //Blockade Class
 //default constructor
 Blockade::Blockade():Order(){
@@ -203,38 +308,6 @@ bool Blockade::validate(){
 void Blockade::execute(){
 
 }
-
-
-//Airlift Class
-//default constructor
-Airlift::Airlift():Order(){
-
-}
-
-//constructor
-Airlift::Airlift(string orderID) : Order(orderID){
-
-}
-
-//copy constructor
-Airlift::Airlift(const Airlift& a) : Order(a) {
-
-}
-
-//assignment operator
-Airlift& Airlift::operator=(const Airlift& a) {
-  Order::operator= (a);
-  return *this;
-}
-
-bool Airlift::validate() {
-
-};
-
-void Airlift::execute(){
-
-}
-
 
 //Negotiate Class
 //default constructor

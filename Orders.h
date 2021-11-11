@@ -8,6 +8,8 @@ using namespace std;
 
 class Player;
 class Territory;
+
+bool isTerritoryOwnedByPlayer(Player* p, Territory* t);
 class Order {
     private:
        //attributes, identifier of the order
@@ -34,31 +36,54 @@ class Deploy: public Order{
         //default constructor
         Deploy();
         //parametrized constructor
-        Deploy(string orderID, Player* player, Territory* territory, int number_of_deployed_army);
+        Deploy(string orderID, Player* player, Territory* territory, int number);
         //copy constructor
         Deploy(const Deploy &deploy);
         //asssignment operator
         Deploy& operator= (const Deploy& deploy);
         bool validate();
         void execute();
-        Player* orderPlayer;
-        Territory* targetTerritory;
-        int number_of_deployed_army;
+        Player* orderIssuer;
+        Territory* target;
+        int numberOfUnits;
 };
 
-/*
 class Advance: public Order{
     public:
         //default constructor
         Advance();
         //parametrized constructor
-        Advance(string orderID);
+        Advance(string orderID, Player* player, Territory* t1, Territory* t2, int number);
         //copy constructor
         Advance(const Advance& ad);
         //asssignment operator
         Advance& operator= (const Advance& advanced);
         bool validate();
         void execute();
+        Player* orderIssuer;
+        Territory* from;
+        Territory* target;
+        int numberOfUnits;
+};
+
+
+class Airlift: public Order
+{
+    public:
+        //default constructor
+        Airlift();
+        //parametrized constructor
+        Airlift(string orderID, Player* player, Territory* t1, Territory* t2, int number);
+        //copy constructor
+        Airlift(const Airlift& a);
+        //asssignment operator
+        Airlift& operator= (const Airlift& a);
+        bool validate();
+        void execute();
+        Player* orderIssuer;
+        Territory* from;
+        Territory* target;
+        int numberOfUnits;
 };
 
 class Bomb: public Order
@@ -67,15 +92,19 @@ class Bomb: public Order
         //default constructor
         Bomb();
         //parametrized constructor
-        Bomb(string orderID);
+        Bomb(string orderID, Player* player, Territory* t1, Territory* t2);
         //copy constructor
         Bomb(const Bomb& b);
         //asssignment operator
         Bomb& operator= (const Bomb& b);
         bool validate();
         void execute();
+        Player* orderIssuer;
+        Territory* from;
+        Territory* target;
 };
 
+/*
 class Blockade: public Order
 {
     public:
@@ -87,21 +116,6 @@ class Blockade: public Order
         Blockade(const Blockade& bl);
         //asssignment operator
         Blockade& operator= (const Blockade& bl);
-        bool validate();
-        void execute();
-};
-
-class Airlift: public Order
-{
-    public:
-        //default constructor
-        Airlift();
-        //parametrized constructor
-        Airlift(string orderID);
-        //copy constructor
-        Airlift(const Airlift& a);
-        //asssignment operator
-        Airlift& operator= (const Airlift& a);
         bool validate();
         void execute();
 };

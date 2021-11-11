@@ -14,7 +14,6 @@ Territory::Territory (const Territory &t1){
     this->territory_name = t1.territory_name;
     this->continent_ref=t1.continent_ref;
     this->army_nb=t1.army_nb;
-    cout << "Inside Territory copy constructor" << endl;
 }
 
 //Territorry dummy constructor
@@ -31,8 +30,8 @@ Territory& Territory::operator=(const Territory& t) {
     return *this;
 }
 
-void Territory::addArmy(int numberOfArmy) {
-    army_nb += numberOfArmy;
+void Territory::setArmy(int numberOfArmy) {
+    army_nb = numberOfArmy;
 }
 
 //Default constructor
@@ -41,7 +40,6 @@ Player::Player(){
     this->territories={};
     this->orders= new OrderList();
     this->name = "Anonymous";
-    cout << "Player created inside default constructor" << endl;
 }
 
 //Constructor
@@ -50,12 +48,10 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories){
     this->hand = hand;
     this->territories = territories;
     this->orders= new OrderList();
-    cout << "Player created inside constructor" << endl;
 }
 
 //Copy constructor
 Player::Player(const Player& p){
-  cout << "Inside copy constructor of Player" << endl;
     this->name = p.name;
     this->hand = new Hand;
     *hand= *p.hand;
@@ -79,7 +75,6 @@ Player::~Player()
 
 //assignment operator
 Player& Player::operator=(const Player& p){
-    cout << "Inside operator = of Player" << endl;
     this->name = p.name;
     this->hand = new Hand();
     *hand = *p.hand;
