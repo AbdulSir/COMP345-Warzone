@@ -9,12 +9,13 @@ using namespace std;
 class Player;
 class Territory;
 
+// free function to determine if a territory is owned by player
 bool isTerritoryOwnedByPlayer(Player* p, Territory* t);
 class Order {
-    private:
-       //attributes, identifier of the order
-        string orderID;
     public:
+        // attributes
+        Player* orderIssuer;
+        string orderID;
         //default constructor
         Order();
         //parametrized constructor
@@ -23,17 +24,19 @@ class Order {
         Order& operator= (const Order& order);
         //copy constructor
         Order(const Order &order);
-        // virtual ~Order();
+        virtual ~Order();
         string getOrderID();//@return string orderID    
         bool validate();
         virtual void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Order &order);
-        Player* orderIssuer;
 };
 
-class Deploy: public Order{
+class Deploy: public Order {
     public:
+        // attributes
+        Territory* target;
+        int numberOfUnits;
         //default constructor
         Deploy();
         //parametrized constructor
@@ -46,12 +49,14 @@ class Deploy: public Order{
         void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Deploy &order);
-        Territory* target;
-        int numberOfUnits;
 };
 
-class Advance: public Order{
+class Advance: public Order {
     public:
+        // attributes
+        Territory* from;
+        Territory* target;
+        int numberOfUnits;
         //default constructor
         Advance();
         //parametrized constructor
@@ -64,15 +69,15 @@ class Advance: public Order{
         void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Advance &order);
-        Territory* from;
-        Territory* target;
-        int numberOfUnits;
 };
 
 
-class Airlift: public Order
-{
+class Airlift: public Order {
     public:
+        // attributes
+        Territory* from;
+        Territory* target;
+        int numberOfUnits;
         //default constructor
         Airlift();
         //parametrized constructor
@@ -85,14 +90,13 @@ class Airlift: public Order
         void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Airlift &order);
-        Territory* from;
-        Territory* target;
-        int numberOfUnits;
 };
 
-class Bomb: public Order
-{
+class Bomb: public Order {
     public:
+        // attributes
+        Territory* from;
+        Territory* target;
         //default constructor
         Bomb();
         //parametrized constructor
@@ -105,13 +109,12 @@ class Bomb: public Order
         void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Bomb &order);
-        Territory* from;
-        Territory* target;
 };
 
-class Blockade: public Order
-{
+class Blockade: public Order {
     public:
+        // attributes
+        Territory* target;
         //default constructor
         Blockade();
         //parametrized constructor
@@ -124,12 +127,12 @@ class Blockade: public Order
         void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Blockade &order);
-        Territory* target;
 };
 
-class Negotiate: public Order
-{
+class Negotiate: public Order {
     public:
+        // attributes
+        Player* target;
         //default constructor
         Negotiate();
         //parametrized constructor
@@ -142,12 +145,11 @@ class Negotiate: public Order
         void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Negotiate &order);
-        Player* target;
 };
 
 class OrderList {
     public:
-        //vector holding all orders
+        // attributes
         vector<Order*> orderList;
         //default constructor
         OrderList();
