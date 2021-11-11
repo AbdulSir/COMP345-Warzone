@@ -34,6 +34,12 @@ void Territory::setArmy(int numberOfArmy) {
     army_nb = numberOfArmy;
 }
 
+ostream & operator << (ostream &out, const Territory &t1) {
+    out << "Territory name " << t1.territory_name << endl;
+    out << "Number of armies: " << t1.army_nb << endl;
+    return out;
+}
+
 //Default constructor
 Player::Player(){
     this->hand = new Hand();

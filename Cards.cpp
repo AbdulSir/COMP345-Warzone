@@ -18,10 +18,11 @@ Card& Card::operator= (const Card& card) {
     return *this;
 }
 
-Order Card::play() {
-    Order newOrder;
-    cout << "Playing " << cardType << " card." << endl;
-    return newOrder;
+Order* Card::play() {
+    if (cardType == "airlift") {
+        return new Airlift();
+    }
+    return NULL;
 }
 
 // Deck class

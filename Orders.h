@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Player.h"
 #include <string>
 #include <vector>
 #include <iostream>
 using namespace std;
-#include "Player.h"
 
 class Player;
 class Territory;
@@ -13,19 +13,20 @@ class Territory;
 bool isTerritoryOwnedByPlayer(Player* p, Territory* t);
 class Order {
     public:
+        int orderId;
+        static int currentId;
         // attributes
         Player* orderIssuer;
-        string orderID;
         //default constructor
         Order();
         //parametrized constructor
-        Order(string orderID, Player* orderIssuer);
+        Order(Player* orderIssuer);
         //asssignment operator
         Order& operator= (const Order& order);
         //copy constructor
         Order(const Order &order);
         // virtual ~Order();
-        string getOrderID();//@return string orderID    
+        void setOrderIssuer(Player* orderIssuer);
         bool validate();
         virtual void execute();
         //stream insertion operators
@@ -40,7 +41,7 @@ class Deploy: public Order {
         //default constructor
         Deploy();
         //parametrized constructor
-        Deploy(string orderID, Player* player, Territory* territory, int number);
+        Deploy(Player* player, Territory* territory, int number);
         //copy constructor
         Deploy(const Deploy &deploy);
         //asssignment operator
@@ -60,7 +61,7 @@ class Advance: public Order {
         //default constructor
         Advance();
         //parametrized constructor
-        Advance(string orderID, Player* player, Territory* t1, Territory* t2, int number);
+        Advance(Player* player, Territory* t1, Territory* t2, int number);
         //copy constructor
         Advance(const Advance& ad);
         //asssignment operator
@@ -81,11 +82,15 @@ class Airlift: public Order {
         //default constructor
         Airlift();
         //parametrized constructor
-        Airlift(string orderID, Player* player, Territory* t1, Territory* t2, int number);
+        Airlift(Player* player, Territory* t1, Territory* t2, int number);
         //copy constructor
         Airlift(const Airlift& a);
         //asssignment operator
         Airlift& operator= (const Airlift& a);
+        //setters
+        void setFrom(Territory* from);
+        void setTarget(Territory* target);
+        void setNumberOfUnits(int number);
         bool validate();
         void execute();
         //stream insertion operators
@@ -100,7 +105,7 @@ class Bomb: public Order {
         //default constructor
         Bomb();
         //parametrized constructor
-        Bomb(string orderID, Player* player, Territory* t1, Territory* t2);
+        Bomb(Player* player, Territory* t1, Territory* t2);
         //copy constructor
         Bomb(const Bomb& b);
         //asssignment operator
@@ -118,7 +123,7 @@ class Blockade: public Order {
         //default constructor
         Blockade();
         //parametrized constructor
-        Blockade(string orderID, Player* player, Territory* territory);
+        Blockade(Player* player, Territory* territory);
         //copy constructor
         Blockade(const Blockade& bl);
         //asssignment operator
@@ -136,7 +141,7 @@ class Negotiate: public Order {
         //default constructor
         Negotiate();
         //parametrized constructor
-        Negotiate(string orderID, Player* player, Player* target);
+        Negotiate(Player* player, Player* target);
         //copy constructor
         Negotiate(const Negotiate& n);
         //asssignment operator

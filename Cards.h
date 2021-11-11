@@ -7,7 +7,6 @@
 using namespace std;
 
 class Order;
-class OrderList;
 
 class Card {
     public:
@@ -20,7 +19,7 @@ class Card {
         // overloaded assignment operator
         Card& operator= (const Card& card);
         // play the card
-        Order play();
+        Order* play();
         // stream insertion operators
         friend ostream & operator<< (ostream &out, const Card &c);
 };

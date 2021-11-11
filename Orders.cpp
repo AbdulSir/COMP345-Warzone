@@ -7,11 +7,11 @@
 
 using namespace std;
 
-bool isTerritoryOwnedByPlayer(Player* p, Territory* t) {
+bool isTerritoryOwnedByPlayer(Player* p, Territory* territory) {
     vector <Territory*> territories = p->getTerritories();
     bool returnValue = false;
     for (auto t: territories) {
-        if (t->territory_name == t->territory_name) {
+        if (t->territory_name == territory->territory_name) {
             returnValue = true;
         }
     }
@@ -19,34 +19,32 @@ bool isTerritoryOwnedByPlayer(Player* p, Territory* t) {
 };
 
 // Order Class
+
+int Order::currentId = 0;
 // default constructor
-Order::Order() {
-    cout << "Empty order" << endl;
-};
+Order::Order(): orderId(currentId++) {};
 
 // parametrized constructor
-Order::Order(string orderID, Player* player){
-    this->orderID = orderID;
+Order::Order(Player* player) : orderId(currentId++) {
     this->orderIssuer = player;
 };
 
 Order::Order(const Order &o) {
-    orderID = o.orderID;
+    orderId = o.orderId;
     this->orderIssuer = new Player;
     *orderIssuer = *o.orderIssuer;
 }
 
 // assignment operator
 Order& Order::operator= (const Order& order){
-    this->orderID = order.orderID;
+    this->orderId = order.orderId;
     this->orderIssuer = new Player;
     *orderIssuer = *order.orderIssuer;
     return *this;
 };
 
-// @return string orderID
-string Order::getOrderID(){
-    return orderID;
+void Order::setOrderIssuer(Player* player) {
+    orderIssuer = player;
 };
 
 bool Order::validate() {
@@ -55,9 +53,9 @@ bool Order::validate() {
 
 void Order::execute(){
     if (validate()){
-        cout <<"Order " << orderID << " executed"<< endl;
+        cout <<"Order " << orderId << " executed"<< endl;
     } else {
-        cout << "Order "<< orderID <<" invalid! Execution failed."<<endl;
+        cout << "Order "<< orderId <<" invalid! Execution failed."<<endl;
     }
 }
 
@@ -65,7 +63,7 @@ void Order::execute(){
 Deploy::Deploy() : Order() {}
 
 //constructor
-Deploy::Deploy(string orderID, Player* player, Territory* territory, int number) : Order(orderID, player) {
+Deploy::Deploy(Player* player, Territory* territory, int number) : Order(player) {
     this->target = new Territory;
     *target = *territory;
     numberOfUnits = number;
@@ -110,7 +108,7 @@ void Deploy::execute() {
 Advance::Advance() : Order() {};
 
 //constructor
-Advance::Advance(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID, player) {
+Advance::Advance(Player* player, Territory* t1, Territory* t2, int number) : Order(player) {
     this->from = new Territory;
     *from = *t1;
     this->target = new Territory;
@@ -160,7 +158,7 @@ void Advance::execute() {
 Airlift::Airlift():Order(){};
 
 //constructor
-Airlift::Airlift(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID, player){
+Airlift::Airlift(Player* player, Territory* t1, Territory* t2, int number) : Order(player){
     this->from = new Territory;
     *from = *t1;
     this->target = new Territory;
@@ -188,6 +186,18 @@ Airlift& Airlift::operator=(const Airlift& a) {
     return *this;
 }
 
+void Airlift::setFrom(Territory* t) {
+    from = t;
+};
+
+void Airlift::setTarget(Territory* t) {
+    target = t;
+};
+
+void Airlift::setNumberOfUnits(int n) {
+    numberOfUnits = n;
+};
+
 bool Airlift::validate() {
     return isTerritoryOwnedByPlayer(orderIssuer, from) && isTerritoryOwnedByPlayer(orderIssuer, target);
 };
@@ -207,7 +217,7 @@ void Airlift::execute(){
 Bomb::Bomb():Order() {};
 
 //constructor
-Bomb::Bomb(string orderID, Player* player, Territory* t1, Territory* t2) : Order(orderID, player){
+Bomb::Bomb(Player* player, Territory* t1, Territory* t2) : Order(player){
     this->from = new Territory;
     *from = *t1;
     this->target = new Territory;
@@ -252,7 +262,7 @@ void Bomb::execute(){
 Blockade::Blockade():Order() {};
 
 //constructor
-Blockade::Blockade(string orderID, Player* player, Territory* territory) : Order(orderID, player) {
+Blockade::Blockade(Player* player, Territory* territory) : Order(player) {
     this->target = territory;
 }
 
@@ -290,7 +300,7 @@ void Blockade::execute(){
 Negotiate::Negotiate():Order() {};
 
 //constructor
-Negotiate::Negotiate(string orderID, Player* player, Player* target) : Order(orderID, player) {
+Negotiate::Negotiate(Player* player, Player* target) : Order(player) {
     this->target = target;
 }
 
@@ -362,7 +372,7 @@ void OrderList::addOrder(Order* order){
 
 //move order inside orderList
 void OrderList::move(Order* order, int newPosition){
-    cout<<"Move order "<<order->getOrderID()<<" to index "<<newPosition<<endl;
+    cout<<"Move order "<<order->orderId<<" to index "<<newPosition<<endl;
     //remove order from list
     for(int i=0; i<orderList.size();i++){
         if(orderList[i]==order){
@@ -379,7 +389,7 @@ void OrderList::remove(Order* order){
             orderList.erase(find(orderList.begin(),orderList.end(),order));
         }
     }
-    cout <<"Order "<< order->getOrderID()<<" removed from list" << endl;
+    cout <<"Order "<< order->orderId <<" removed from list" << endl;
 }
 
 //stream insertion operators
@@ -398,7 +408,7 @@ ostream& operator<<(ostream& out, const Order& o)
 {
     out << "Order:"<<endl ;
     out << "-------------------------------"<<endl;
-    out << "ID: "<< o.orderID << endl;
+    out << "ID: "<< o.orderId << endl;
     out<<"Order Issuer: "<< o.orderIssuer->getName();
     return out;
 }
