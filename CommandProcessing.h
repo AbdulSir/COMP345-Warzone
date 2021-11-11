@@ -5,6 +5,7 @@
 #include <string>
 using namespace std;
 #include <fstream>
+using namespace std;
 #include <list>
 
 #pragma once
@@ -28,22 +29,41 @@ public:
     list<Command*> lc;
     CommandProcessor();
     CommandProcessor(CommandProcessor& cp);
-    ~CommandProcessor();
+    virtual ~CommandProcessor();
     CommandProcessor& operator= (const CommandProcessor& cp);
     void getCommand(string gameState);
     bool validate(string c, string gameState);
     friend ostream& operator<<(ostream& out, const CommandProcessor& cp);
-private:
-    string readCommand();
+protected:
+    virtual string readCommand();
     void saveCommand(Command* c);
 };
 
 
-//FileCommandProcessorAdapter
-class FileCommandProcessorAdapter: CommandProcessor {
+//FileLineReader
+class FileLineReader {
 public:
-    std::ifstream flr;
-    void readFile(string file);
+    ifstream input;
+    int currentLine;
+    FileLineReader();
+    FileLineReader(FileLineReader& f);
+    FileLineReader& operator= (const FileLineReader& f);
+    string readLineFromFile(string fileName);
+    friend ostream& operator<<(ostream& out, const FileLineReader& f);
+};
+
+
+//FileCommandProcessorAdapter
+class FileCommandProcessorAdapter: public CommandProcessor {
+public:
+    FileLineReader* flr;
+    string fileName;
+    FileCommandProcessorAdapter(string fileName);
+    FileCommandProcessorAdapter(FileCommandProcessorAdapter& fcpa);
+    ~FileCommandProcessorAdapter();
+    FileCommandProcessorAdapter& operator= (const FileCommandProcessorAdapter& fcpa);
+    string readCommand();
+    friend ostream& operator<<(ostream& out, const FileCommandProcessorAdapter& fcpa);
 };
 
 
