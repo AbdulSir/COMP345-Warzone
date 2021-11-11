@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Orders.h"
+#include "Cards.h"
 
 #include <iostream>
 using namespace std;
@@ -28,6 +29,7 @@ int main() {
 
     Airlift* order3 = new Airlift("4", player1, test, test2, 3);
     order3->execute();
+
     orderList->addOrder(order1);
     orderList->addOrder(order2);
     orderList->addOrder(order3);

@@ -5,10 +5,14 @@
 #include <iostream>
 #include <vector>
 #include "Orders.h"
+#include "Cards.h"
 using namespace std;
 
 class Order;
 class OrderList;
+class Card;
+class Hand;
+
 //Territory dummy class declaration
 class Territory
 {
@@ -23,16 +27,6 @@ class Territory
         string territory_name;
         int continent_ref;
         int army_nb;
-};
-
-//Card dummy class declaration
-class Card{
-    
-};
-
-//Hand dummy class declaration
-class Hand{
-    
 };
 
 //Player class declaration

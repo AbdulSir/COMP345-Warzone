@@ -24,7 +24,7 @@ class Order {
         Order& operator= (const Order& order);
         //copy constructor
         Order(const Order &order);
-        virtual ~Order();
+        // virtual ~Order();
         string getOrderID();//@return string orderID    
         bool validate();
         virtual void execute();
