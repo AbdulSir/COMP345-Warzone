@@ -4,15 +4,6 @@ using namespace std;
 #include <string>
 #include <list>
 
-// dummy classes
-Order::Order() {};
-
-OrderList::OrderList() {};
-
-void OrderList::addToList(Order o) {
-    cout << "Add an order to list" << endl;
-};
-
 // Card class
 Card::Card() {}
 
@@ -27,21 +18,20 @@ Card& Card::operator= (const Card& card) {
     return *this;
 }
 
-Order Card::play() {
-    Order newOrder;
-    cout << "Playing " << cardType << " card." << endl;
-    return newOrder;
-}
-
-ostream & operator<< (ostream &out, const Card &c) {
-    out << c.cardType << endl;
-    return out;
-}
- 
-istream & operator>> (istream &in,  Card &c) {
-    cout << "Enter card type ";
-    in >> c.cardType;
-    return in;
+Order* Card::play() {
+    if (cardType == "airlift") {
+        return new Airlift();
+    }
+    if (cardType == "bomb") {
+        return new Bomb();
+    }
+    if (cardType == "blockade") {
+        return new Blockade();
+    }
+    if (cardType == "diplomacy") {
+        return new Negotiate();
+    }
+    return NULL;
 }
 
 // Deck class
@@ -93,13 +83,6 @@ void Deck::addToDeck(Card* c) {
     deck.push_back(c);
 };
 
-ostream & operator<< (ostream &out, Deck &c) {
-    for (auto it = c.deck.cbegin(); it != c.deck.cend(); ++it) {
-        out << *it << endl;
-    }
-    return out;
-}
-
 Card* Deck::draw() {
     Card* temp(deck.front());
     deck.pop_front();
@@ -133,9 +116,26 @@ void Hand::addToHand(Card* c) {
     handDeck.push_back(c);
 }
 
+// stream insertion operators
+ostream & operator<< (ostream &out, const Card &c) {
+    out << "Card: " << c.cardType << endl;
+    return out;
+}
+
+ostream & operator<< (ostream &out, Deck &c) {
+    for (auto card: c.deck) {
+        if (card) {
+            out << *card << endl;
+        }
+    }
+    return out;
+}
+
 ostream & operator<< (ostream &out, Hand &h) {
-    for (auto it = h.handDeck.cbegin(); it != h.handDeck.cend(); ++it) {
-        out << *it << endl;
+    for (auto card: h.handDeck) {
+        if (card) {
+            out << *card << endl;
+        }
     }
     return out;
 }
