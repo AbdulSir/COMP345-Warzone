@@ -140,3 +140,6 @@ OrderList* Player::getOrders(){
     return orders;
 }
 
+string Player::getName() {
+    return name;
+}

@@ -50,6 +50,7 @@ public:
     void issueOrder();
     vector <Territory*> getTerritories();
     OrderList* getOrders();
+    string getName();
 
 private:
     string name;

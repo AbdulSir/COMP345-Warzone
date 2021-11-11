@@ -32,11 +32,15 @@ Order::Order(string orderID, Player* player){
 
 Order::Order(const Order &o) {
     orderID = o.orderID;
+    this->orderIssuer = new Player;
+    *orderIssuer = *o.orderIssuer;
 }
 
 // assignment operator
 Order& Order::operator= (const Order& order){
     this->orderID = order.orderID;
+    this->orderIssuer = new Player;
+    *orderIssuer = *order.orderIssuer;
     return *this;
 };
 
@@ -73,8 +77,6 @@ Deploy::Deploy() : Order() {}
 
 //constructor
 Deploy::Deploy(string orderID, Player* player, Territory* territory, int number) : Order(orderID, player) {
-    this->orderIssuer = new Player;
-    *orderIssuer = *player;
     this->target = new Territory;
     *target = *territory;
     numberOfUnits = number;
@@ -82,8 +84,6 @@ Deploy::Deploy(string orderID, Player* player, Territory* territory, int number)
 
 //copy constructor
 Deploy::Deploy(const Deploy& d) : Order(d) {
-    this->orderIssuer = new Player;
-    *orderIssuer = *d.orderIssuer;
     this->target = new Territory;
     *target = *d.target;
     numberOfUnits = d.numberOfUnits;
@@ -92,8 +92,6 @@ Deploy::Deploy(const Deploy& d) : Order(d) {
 //assignment operator
 Deploy& Deploy::operator=(const Deploy& d) {
     Order::operator= (d);
-    this->orderIssuer = new Player;
-    *orderIssuer = *d.orderIssuer;
     this->target = new Territory;
     *target = *d.target;
     numberOfUnits = d.numberOfUnits;
@@ -124,8 +122,6 @@ Advance::Advance() : Order() {};
 
 //constructor
 Advance::Advance(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID, player) {
-    this->orderIssuer = new Player;
-    *orderIssuer = *player;
     this->from = new Territory;
     *from = *t1;
     this->target = new Territory;
@@ -135,8 +131,6 @@ Advance::Advance(string orderID, Player* player, Territory* t1, Territory* t2, i
 
 //copy constructor
 Advance::Advance(const Advance& a) : Order(a){
-    this->orderIssuer = new Player;
-    *orderIssuer = *a.orderIssuer;
     this->from = new Territory;
     *target = *a.from;
     this->target = new Territory;
@@ -147,8 +141,6 @@ Advance::Advance(const Advance& a) : Order(a){
 //assignment operator
 Advance& Advance::operator=(const Advance& a){
     Order::operator= (a);
-    this->orderIssuer = new Player;
-    *orderIssuer = *a.orderIssuer;
     this->from = new Territory;
     *from = *a.from;
     this->target = new Territory;
@@ -180,8 +172,6 @@ Airlift::Airlift():Order(){};
 
 //constructor
 Airlift::Airlift(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID, player){
-    this->orderIssuer = new Player;
-    *orderIssuer = *player;
     this->from = new Territory;
     *from = *t1;
     this->target = new Territory;
@@ -191,8 +181,6 @@ Airlift::Airlift(string orderID, Player* player, Territory* t1, Territory* t2, i
 
 //copy constructor
 Airlift::Airlift(const Airlift& a) : Order(a) {
-    this->orderIssuer = new Player;
-    *orderIssuer = *a.orderIssuer;
     this->from = new Territory;
     *target = *a.from;
     this->target = new Territory;
@@ -203,8 +191,6 @@ Airlift::Airlift(const Airlift& a) : Order(a) {
 //assignment operator
 Airlift& Airlift::operator=(const Airlift& a) {
     Order::operator= (a);
-    this->orderIssuer = new Player;
-    *orderIssuer = *a.orderIssuer;
     this->from = new Territory;
     *from = *a.from;
     this->target = new Territory;
@@ -233,8 +219,6 @@ Bomb::Bomb():Order() {};
 
 //constructor
 Bomb::Bomb(string orderID, Player* player, Territory* t1, Territory* t2) : Order(orderID, player){
-    this->orderIssuer = new Player;
-    *orderIssuer = *player;
     this->from = new Territory;
     *from = *t1;
     this->target = new Territory;
@@ -243,8 +227,6 @@ Bomb::Bomb(string orderID, Player* player, Territory* t1, Territory* t2) : Order
 
 //copy constructor
 Bomb::Bomb(const Bomb& b) : Order(b){
-    this->orderIssuer = new Player;
-    *orderIssuer = *b.orderIssuer;
     this->from = new Territory;
     *target = *b.from;
     this->target = new Territory;
@@ -254,8 +236,6 @@ Bomb::Bomb(const Bomb& b) : Order(b){
 //assignment operator
 Bomb& Bomb::operator=(const Bomb& b){
     Order::operator= (b);
-    this->orderIssuer = new Player;
-    *orderIssuer = *b.orderIssuer;
     this->from = new Territory;
     *from = *b.from;
     this->target = new Territory;
@@ -278,69 +258,82 @@ void Bomb::execute(){
     }
 }
 
-/*
 //Blockade Class
 //default constructor
-Blockade::Blockade():Order(){
-
-};
+Blockade::Blockade():Order() {};
 
 //constructor
-Blockade::Blockade(string orderID) : Order(orderID, player) {
-
+Blockade::Blockade(string orderID, Player* player, Territory* territory) : Order(orderID, player) {
+    this->target = territory;
 }
 
 //copy constructor
 Blockade::Blockade(const Blockade& bl) : Order(bl){
-
+    this->target = new Territory;
+    *target = *bl.target;
 }
 
 //assignment operator
-Blockade& Blockade::operator=(const Blockade& bl){
-  Order::operator= (bl);
-  return *this;
+Blockade& Blockade::operator=(const Blockade& b){
+    Order::operator= (b);
+    this->target = new Territory;
+    *target = *b.target;
+    return *this;
 }
 
 bool Blockade::validate(){
-
+    return !isTerritoryOwnedByPlayer(orderIssuer, target);
 };
 
 void Blockade::execute(){
-
+    if (validate()) {
+        target->setArmy(target->army_nb *2);
+        // transfer ownership to neutral
+        cout << "Blockade order executed" << endl;
+    } else {
+        cout << "Blockade order invalid" << endl;
+    }
 }
+
 
 //Negotiate Class
 //default constructor
-Negotiate::Negotiate():Order(){
-
-};
+Negotiate::Negotiate():Order() {};
 
 //constructor
-Negotiate::Negotiate(string orderID) : Order(orderID, player){
-
+Negotiate::Negotiate(string orderID, Player* player, Player* target) : Order(orderID, player) {
+    this->target = target;
 }
 
 //copy constructor
 Negotiate::Negotiate(const Negotiate& n) : Order(n){
-
+    this->target = new Player;
+    *target = *n.target;
 }
 
 //assignment operator
 Negotiate& Negotiate::operator=(const Negotiate& n){
-
-  Order::operator= (n);
-  return *this;
+    Order::operator= (n);
+    this->target = new Player;
+    *target = *n.target;
+    return *this;
 }
 
 bool Negotiate::validate(){
-
+    if (target->getName() == orderIssuer->getName) {
+        return false;
+    }
+    return true;
 };
 
 void Negotiate::execute(){
-
+    if (validate()) {
+        // any attack that may be declared between territories of the player issuing the negotiate order and the target player will result in invalid order
+        cout << "Negotiate order executed" << endl;
+    } else {
+        cout << "Negotiate order invalid" << endl;
+    }
 }
-
-*/
 
 //OrderList Class
 //default constructor

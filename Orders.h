@@ -101,20 +101,20 @@ class Bomb: public Order
         Territory* target;
 };
 
-/*
 class Blockade: public Order
 {
     public:
         //default constructor
         Blockade();
         //parametrized constructor
-        Blockade(string orderID);
+        Blockade(string orderID, Player* player, Territory* territory);
         //copy constructor
         Blockade(const Blockade& bl);
         //asssignment operator
         Blockade& operator= (const Blockade& bl);
         bool validate();
         void execute();
+        Territory* target;
 };
 
 class Negotiate: public Order
@@ -123,15 +123,15 @@ class Negotiate: public Order
         //default constructor
         Negotiate();
         //parametrized constructor
-        Negotiate(string orderID);
+        Negotiate(string orderID, Player* player);
         //copy constructor
         Negotiate(const Negotiate& n);
         //asssignment operator
         Negotiate& operator= (const Negotiate& n);
         bool validate();
         void execute();
+        Player* target;
 };
-*/
 
 class OrderList {
     public:
