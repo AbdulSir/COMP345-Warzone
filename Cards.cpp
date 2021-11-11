@@ -28,6 +28,9 @@ Order* Card::play() {
     if (cardType == "blockade") {
         return new Blockade();
     }
+    if (cardType == "diplomacy") {
+        return new Negotiate();
+    }
     return NULL;
 }
 

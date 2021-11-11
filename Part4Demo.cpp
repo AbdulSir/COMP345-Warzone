@@ -156,6 +156,5 @@ int main() {
     delete blockadeOrder1;
     delete blockadeOrder2;
 
-
     return 0;
 }
