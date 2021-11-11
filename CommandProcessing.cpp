@@ -9,6 +9,7 @@
 using namespace std;
 #include <string>
 using namespace std;
+#include <fstream>
 
 //METHODS IN COMMAND
 
@@ -50,11 +51,11 @@ void Command::saveEffect(string c) {
         effect = mapName + " is an invalid map";
     }
     else if (c.find("validatemap") != string::npos) {
-        effect =  "The map has been validated";
+        effect =  "The map has been successfully validated";
     }
     else if (c.find("addplayer") != string::npos) {
         string playerName = c.substr(10);
-        effect = "Player " + playerName + " has been added";
+        effect = "Player " + playerName + " has been successfully added to the game";
     }
     else if (c == "gamestart") {
         effect = "Players have been added and the game will now begin";
@@ -103,8 +104,7 @@ ostream& operator<<(ostream& out, const CommandProcessor& cp) {
     return out;
 }
 
-
-//Method provided to other classes (GameEngine, Player, etc) to get commands
+//Method provided to other objects (like the GameEngine) to get commands
 void CommandProcessor::getCommand(string gameState) {
     string commandStr = readCommand();
     if (validate(commandStr, gameState)) {
@@ -124,32 +124,29 @@ void CommandProcessor::getCommand(string gameState) {
 //Validates if command is valid in current game state
 bool CommandProcessor::validate(string c, string gameState) {
     if (c.substr(0,8) == "loadmap " && (gameState == "start" || gameState == "mapLoaded")) {
-        //        if (c.substr(c.length()-4) == ".map")
-        return true;
-        //        else
-        //           return false;
+        if (c.substr(c.length()-4) == ".map" && c.rfind(" ") == 7 && c.find(" .map") == c.npos)
+            return true;
+        else
+            return false;
     }
     else if (c == "validatemap" && gameState == "mapLoaded") {
         return true;
     }
-    else if (c.substr(0,10) == "addplayer " && (gameState == "mapValidated" || gameState == "playersAdded")) {
+    else if (c.substr(0,10) == "addplayer " && c.rfind(" ") == 9 && c.size() > 10 && (gameState == "mapValidated" || gameState == "playersAdded")) {
         return true;
     }
     else if (c == "gamestart" && gameState == "playersAdded") {
         return true;
     }
-    else if (c == "replay" && gameState=="win") {
+    else if ((c == "replay" || c == "quit") && gameState=="win") {
         return true;
     }
-    else if (c == "quit" && gameState=="win") {
-        return true;
-    }
-    else
-        return false;
+    return false;
 }
 
 //Gets commands from the console as a string
 string CommandProcessor::readCommand() {
+    cout << "In CommandProcessor readCommand()" << endl;
     string commandStr;
     cout << "Please enter a command" << endl;
     getline(cin,commandStr);
@@ -162,26 +159,142 @@ void CommandProcessor::saveCommand(Command* c) {
 }
 
 
-//METHODS IN FileCommandAdaptor
-void FileCommandProcessorAdapter::readFile(string file) {
-    flr.open(file);
+//METHODS IN FileCommandProcessorAdaptor
+
+//FileCommandProcessorAdapter constructor with file-to-be-read as parameter
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(string f): CommandProcessor(), fileName(f), flr(new FileLineReader()) {
 }
+
+//FileCommandProcessorAdapter copy constructor
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileCommandProcessorAdapter& fcpa): CommandProcessor(fcpa), fileName(fcpa.fileName), flr(fcpa.flr) {
+}
+
+//FileCommandProcessorAdapter destructor
+FileCommandProcessorAdapter::~FileCommandProcessorAdapter() {
+    delete flr;
+    flr = NULL;
+}
+
+//Assignment operator
+FileCommandProcessorAdapter& FileCommandProcessorAdapter::operator= (const FileCommandProcessorAdapter& fcpa) {
+    this->fileName = fcpa.fileName;
+    this->flr = fcpa.flr;
+    return *this;
+}
+
+//Stream insertion operator
+ostream& operator<<(ostream& out, const FileCommandProcessorAdapter& fcpa) {
+    out << "Using FileCommandProcessorAdapter: " << endl;
+    return out;
+}
+
+//Method that reads the command from a file (overrides readCommand of CommandProcessor)
+string FileCommandProcessorAdapter::readCommand() {
+    cout << "In FileCommandProcessorAdapter readCommand()" << endl;
+    string command = flr->readLineFromFile(fileName);
+    cout << "Command read from file: \n" << command << endl;
+    return command;
+}
+
+
+//METHODS IN FileLineReader
+
+//FileLineReader constructor
+FileLineReader::FileLineReader() {
+    currentLine = 0;
+}
+
+//FileLineReader copy constructor
+FileLineReader::FileLineReader(FileLineReader& f) {
+    this->currentLine = f.currentLine;
+}
+
+//Assignment operator
+FileLineReader& FileLineReader::operator= (const FileLineReader& f) {
+    this->currentLine = f.currentLine;
+    return *this;
+}
+
+//Stream insertion operator
+ostream& operator<<(ostream& out, const FileLineReader& f) {
+    out << "Using FileLineReader: " << endl;
+    return out;
+}
+
+//Reads a line from a file
+string FileLineReader::readLineFromFile(string fileName){
+    string line, command;
+    int count = 0;
+    input.open(fileName);
+    while (true) {
+        if (count == currentLine) {
+            getline (input, line);
+            command.append(line + "\n");
+            currentLine++;
+            break;
+        }
+        else {
+            getline (input, line);
+            count++;
+        }
+    }
+    input.close();
+    return command;
+}
+
 
 
 int main() {
     
-    //    cout << "Please enter one of the following:" << endl
-    //    << "\t-console to enter commands in the console" << endl
-    //    << "\t-file <file name> to read commands from a file";
+    string choice;
+    cout << "Please enter one of the following:" << endl
+    << "\t-console to enter commands in the console" << endl
+    << "\t-file <file name> to read commands from a file" << endl;
+    getline(cin, choice);
     
-    CommandProcessor* cp = new CommandProcessor();
-    cp->getCommand("start");
-    cp->getCommand("mapLoaded");
-    cp->getCommand("mapValidated");
-    cp->getCommand("playersAdded");
-    cp->getCommand("win");
-    cout << *cp;
+    if (choice == "-console") {
+        
+        //Reading commands from console
+        CommandProcessor* cp = new CommandProcessor();
+        cp->getCommand("start");
+        cp->getCommand("mapLoaded");
+        cp->getCommand("mapValidated");
+        cp->getCommand("playersAdded");
+        cp->getCommand("win");
+        cout << *cp;
+        
+        delete cp;
+        cp = NULL;
+    }
     
-    delete cp;
+    else if (choice.substr(0,6) == "-file "){
+        string file = choice.substr(6);
+        //Reading commands from file
+        CommandProcessor* fcpa = new FileCommandProcessorAdapter(file);
+        fcpa->getCommand("start");
+        delete fcpa;
+        fcpa = NULL;
+    }
+    
+    //    FileLineReader f;
+    //    cout << f.readLineFromFile("validCommandsFile.txt");
+    //    cout << f.readLineFromFile("validCommandsFile.txt");
+    //    cout << f.readLineFromFile("validCommandsFile.txt");
+    //    cout << f.readLineFromFile("validCommandsFile.txt");
+    //    cout << f.readLineFromFile("validCommandsFile.txt");
+    //    cout << f.readLineFromFile("validCommandsFile.txt");
+    //    cout << f.readLineFromFile("validCommandsFile.txt");
+    //
+    //    FileCommandProcessorAdapter* fcpa = new FileCommandProcessorAdapter("validCommandsFile.txt");
+    //    fcpa -> readCommand();
+    //    fcpa -> readCommand();
+    //    fcpa -> readCommand();
+    //    fcpa -> readCommand();
+    //    fcpa -> readCommand();
+    //    fcpa -> readCommand();
+    //
+    //    CommandProcessor* cp = new FileCommandProcessorAdapter("validCommandsFile.txt");
+    //    cp->getCommand("start");
+    
 }
 
