@@ -25,8 +25,9 @@ Order::Order() {
 };
 
 // parametrized constructor
-Order::Order(string orderID){
+Order::Order(string orderID, Player* player){
     this->orderID = orderID;
+    this->orderIssuer = player;
 };
 
 Order::Order(const Order &o) {
@@ -71,7 +72,7 @@ ostream& operator<<(ostream& out, const Order& o)
 Deploy::Deploy() : Order() {}
 
 //constructor
-Deploy::Deploy(string orderID, Player* player, Territory* territory, int number) : Order(orderID) {
+Deploy::Deploy(string orderID, Player* player, Territory* territory, int number) : Order(orderID, player) {
     this->orderIssuer = new Player;
     *orderIssuer = *player;
     this->target = new Territory;
@@ -122,7 +123,7 @@ void Deploy::execute() {
 Advance::Advance() : Order() {};
 
 //constructor
-Advance::Advance(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID) {
+Advance::Advance(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID, player) {
     this->orderIssuer = new Player;
     *orderIssuer = *player;
     this->from = new Territory;
@@ -178,7 +179,7 @@ void Advance::execute() {
 Airlift::Airlift():Order(){};
 
 //constructor
-Airlift::Airlift(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID){
+Airlift::Airlift(string orderID, Player* player, Territory* t1, Territory* t2, int number) : Order(orderID, player){
     this->orderIssuer = new Player;
     *orderIssuer = *player;
     this->from = new Territory;
@@ -231,7 +232,7 @@ void Airlift::execute(){
 Bomb::Bomb():Order() {};
 
 //constructor
-Bomb::Bomb(string orderID, Player* player, Territory* t1, Territory* t2) : Order(orderID){
+Bomb::Bomb(string orderID, Player* player, Territory* t1, Territory* t2) : Order(orderID, player){
     this->orderIssuer = new Player;
     *orderIssuer = *player;
     this->from = new Territory;
@@ -252,14 +253,13 @@ Bomb::Bomb(const Bomb& b) : Order(b){
 
 //assignment operator
 Bomb& Bomb::operator=(const Bomb& b){
-    Order::operator= (a);
+    Order::operator= (b);
     this->orderIssuer = new Player;
     *orderIssuer = *b.orderIssuer;
     this->from = new Territory;
     *from = *b.from;
     this->target = new Territory;
     *target = *b.target;
-    numberOfUnits = b.numberOfUnits;
     return *this;
 }
 
@@ -271,7 +271,7 @@ bool Bomb::validate(){
 
 void Bomb::execute(){
     if (validate()) {
-        target->setArmy(target->army_nb / 2)
+        target->setArmy(target->army_nb / 2);
         cout << "Bomb order executed" << endl;
     } else {
         cout << "Bomb order invalid" << endl;
@@ -286,7 +286,7 @@ Blockade::Blockade():Order(){
 };
 
 //constructor
-Blockade::Blockade(string orderID) : Order(orderID) {
+Blockade::Blockade(string orderID) : Order(orderID, player) {
 
 }
 
@@ -316,7 +316,7 @@ Negotiate::Negotiate():Order(){
 };
 
 //constructor
-Negotiate::Negotiate(string orderID) : Order(orderID){
+Negotiate::Negotiate(string orderID) : Order(orderID, player){
 
 }
 

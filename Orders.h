@@ -18,7 +18,7 @@ class Order {
         //default constructor
         Order();
         //parametrized constructor
-        Order(string orderID);
+        Order(string orderID, Player* orderIssuer);
         //asssignment operator
         Order& operator= (const Order& order);
         //copy constructor
@@ -29,6 +29,7 @@ class Order {
         virtual void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Order &order);
+        Player* orderIssuer;
 };
 
 class Deploy: public Order{
@@ -43,7 +44,6 @@ class Deploy: public Order{
         Deploy& operator= (const Deploy& deploy);
         bool validate();
         void execute();
-        Player* orderIssuer;
         Territory* target;
         int numberOfUnits;
 };
@@ -60,7 +60,6 @@ class Advance: public Order{
         Advance& operator= (const Advance& advanced);
         bool validate();
         void execute();
-        Player* orderIssuer;
         Territory* from;
         Territory* target;
         int numberOfUnits;
@@ -80,7 +79,6 @@ class Airlift: public Order
         Airlift& operator= (const Airlift& a);
         bool validate();
         void execute();
-        Player* orderIssuer;
         Territory* from;
         Territory* target;
         int numberOfUnits;
@@ -99,7 +97,6 @@ class Bomb: public Order
         Bomb& operator= (const Bomb& b);
         bool validate();
         void execute();
-        Player* orderIssuer;
         Territory* from;
         Territory* target;
 };
