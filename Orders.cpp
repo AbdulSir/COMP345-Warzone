@@ -61,17 +61,6 @@ void Order::execute(){
     }
 }
 
-//stream insertion operator
-ostream& operator<<(ostream& out, const Order& o)
-{
-    out << "Order:"<<endl ;
-    out << "-------------------------------"<<endl;
-    out << "Order "<< endl;
-    out << "ID: "<< o.orderID << endl;
-    out << endl;
-    return out;
-}
-
 //Deploy Class
 Deploy::Deploy() : Order() {}
 
@@ -320,7 +309,7 @@ Negotiate& Negotiate::operator=(const Negotiate& n){
 }
 
 bool Negotiate::validate(){
-    if (target->getName() == orderIssuer->getName) {
+    if (target->getName() == orderIssuer->getName()) {
         return false;
     }
     return true;
@@ -371,19 +360,6 @@ void OrderList::addOrder(Order* order){
    orderList.push_back(order);
 }
 
-//stream insertion operator
-ostream& operator<<(ostream& out, const OrderList& o)
-{
-    out << "OrderList has the following orders:"<<endl ;
-    out << "-------------------------------"<<endl;
-    for(int i =0; i<o.orderList.size();i++){
-        out<<"Order "<<endl;
-        out<<"ID: "<<o.orderList[i]->getOrderID()<<endl;
-        out<<endl;
-    }
-    return out;
-}
-
 //move order inside orderList
 void OrderList::move(Order* order, int newPosition){
     cout<<"Move order "<<order->getOrderID()<<" to index "<<newPosition<<endl;
@@ -404,4 +380,67 @@ void OrderList::remove(Order* order){
         }
     }
     cout <<"Order "<< order->getOrderID()<<" removed from list" << endl;
+}
+
+//stream insertion operators
+ostream& operator<<(ostream& out, const OrderList& o)
+{
+    out << "OrderList has the following orders:"<<endl ;
+    out << "-------------------------------"<<endl;
+    for(int i =0; i<o.orderList.size();i++){
+        out << endl ;
+        out<< *o.orderList[i] <<endl;
+    }
+    return out;
+}
+
+ostream& operator<<(ostream& out, const Order& o)
+{
+    out << "Order:"<<endl ;
+    out << "-------------------------------"<<endl;
+    out << "ID: "<< o.orderID << endl;
+    out<<"Order Issuer: "<< o.orderIssuer->getName();
+    return out;
+}
+
+ostream& operator <<(ostream &out, const Deploy &order) {
+    out << static_cast<const Order&>(order) << endl;
+    out << "Target: " << order.target->territory_name << endl;
+    out << "Number of armies: " << order.numberOfUnits << endl;
+    return out;
+}
+
+ostream& operator <<(ostream &out, const Advance &order) {
+    out << static_cast<const Order&>(order) << endl;
+    out << "From: " << order.from->territory_name << endl;
+    out << "Target: " << order.target->territory_name << endl;
+    out << "Number of armies: " << order.numberOfUnits << endl;
+    return out;
+}
+
+ostream& operator <<(ostream &out, const Airlift &order) {
+    out << static_cast<const Order&>(order) << endl;
+    out << "From: " << order.from->territory_name << endl;
+    out << "Target: " << order.target->territory_name << endl;
+    out << "Number of armies: " << order.numberOfUnits << endl;
+    return out;
+}
+
+ostream& operator <<(ostream &out, const Bomb &order) {
+    out << static_cast<const Order&>(order) << endl;
+    out << "From: " << order.from->territory_name << endl;
+    out << "Target: " << order.target->territory_name << endl;
+    return out;
+}
+
+ostream& operator <<(ostream &out, const Blockade &order) {
+    out << static_cast<const Order&>(order) << endl;
+    out << "Target: " << order.target->territory_name << endl;
+    return out;
+}
+
+ostream& operator <<(ostream &out, const Negotiate &order) {
+    out << static_cast<const Order&>(order) << endl;
+    out << "Targetted player: " << order.target->getName() << endl;
+    return out;
 }

@@ -44,6 +44,8 @@ class Deploy: public Order{
         Deploy& operator= (const Deploy& deploy);
         bool validate();
         void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Deploy &order);
         Territory* target;
         int numberOfUnits;
 };
@@ -60,6 +62,8 @@ class Advance: public Order{
         Advance& operator= (const Advance& advanced);
         bool validate();
         void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Advance &order);
         Territory* from;
         Territory* target;
         int numberOfUnits;
@@ -79,6 +83,8 @@ class Airlift: public Order
         Airlift& operator= (const Airlift& a);
         bool validate();
         void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Airlift &order);
         Territory* from;
         Territory* target;
         int numberOfUnits;
@@ -97,6 +103,8 @@ class Bomb: public Order
         Bomb& operator= (const Bomb& b);
         bool validate();
         void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Bomb &order);
         Territory* from;
         Territory* target;
 };
@@ -114,6 +122,8 @@ class Blockade: public Order
         Blockade& operator= (const Blockade& bl);
         bool validate();
         void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Blockade &order);
         Territory* target;
 };
 
@@ -123,13 +133,15 @@ class Negotiate: public Order
         //default constructor
         Negotiate();
         //parametrized constructor
-        Negotiate(string orderID, Player* player);
+        Negotiate(string orderID, Player* player, Player* target);
         //copy constructor
         Negotiate(const Negotiate& n);
         //asssignment operator
         Negotiate& operator= (const Negotiate& n);
         bool validate();
         void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Negotiate &order);
         Player* target;
 };
 
