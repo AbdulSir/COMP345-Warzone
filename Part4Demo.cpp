@@ -11,9 +11,6 @@ int main() {
     Territory* firstTerritory = new Territory("A", 0, 10);
     Territory* secondTerritory = new Territory("B", 0, 10);
     Territory* thirdTerritory = new Territory("C", 0, 10);
-    Territory* fourthTerritory = new Territory("D", 0, 10);
-    Territory* fifthTerritory = new Territory("E", 0, 10);
-    Territory* sixthTerritory = new Territory("F", 0, 10);
 
     vector <Territory*> v;
     v.push_back(firstTerritory);
@@ -132,9 +129,6 @@ int main() {
     firstTerritory = NULL;
     secondTerritory = NULL;
     thirdTerritory = NULL;
-    fourthTerritory = NULL;
-    fifthTerritory = NULL;
-    sixthTerritory = NULL;
     player1 = NULL;
     deployOrder1 = NULL;
     deployOrder2 = NULL;
@@ -151,9 +145,6 @@ int main() {
     delete firstTerritory; 
     delete secondTerritory;
     delete thirdTerritory; 
-    delete fourthTerritory;
-    delete fifthTerritory; 
-    delete sixthTerritory;
     delete player1;
     delete deployOrder1;
     delete deployOrder2;
