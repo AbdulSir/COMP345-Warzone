@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -145,6 +147,30 @@ bool Advance::validate() {
 void Advance::execute() {
     if (validate()) {
         // TODO: complete this code
+        if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
+            from->setArmy(from->army_nb - numberOfUnits);
+            target->setArmy(target->army_nb + numberOfUnits);
+            this->effect = "Moved " + to_string(numberOfUnits) + " armies from " + from->getName() + " to " + target->getName();
+        } else {
+            srand (time (0));
+            while (true) {
+                if (numberOfUnits == 0 || target->army_nb == 0) break;
+                int attackerNumber = rand() % 60 + 1;
+                int defenderNumber = rand() & 70 + 1;
+                if (attackerNumber > defenderNumber) {
+                    target->setArmy(target->army_nb -1);
+                } else if (defenderNumber > attackerNumber) {
+                    numberOfUnits = numberOfUnits-1;
+                }
+            }
+            if (target->army_nb == 0) {
+                orderIssuer->addTerritory(target);
+                target->setArmy(numberOfUnits);
+                this->effect = "Attack success, " + orderIssuer->getName() + " now own " + target->territory_name + ", and the territory now has " + to_string(target->army_nb) + " armies";
+            } else {
+                this->effect = "Attack failed, " + target->territory_name + " still has " + to_string(target->army_nb) + " armies"; 
+            }
+        }
         cout << "Advance order executed" << endl;
     } else {
         cout << "Advance order invalid" << endl;

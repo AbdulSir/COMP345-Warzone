@@ -11,7 +11,8 @@ int main() {
     OrderList* orderList = new OrderList();
     Territory* firstTerritory = new Territory("A", 0, 10);
     Territory* secondTerritory = new Territory("B", 0, 10);
-    Territory* thirdTerritory = new Territory("C", 0, 10);
+    Territory* thirdTerritory = new Territory("C", 0, 0);
+    Territory* fourthTerritory = new Territory("D", 0, 10000);
 
     vector <Territory*> v;
     vector <Territory*> v1;
@@ -42,7 +43,22 @@ int main() {
     cout << *deployOrder3 << endl;
 
     // Advance test cases:
+    cout << "-----Test case: player does advance order, target is their territory-----" << endl;
+    Advance* advanceOrder1 = new Advance(player1, firstTerritory, secondTerritory, 5);
+    advanceOrder1->execute();
+    cout << *advanceOrder1 << endl;
 
+    cout << "-----Test case: player does advance order, target is enemy's territory, guaranteed to win-----" << endl;
+    Advance* advanceOrder2 = new Advance(player1, firstTerritory, thirdTerritory, 10);
+    advanceOrder2->execute();
+    cout << *advanceOrder2 << endl;
+
+    cout << "-----Test case: player does advance order, target is enemy's territory, guaranteed to lose-----" << endl;
+    Advance* advanceOrder3 = new Advance(player1, firstTerritory, fourthTerritory, 1);
+    advanceOrder3->execute();
+    cout << *advanceOrder3 << endl;
+
+    // still need an invalid case where the target is not adjacent
 
     // Airlift test cases:
     cout << "-----Test case: create airlift order with card, valid order-----" << endl;
@@ -102,6 +118,8 @@ int main() {
 
     bombOrder2->execute();
     cout << *bombOrder2 << endl;
+
+    // still need an invalid case where the target is not adjacent
 
     // Blockade test cases:
     cout << "-----Test case: create blockade order with card, valid order-----" << endl;
