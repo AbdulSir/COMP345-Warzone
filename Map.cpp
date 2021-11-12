@@ -69,6 +69,24 @@ Map& Map::operator= (const Map& map1) {
     return *this;
 }
 
+bool Map::adjacent_territory(string terr1, string terr2) {
+    bool returnValue = false;
+    for (int i=0; i<territories.size(); i++)
+    {
+        if (terr1.compare(territories[i]->getName()) == 0)
+        {
+            for (Territory* terr:territory_graph[i])
+            {
+                if (terr2.compare(terr->getName()) == 0) {
+                    returnValue = true;
+                }
+            }
+            returnValue = false;
+        }
+    }
+    return returnValue;
+};
+
 // Stream insertion operators
 ostream & operator << (ostream &out, Map &m1) {
 
@@ -106,11 +124,11 @@ Map::Map(string text_contents)
     Map::createMap(text_contents);
     Map::displayMap();
     Map::displayContinents();
-    if(Map::validate())
-        cout << "\nThe Map is a valid map" << endl;
-    else
-        cout << "\nThe Map is NOT a valid map" << endl;
-    Map::delete_pointers();
+    // if(Map::validate())
+        // cout << "\nThe Map is a valid map" << endl;
+    // else
+        // cout << "\nThe Map is NOT a valid map" << endl;
+    // Map::delete_pointers();
 }
 
 bool Map::validate()

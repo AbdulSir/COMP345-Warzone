@@ -7,15 +7,26 @@
 using namespace std;
 
 int main() {
+    Map* m = new Map("[continents]\nNorth_Europe 5 red\nEast_Europe 4 magenta\nSouth_Europe 5 green\nWest_Europe 3 blue\n\n[countries]\n1 England 1 164 126\n2 Scotland 1 158 44\n3 N_Ireland 1 125 70\n4 Rep_Ireland 1 106 90\n5 Wales 1 141 109\n6 Belgum 1 213 153\n7 Netherlands 1 226 128\n\n[borders]\n1 6 7 5 2 3 4\n2 1 3\n3 1 2\n4 1 5\n5 1 4\n6 7 1\n7 6 1\n\n");
+    cout << endl << endl;
     Hand* h = new Hand;
     Hand* h1 = new Hand;
     OrderList* orderList = new OrderList();
-    Territory* firstTerritory = new Territory("A", 0, 10);
-    Territory* secondTerritory = new Territory("B", 0, 10);
-    Territory* thirdTerritory = new Territory("C", 0, 0);
-    Territory* fourthTerritory = new Territory("D", 0, 10000);
-    Territory* fifthTerritory = new Territory("E", 0, 10);
-    Territory* sixthTerritory = new Territory("F", 0, 10);
+    Territory* firstTerritory = m->territories[0];
+    Territory* secondTerritory = m->territories[1];
+    Territory* thirdTerritory = m->territories[2];
+    Territory* fourthTerritory = m->territories[3];
+    Territory* fifthTerritory = m->territories[4];
+    Territory* sixthTerritory = m->territories[5];
+    Territory* seventhTerritory = m->territories[6];
+    
+    cout << *firstTerritory << endl;
+    cout << *secondTerritory << endl;
+    cout << *thirdTerritory << endl;
+    cout << *fourthTerritory << endl;
+    cout << *fifthTerritory << endl;
+    cout << *sixthTerritory << endl;
+    cout << *seventhTerritory << endl;
 
     vector <Territory*> v;
     vector <Territory*> v1;
@@ -53,21 +64,26 @@ int main() {
 
     // Advance test cases:
     cout << "-----Test case: player does advance order, target is their territory-----" << endl;
-    Advance* advanceOrder1 = new Advance(player1, firstTerritory, secondTerritory, 5);
+    Advance* advanceOrder1 = new Advance(player1, firstTerritory, secondTerritory, 5, m);
     advanceOrder1->execute();
     cout << *advanceOrder1 << endl;
 
     cout << "-----Test case: player does advance order, target is enemy's territory, guaranteed to win-----" << endl;
-    Advance* advanceOrder2 = new Advance(player1, firstTerritory, thirdTerritory, 10);
+    thirdTerritory->setArmy(0);
+    Advance* advanceOrder2 = new Advance(player1, firstTerritory, thirdTerritory, 10, m);
     advanceOrder2->execute();
     cout << *advanceOrder2 << endl;
 
     cout << "-----Test case: player does advance order, target is enemy's territory, guaranteed to lose-----" << endl;
-    Advance* advanceOrder3 = new Advance(player1, firstTerritory, fourthTerritory, 1);
+    thirdTerritory->setArmy(1000);
+    Advance* advanceOrder3 = new Advance(player1, firstTerritory, thirdTerritory, 1, m);
     advanceOrder3->execute();
     cout << *advanceOrder3 << endl;
 
-    // still need an invalid case where the target is not adjacent
+    cout << "-----Test case: player does advance order, target not adjacent-----" << endl;
+    Advance* advanceOrder4 = new Advance(player1, firstTerritory, seventhTerritory, 10, m);
+    advanceOrder4->execute();
+    cout << *advanceOrder4 << endl;
 
     // Airlift test cases:
     cout << "-----Test case: create airlift order with card, valid order-----" << endl;
@@ -113,6 +129,7 @@ int main() {
     Bomb* bombOrder1 = dynamic_cast<Bomb*>(h->discardFromHand().play());
     bombOrder1->setOrderIssuer(player1);
     bombOrder1->setTarget(thirdTerritory);
+    bombOrder1->setMap(m);
 
     cout << "Before execution C: " << *thirdTerritory << endl;
     bombOrder1->execute();
@@ -124,11 +141,20 @@ int main() {
     Bomb* bombOrder2 = dynamic_cast<Bomb*>(h->discardFromHand().play());
     bombOrder2->setOrderIssuer(player1);
     bombOrder2->setTarget(firstTerritory);
+    bombOrder2->setMap(m);
 
     bombOrder2->execute();
     cout << *bombOrder2 << endl;
 
-    // still need an invalid case where the target is not adjacent
+    cout << "-----Test case: create bomb order with card but target is not adjacent to any player's territory-----" << endl;
+    h->addToHand(new Card("bomb"));
+    Bomb* bombOrder3 = dynamic_cast<Bomb*>(h->discardFromHand().play());
+    bombOrder3->setOrderIssuer(player1);
+    bombOrder3->setTarget(seventhTerritory);
+    bombOrder3->setMap(m);
+
+    bombOrder3->execute();
+    cout << *bombOrder3 << endl;
 
     // Blockade test cases:
     cout << "-----Test case: create blockade order with card, valid order-----" << endl;
@@ -162,7 +188,7 @@ int main() {
 
     negotiateOrder1->execute();
     cout << *negotiateOrder1 << endl;
-    Advance* testAttackOrder = new Advance(player1, firstTerritory, fifthTerritory, 5);
+    Advance* testAttackOrder = new Advance(player1, firstTerritory, fifthTerritory, 5, m);
     testAttackOrder->execute();
     cout << *testAttackOrder << endl;
 

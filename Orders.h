@@ -9,6 +9,7 @@ using namespace std;
 
 class Player;
 class Territory;
+class Map;
 
 // free function to determine if a territory is owned by player
 bool isTerritoryOwnedByPlayer(Player* p, Territory* t);
@@ -61,10 +62,11 @@ class Advance: public Order {
         Territory* from;
         Territory* target;
         int numberOfUnits;
+        Map* map;
         //default constructor
         Advance();
         //parametrized constructor
-        Advance(Player* player, Territory* t1, Territory* t2, int number);
+        Advance(Player* player, Territory* t1, Territory* t2, int number, Map* m);
         //copy constructor
         Advance(const Advance& ad);
         //asssignment operator
@@ -104,16 +106,18 @@ class Bomb: public Order {
     public:
         // attributes
         Territory* target;
+        Map* map;
         //default constructor
         Bomb();
         //parametrized constructor
-        Bomb(Player* player, Territory* t1, Territory* t2);
+        Bomb(Player* player, Territory* t1, Territory* t2, Map* m);
         //copy constructor
         Bomb(const Bomb& b);
         //asssignment operator
         Bomb& operator= (const Bomb& b);
         //setters
         void setTarget(Territory* target);
+        void setMap(Map* m);
         bool validate();
         void execute();
         //stream insertion operators

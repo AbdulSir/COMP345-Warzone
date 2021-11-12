@@ -49,6 +49,7 @@ class Map
         bool map_is_connected();
         bool continents_are_connected();
         bool territory_belongs_to_one_continent();
+        bool adjacent_territory(string terr1, string terr2);
         int num_of_continents;
         vector<string> continents;
         vector<string> countries;

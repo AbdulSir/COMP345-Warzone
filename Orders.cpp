@@ -109,10 +109,11 @@ void Deploy::execute() {
 Advance::Advance() : Order() {};
 
 //constructor
-Advance::Advance(Player* player, Territory* t1, Territory* t2, int number) : Order(player) {
+Advance::Advance(Player* player, Territory* t1, Territory* t2, int number, Map* m) : Order(player) {
     from = t1;
     target = t2;
     numberOfUnits = number;
+    map = m;
 }
 
 //copy constructor
@@ -138,9 +139,8 @@ Advance& Advance::operator=(const Advance& a){
 bool Advance::validate() {
     bool isValid = true;
 
-    // TODO: modify territory class
-    // hard code to true for now
-    bool areTerritoriesAdjacent = true;
+    bool areTerritoriesAdjacent = map->adjacent_territory(from->getName(), target->getName());
+
     if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
         for (auto t: orderIssuer->getTerritories()) {
             if (t == target) {
@@ -252,8 +252,9 @@ void Airlift::execute(){
 Bomb::Bomb():Order() {};
 
 //constructor
-Bomb::Bomb(Player* player, Territory* t1, Territory* t2) : Order(player){
+Bomb::Bomb(Player* player, Territory* t1, Territory* t2, Map* m) : Order(player){
     target = t2;
+    map = m;
 }
 
 //copy constructor
@@ -274,11 +275,18 @@ void Bomb::setTarget(Territory* t) {
     target = t;
 };
 
+void Bomb::setMap(Map* m) {
+    map = m;
+};
+
 bool Bomb::validate(){
-    // TODO: modify territory class
-    // hard code to true for now
-    bool areTerritoriesAdjacent = true;
+    bool areTerritoriesAdjacent = false;
     bool isValid = true;
+    for (auto t: orderIssuer->getTerritories()) {
+        if (map->adjacent_territory(t->getName(), target->getName())) {
+            areTerritoriesAdjacent = true;
+        }
+    }
     if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
         for (auto t: orderIssuer->getTerritories()) {
             if (t == target) {
