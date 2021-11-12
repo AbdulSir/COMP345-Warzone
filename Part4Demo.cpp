@@ -10,7 +10,6 @@ int main() {
     MapLoader* map_loader = new MapLoader("europe.map");
     Map* m = map_loader->map_object;
     cout << endl << endl;
-    Deck* gameDeck = new Deck(10);
 
     Hand* h = new Hand;
     Hand* h1 = new Hand;
@@ -39,8 +38,7 @@ int main() {
     v.push_back(firstTerritory);
     v.push_back(secondTerritory);
     v2.push_back(fifthTerritory);
-    v2.push_back(sixthTerritory);
-
+    
     // Player only owns A and B
     Player* player1 = new Player("testName", h, v);
     Player* player2 = new Player("anotherName", h1, v2);
@@ -85,7 +83,7 @@ int main() {
     cout << *advanceOrder3 << endl;
 
     cout << "-----Test case: player does advance order, target not adjacent-----" << endl;
-    Advance* advanceOrder4 = new Advance(player1, firstTerritory, seventhTerritory, 10, m);
+    Advance* advanceOrder4 = new Advance(player1, secondTerritory, fifthTerritory, 10, m);
     advanceOrder4->execute();
     cout << *advanceOrder4 << endl;
 
@@ -132,12 +130,12 @@ int main() {
     h->addToHand(new Card("bomb"));
     Bomb* bombOrder1 = dynamic_cast<Bomb*>(h->discardFromHand().play());
     bombOrder1->setOrderIssuer(player1);
-    bombOrder1->setTarget(thirdTerritory);
+    bombOrder1->setTarget(fourthTerritory);
     bombOrder1->setMap(m);
 
-    cout << "Before execution C: " << *thirdTerritory << endl;
+    cout << "Before execution: " << *fourthTerritory << endl;
     bombOrder1->execute();
-    cout << "After execution C: " << *thirdTerritory << endl;
+    cout << "After execution: " << *fourthTerritory << endl;
     cout << *bombOrder1 << endl;
 
     cout << "-----Test case: create bomb order with card but target is the player's territory-----" << endl;
@@ -153,8 +151,8 @@ int main() {
     cout << "-----Test case: create bomb order with card but target is not adjacent to any player's territory-----" << endl;
     h->addToHand(new Card("bomb"));
     Bomb* bombOrder3 = dynamic_cast<Bomb*>(h->discardFromHand().play());
-    bombOrder3->setOrderIssuer(player1);
-    bombOrder3->setTarget(seventhTerritory);
+    bombOrder3->setOrderIssuer(player2);
+    bombOrder3->setTarget(secondTerritory);
     bombOrder3->setMap(m);
 
     bombOrder3->execute();
@@ -205,6 +203,8 @@ int main() {
     negotiateOrder2->execute();
     cout << *negotiateOrder2 << endl;
 
+    map_loader = NULL;
+    m = NULL;
     h = NULL;
     h1 = NULL;
     orderList = NULL;
@@ -235,6 +235,10 @@ int main() {
     testAttackOrder = NULL;
 
     //delete all pointers
+    delete map_loader;
+    delete m;
+    delete h;
+    delete h1;
     delete orderList;
     delete firstTerritory;
     delete secondTerritory;

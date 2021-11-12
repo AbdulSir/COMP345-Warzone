@@ -140,14 +140,6 @@ bool Advance::validate() {
     bool isValid = true;
 
     bool areTerritoriesAdjacent = map->adjacent_territory(from->getName(), target->getName());
-
-    if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
-        for (auto t: orderIssuer->getTerritories()) {
-            if (t == target) {
-                isValid = false;
-            }
-        }
-    }
     if (!isTerritoryOwnedByPlayer(orderIssuer, from)) {
         isValid = false;
     }
@@ -289,11 +281,7 @@ bool Bomb::validate(){
         }
     }
     if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
-        for (auto t: orderIssuer->getTerritories()) {
-            if (t == target) {
-                isValid = false;
-            }
-        }
+        isValid = false;
     }
     if (!areTerritoriesAdjacent) {
         isValid = false;

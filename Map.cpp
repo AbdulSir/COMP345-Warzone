@@ -81,7 +81,6 @@ bool Map::adjacent_territory(string terr1, string terr2) {
                     returnValue = true;
                 }
             }
-            returnValue = false;
         }
     }
     return returnValue;
