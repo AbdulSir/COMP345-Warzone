@@ -179,6 +179,7 @@ void Advance::execute() {
                 orderIssuer->addTerritory(target);
                 target->setArmy(numberOfUnits);
                 this->effect = "Attack success, " + orderIssuer->getName() + " now own " + target->territory_name + ", and the territory now has " + to_string(target->army_nb) + " armies";
+                orderIssuer->setWillDrawCard(true);
             } else {
                 this->effect = "Attack failed, " + target->territory_name + " still has " + to_string(target->army_nb) + " armies"; 
             }

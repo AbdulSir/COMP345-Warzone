@@ -33,6 +33,7 @@ public:
     void removeTerritory(Territory* t);
     void setReinforcementPool(int number);
     void setPeacefulTerritories(vector<Territory*> v);
+    void setWillDrawCard(bool value);
 
 private:
     string name;
@@ -41,4 +42,5 @@ private:
     OrderList* orders;
     int reinforcementPool;
     vector <Territory*> peacefulTerrtories;
+    bool willDrawCardAtTheEndOfTurn;
 };
