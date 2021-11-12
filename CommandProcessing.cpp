@@ -129,8 +129,9 @@ void CommandProcessor::getCommand(string gameState) {
     else {
         cout << commandStr << " is not a valid command for the " << gameState << " state\n" << endl;
         Command* c = new Command(commandStr);
-        c->effect = "No effect (Invalid command for " + gameState + " state)";
+        LogObserver *observer = new LogObserver(c) ;
         saveCommand(c);
+        c->effect = "No effect (Invalid command for " + gameState + " state)";
     }
 }
 

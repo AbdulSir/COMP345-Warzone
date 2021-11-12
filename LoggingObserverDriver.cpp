@@ -149,7 +149,7 @@ int main() {
     
     orderList->addOrder(deployOrder1);
     
-    cout << *deployOrder1 << endl;
+    cout << "\n" << *deployOrder1 << endl;
     deployOrder1->execute();
     cout << endl;
     
