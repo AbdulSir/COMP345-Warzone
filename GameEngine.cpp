@@ -5,10 +5,13 @@
 //
 
 #include "GameEngine.h"
+#include "Player.h"
 #include <string>
 #include <iostream>
 using namespace std;
 
+
+class Player;
 
 //Constructor
 GameEngine::GameEngine() : state("start"), command("") {
@@ -191,4 +194,124 @@ void GameEngine::executeOrders() {
         win();
     else
         std::cout << "ERROR: Invalid command for " << state << " state" << endl;
+}
+
+void GameEngine::mainGameLoop(){
+    cout << "Starting Game"<<endl;
+    int numberOfTerritories; //will territories vector be created in part 2?
+    vector<Player*> playerList; //will this be created in Part 2??
+
+    bool gameWon = false;
+    while(gameWon==false){
+        //execute 3 main phases sequentially
+        reinforcementPhase();
+        issueOrdersPhase();
+        executeOrdersPhase();
+
+        //check for winner
+        for (Player player : playerList){
+            if (player.getTerritories().size() == numberOfTerritories){
+                cout << "The Winner Is: " << player.getName << endl;
+                gameWon = true;
+                break;
+            }
+        }
+        //check for players to remove
+        for (int i = 0; i < playerList.size(); i++){
+            if (playerList[i].getTerritories().size() == 0){
+                cout << playerList[i].getName << " has been eliminated." << endl;
+                playerList.erase(i);
+            }
+        }
+
+    }
+
+    //FINSIH THIS METHOD WITH LOGGING, OUTPUT MESSSAGE, ETC
+}
+
+void GameEngine::reinforcementPhase(){
+    cout << "Beginning Reinforcement Phase"<<endl;
+    vector<Player*> playerList; 
+
+    for (Player player : playerList){
+        //minimum added is 3 or minimum required in pool is 3??
+        if (player.getTerritories().size() < 12 && player.getTerritories.size() > 0){
+            player.setReinforcementPool(player.getReinforcementPool()+3);
+            cout << player.getName << " has " << player.getTerritories().size() << " territories" << endl;
+            cout << "3 armies added to reinforcement pool" << endl;
+        } 
+        else {
+            //add # of territories/3 rounded down to nearest int
+            player.setReinforcementPool(player.getReinforcementPool()+player.getTerritories().size()/3);
+            cout << player.getName << " has " << player.getTerritories.size() << " territories" << endl;
+            cout << player.getTerritories().size()/3 << " armies were added to their reinforcement pool" << endl;
+        }
+
+        //add continent control bonus if applicable
+        // -- **logic for ownership of continent*
+        /*
+        for (Player player : Playerlist)       {
+            for(int j=0; j < continents.size(); j++){
+                for(Territory territory: territories){
+                    if (isTerritoryOwnedByPlayer(player, territory)){
+                        player.setReinforcementPool(player.getReinforcementPool + continent.getControlBonus()); // continent not a class but this is the logic
+                    }
+                }
+
+            }
+        } 
+        */
+    }
+    cout << "Emd of Reinforcement Phase" << endl;
+}
+
+void GameEngine::issueOrdersPhase(){
+    vector<Player*> playerList;
+    bool readyToExecute = false;
+    int playersReady = 0;
+
+    cout << "Beginning issue orders phase.";
+
+    //each player adds an order until all players ready
+    while(!readyToExecute){
+
+        for (int i=0; i < playerList.size(); i++){
+            cout << "Player "<< i <<"\'s turn" <<endl;
+            char decision;
+
+            //Check if they would like to issue order or not
+            cout << "Would you like to issue an order? [y/n]"
+            cin >> decision;
+
+            //if they choose yes, send them to issueOrder dialogue
+            if (decision == 'y'){
+                playerList[i]->issueOrder();
+            }
+            else {
+                playersReady+=1; //if not, increment ready
+            }
+        }
+        //if all players decide not to issue order, set readyToExecute to true to break loop
+        if(playersReady == playersList.size()){
+                readyToExecute = true;
+            }
+    }
+
+    cout << End of issue orders phase" < <endl;
+}
+
+void GameEngine::executeOrdersPhase(){
+    vector<Player*> playerList;
+
+    // execute orders one player at a time until all orders have been executed
+    // need to determine which player(s) have the most # of orders, skip the indices of those who have less
+    for (int i=0; i < orders.size(); i++){
+        for (int j=0; j<playerList.size(); j++){
+            playerList[j]->getOrders[i]Order1->execute();
+        }
+
+    }
+
+
+
 }
