@@ -5,10 +5,10 @@
 
 #include "CommandProcessing.h"
 #include "GameEngine.h"
+#include "LoggingObserver.h"
 #include <iostream>
 using namespace std;
 #include <string>
-using namespace std;
 #include <fstream>
 
 //METHODS IN COMMAND
@@ -66,6 +66,18 @@ void Command::saveEffect(string c) {
     else if (c == "quit") {
         effect = "End of program";
     }
+    Notify(this);
+}
+
+//overrite ILoggable stringToLog method
+std::string Command::stringToLog(){
+    cout<<"\nWriting Command's Effect to gamelog.txt file ...\n"<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Command's Effect: "<<this->effect<<"\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return this->effect;
 }
 
 
@@ -110,8 +122,9 @@ void CommandProcessor::getCommand(string gameState) {
     if (validate(commandStr, gameState)) {
         cout << commandStr << " is a valid command for the " << gameState << " state\n" <<endl;
         Command* c = new Command(commandStr);
-        c->saveEffect(commandStr);
+        LogObserver *observer = new LogObserver(c) ;
         saveCommand(c);
+        c->saveEffect(commandStr);
     }
     else {
         cout << commandStr << " is not a valid command for the " << gameState << " state\n" << endl;
@@ -156,6 +169,23 @@ string CommandProcessor::readCommand() {
 //Saves command in list of commands
 void CommandProcessor::saveCommand(Command* c) {
     lc.push_back(c);
+    Notify(this);
+}
+
+//overrite ILoggable stringToLog method
+std::string CommandProcessor::stringToLog(){
+    cout<<"\nWriting Command to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    std::string gamelog;
+    for (auto it = this->lc.begin(); it != this->lc.end(); it++)
+    {
+        gamelog+=(*it)->command + " ";
+    }
+    myfile <<"Command: " << gamelog << "\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return gamelog;
 }
 
 
@@ -241,60 +271,3 @@ string FileLineReader::readLineFromFile(string fileName){
     input.close();
     return command;
 }
-
-
-
-int main() {
-    
-    string choice;
-    cout << "Please enter one of the following:" << endl
-    << "\t-console to enter commands in the console" << endl
-    << "\t-file <file name> to read commands from a file" << endl;
-    getline(cin, choice);
-    
-    if (choice == "-console") {
-        
-        //Reading commands from console
-        CommandProcessor* cp = new CommandProcessor();
-        cp->getCommand("start");
-        cp->getCommand("mapLoaded");
-        cp->getCommand("mapValidated");
-        cp->getCommand("playersAdded");
-        cp->getCommand("win");
-        cout << *cp;
-        
-        delete cp;
-        cp = NULL;
-    }
-    
-    else if (choice.substr(0,6) == "-file "){
-        string file = choice.substr(6);
-        //Reading commands from file
-        CommandProcessor* fcpa = new FileCommandProcessorAdapter(file);
-        fcpa->getCommand("start");
-        delete fcpa;
-        fcpa = NULL;
-    }
-    
-    //    FileLineReader f;
-    //    cout << f.readLineFromFile("validCommandsFile.txt");
-    //    cout << f.readLineFromFile("validCommandsFile.txt");
-    //    cout << f.readLineFromFile("validCommandsFile.txt");
-    //    cout << f.readLineFromFile("validCommandsFile.txt");
-    //    cout << f.readLineFromFile("validCommandsFile.txt");
-    //    cout << f.readLineFromFile("validCommandsFile.txt");
-    //    cout << f.readLineFromFile("validCommandsFile.txt");
-    //
-    //    FileCommandProcessorAdapter* fcpa = new FileCommandProcessorAdapter("validCommandsFile.txt");
-    //    fcpa -> readCommand();
-    //    fcpa -> readCommand();
-    //    fcpa -> readCommand();
-    //    fcpa -> readCommand();
-    //    fcpa -> readCommand();
-    //    fcpa -> readCommand();
-    //
-    //    CommandProcessor* cp = new FileCommandProcessorAdapter("validCommandsFile.txt");
-    //    cp->getCommand("start");
-    
-}
-

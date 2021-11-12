@@ -6,10 +6,11 @@
 
 
 #include <string>
+#include "LoggingObserver.h"
 using namespace std;
 
 #pragma once
-class GameEngine {
+class GameEngine : public ILoggable, public Subject {
     
 public:
     
@@ -52,5 +53,7 @@ public:
     void issueOrders();
     void executeOrders();
     
+    //overrite ILoggable stringToLog method
+    virtual std::string stringToLog();
 };
 

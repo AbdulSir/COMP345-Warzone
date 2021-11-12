@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 
 using namespace std;
 
@@ -57,6 +58,18 @@ void Order::execute(){
     } else {
         cout << "Order "<< orderId <<" invalid! Execution failed."<<endl;
     }
+    Notify(this);
+}
+
+std::string Order::stringToLog(){
+    cout<<"\nWriting executed Order to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Order executed: ";
+    myfile <<to_string(this->orderId)<<"\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return to_string(this->orderId);
 }
 
 //Deploy Class
@@ -90,6 +103,7 @@ bool Deploy::validate() {
 };
 
 void Deploy::execute() {
+    Order::execute();
     if (validate()) {
         vector <Territory*> territories = orderIssuer->getTerritories();
         for (auto t: territories) {
@@ -147,6 +161,7 @@ bool Advance::validate() {
 };
 
 void Advance::execute() {
+    Order::execute();
     if (validate()) {
         // TODO: complete this code
         cout << "Advance order executed" << endl;
@@ -205,6 +220,7 @@ bool Airlift::validate() {
 };
 
 void Airlift::execute(){
+    Order::execute();
     if (validate()) {
         from->setArmy(from->army_nb - numberOfUnits);
         target->setArmy(target->army_nb + numberOfUnits);
@@ -250,6 +266,7 @@ bool Bomb::validate(){
 };
 
 void Bomb::execute(){
+    Order::execute();
     if (validate()) {
         target->setArmy(target->army_nb / 2);
         cout << "Bomb order executed" << endl;
@@ -290,6 +307,7 @@ bool Blockade::validate(){
 };
 
 void Blockade::execute(){
+    Order::execute();
     if (validate()) {
         target->setArmy(target->army_nb *2);
         // TODO: transfer ownership to neutral
@@ -330,6 +348,7 @@ bool Negotiate::validate(){
 };
 
 void Negotiate::execute(){
+    Order::execute();
     if (validate()) {
         // TODO: complete this code
         cout << "Negotiate order executed" << endl;
@@ -371,7 +390,8 @@ OrderList& OrderList::operator= (const OrderList& o){
 
 //add order to orderList
 void OrderList::addOrder(Order* order){
-   orderList.push_back(order);
+    orderList.push_back(order);
+    Notify(this);
 }
 
 //move order inside orderList
@@ -394,6 +414,21 @@ void OrderList::remove(Order* order){
         }
     }
     cout <<"Order "<< order->orderId <<" removed from list" << endl;
+}
+
+std::string OrderList::stringToLog(){
+    cout<<"\nWriting issued Order to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Order issued: ";
+    std::string orderIssued;
+    for(int i=0; i<orderList.size();i++){
+        orderIssued=+orderList[i]->orderId;
+        myfile <<orderList[i]->orderId<<"\n";
+    }
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return orderIssued;
 }
 
 //stream insertion operators
