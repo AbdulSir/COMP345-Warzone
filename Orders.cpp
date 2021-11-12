@@ -202,10 +202,10 @@ void Airlift::execute(){
     if (validate()) {
         from->setArmy(from->army_nb - numberOfUnits);
         target->setArmy(target->army_nb + numberOfUnits);
-        cout << "Airlife order executed" << endl;
+        cout << "Airlift order executed" << endl;
         this->effect = "Airlifted from " + from->territory_name + " " + to_string(numberOfUnits) + " armies to territory " + target->territory_name;
     } else {
-        cout << "Airlife order invalid" << endl;
+        cout << "Airlift order invalid" << endl;
     }
 }
 
@@ -295,7 +295,7 @@ void Blockade::execute(){
         orderIssuer->removeTerritory(target);
         neutral->addTerritory(target);
         cout << "Blockade order executed" << endl;
-        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + neutral->getName();
+        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + neutral->getName() + " and this territory has " + to_string(target->army_nb) + " armies";
     } else {
         cout << "Blockade order invalid" << endl;
     }

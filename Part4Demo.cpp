@@ -20,6 +20,7 @@ int main() {
     // Player only owns A and B
     Player* player1 = new Player("testName", h, v);
     Player* neutralPlayer = new Player("Neutral", new Hand, v1);
+
     // Deploy test cases:
     cout << "-----Test case: player does deploy order but the target territory does not belong to the player-----" << endl;
     Deploy* deployOrder1 = new Deploy(player1, thirdTerritory, 3);
