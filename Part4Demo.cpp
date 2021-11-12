@@ -7,10 +7,14 @@
 using namespace std;
 
 int main() {
-    Map* m = new Map("[continents]\nNorth_Europe 5 red\nEast_Europe 4 magenta\nSouth_Europe 5 green\nWest_Europe 3 blue\n\n[countries]\n1 England 1 164 126\n2 Scotland 1 158 44\n3 N_Ireland 1 125 70\n4 Rep_Ireland 1 106 90\n5 Wales 1 141 109\n6 Belgum 1 213 153\n7 Netherlands 1 226 128\n\n[borders]\n1 6 7 5 2 3 4\n2 1 3\n3 1 2\n4 1 5\n5 1 4\n6 7 1\n7 6 1\n\n");
+    MapLoader* map_loader = new MapLoader("europe.map");
+    Map* m = map_loader->map_object;
     cout << endl << endl;
+    Deck* gameDeck = new Deck(10);
+
     Hand* h = new Hand;
     Hand* h1 = new Hand;
+
     OrderList* orderList = new OrderList();
     Territory* firstTerritory = m->territories[0];
     Territory* secondTerritory = m->territories[1];
@@ -70,13 +74,13 @@ int main() {
 
     cout << "-----Test case: player does advance order, target is enemy's territory, guaranteed to win-----" << endl;
     thirdTerritory->setArmy(0);
-    Advance* advanceOrder2 = new Advance(player1, firstTerritory, thirdTerritory, 10, m);
+    Advance* advanceOrder2 = new Advance(player1, secondTerritory, thirdTerritory, 10, m);
     advanceOrder2->execute();
     cout << *advanceOrder2 << endl;
 
     cout << "-----Test case: player does advance order, target is enemy's territory, guaranteed to lose-----" << endl;
     thirdTerritory->setArmy(1000);
-    Advance* advanceOrder3 = new Advance(player1, firstTerritory, thirdTerritory, 1, m);
+    Advance* advanceOrder3 = new Advance(player1, secondTerritory, thirdTerritory, 1, m);
     advanceOrder3->execute();
     cout << *advanceOrder3 << endl;
 
