@@ -30,19 +30,10 @@ Territory& Territory::operator= (const Territory& terr) {
 }
 
 // Stream insertion operators
-ostream & operator << (ostream &out, const Territory &terr) {
-    out << terr.territory_name << endl;
+ostream & operator << (ostream &out, const Territory &t1) {
+    out << endl << "Territory name " << t1.territory_name << endl;
+    out << "Number of armies: " << t1.army_nb << endl;
     return out;
-}
-
-istream & operator >> (istream &in,  Territory &terr) {
-    cout << "Enter territory name ";
-    in >> terr.territory_name;
-    cout << "Enter continent ref ";
-    in >> terr.continent_ref;
-    cout << "Enter number of armies for that territory ";
-    in >> terr.army_nb;
-    return in;
 }
 
 Territory::Territory (string terr_name, int contin_ref, int nb_of_armies)
@@ -56,6 +47,10 @@ Territory::Territory (string terr_name, int contin_ref, int nb_of_armies)
 string Territory::getName()
 {
     return territory_name;
+}
+
+void Territory::setArmy(int numberOfArmy) {
+    army_nb = numberOfArmy;
 }
 
 // Map CLASS
@@ -388,10 +383,4 @@ MapLoader::MapLoader(string file_name)
     map_object = new Map(text_contents);
     // Close the file
     MyReadFile.close();
-}
-
-//Dummy Player CLASS
-Player::Player ()
-{
-
 }
