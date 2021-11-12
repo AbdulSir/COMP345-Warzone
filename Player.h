@@ -9,9 +9,7 @@
 #include "Map.h"
 using namespace std;
 
-class Order;
 class OrderList;
-class Card;
 class Hand;
 class Territory;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Player.h"
+#include "Map.h"
 #include <string>
 #include <vector>
 #include <iostream>
