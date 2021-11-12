@@ -84,7 +84,42 @@ vector <Territory*> Player::toAttack(){
 }
 
 void Player::issueOrder(){
-    cout << "Inside issueOrder of Player" << endl;
+    string currentOrder;
+    cout << "Inside issue order of Player" << endl;
+   
+   if (player.getReinforcementPool() != 0){
+       Deploy deployOrder = new Deploy();
+   } 
+
+    switch(currentOrder) {
+        case "deploy":
+           // Deploy deployOrder = new Deploy();
+            Deploy order = new Deploy();
+
+    break;
+         case "advance":
+           // Advance advanceOrder = new Advance();
+           Advance order = new Advance();
+    break;
+        case "airlift":
+           //Airlift airliftOrder = new Airlift();
+           Airlift order = new Airlift();
+    break;
+         case "bomb":
+           // Bomb bombOrder = new Bomb();
+           Bomb order = new Bomb();
+    break;
+        case "blockade":
+           // Blockade blockadeOrder = new Blockade();
+           Blockade order = new Blockade();
+    break;
+         case "negotiate":
+          //  Negotiate negotiateOrder = name Negotiate();
+          Negotiate order = name Negotiate();
+    break;
+        default:
+            break;
+}
     Order * order = new Order();
     this->orders->orderList.push_back(order);
 }
