@@ -51,6 +51,11 @@ public:
     void assignReinforcement();
     void issueOrders();
     void executeOrders();
-    
+
+    //Main game loop for reinforcement, issuing orders, and orders execution phase
+    void mainGameLoop();
+    void reinforcementPhase();
+    void issueOrdersPhase();
+    void executeOrdersPhase();
 };
 
