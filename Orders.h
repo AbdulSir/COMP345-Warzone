@@ -15,6 +15,7 @@ class Order {
     public:
         int orderId;
         static int currentId;
+        string effect;
         // attributes
         Player* orderIssuer;
         //default constructor
@@ -27,6 +28,7 @@ class Order {
         Order(const Order &order);
         // virtual ~Order();
         void setOrderIssuer(Player* orderIssuer);
+        void setEffect(string effect);
         bool validate();
         virtual void execute();
         //stream insertion operators
@@ -121,10 +123,11 @@ class Blockade: public Order {
     public:
         // attributes
         Territory* target;
+        Player* neutral;
         //default constructor
         Blockade();
         //parametrized constructor
-        Blockade(Player* player, Territory* territory);
+        Blockade(Player* player, Territory* territory, Player* neutral);
         //copy constructor
         Blockade(const Blockade& bl);
         //asssignment operator
@@ -133,6 +136,7 @@ class Blockade: public Order {
         void execute();
         //setters
         void setTarget(Territory* target);
+        void setNeutralPlayer(Player* player);
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Blockade &order);
 };

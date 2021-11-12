@@ -6,6 +6,7 @@
 #include <iostream>
 #include <ostream>
 #include <string>
+
 using namespace std;
 
 //Default constructor
@@ -98,6 +99,18 @@ string Player::getName() {
 
 void Player::setReinforcementPool(int number) {
     reinforcementPool = number;
+};
+
+void Player::addTerritory(Territory* t) {
+    territories.push_back(t);
+};
+
+void Player::removeTerritory(Territory* t) {
+    for (int i=0; i<territories.size(); i++) {
+        if (territories[i] == t) {
+            territories.erase(find(territories.begin(), territories.end(), t));
+        }
+    }
 };
 
 int Player::getReinforcementPool() {

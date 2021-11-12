@@ -31,6 +31,8 @@ public:
     OrderList* getOrders();
     string getName();
     int getReinforcementPool();
+    void addTerritory(Territory* t);
+    void removeTerritory(Territory* t);
     void setReinforcementPool(int number);
 
 private:

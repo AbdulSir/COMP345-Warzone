@@ -22,11 +22,12 @@ bool isTerritoryOwnedByPlayer(Player* p, Territory* territory) {
 
 int Order::currentId = 0;
 // default constructor
-Order::Order(): orderId(currentId++) {};
+Order::Order(): orderId(currentId++), effect("None") {};
 
 // parametrized constructor
 Order::Order(Player* player) : orderId(currentId++) {
     this->orderIssuer = player;
+    this->effect = "None";
 };
 
 Order::Order(const Order &o) {
@@ -53,7 +54,7 @@ bool Order::validate() {
 
 void Order::execute(){
     if (validate()){
-        cout <<"Order " << orderId << " executed"<< endl;
+        cout << "Order " << orderId << " executed"<< endl;
     } else {
         cout << "Order "<< orderId <<" invalid! Execution failed."<<endl;
     }
@@ -64,8 +65,7 @@ Deploy::Deploy() : Order() {}
 
 //constructor
 Deploy::Deploy(Player* player, Territory* territory, int number) : Order(player) {
-    this->target = new Territory;
-    *target = *territory;
+    target = territory;
     numberOfUnits = number;
 }
 
@@ -92,13 +92,11 @@ bool Deploy::validate() {
 void Deploy::execute() {
     if (validate()) {
         vector <Territory*> territories = orderIssuer->getTerritories();
-        for (auto t: territories) {
-            if (t->territory_name == target->territory_name) {
-                orderIssuer->setReinforcementPool(orderIssuer->getReinforcementPool() - numberOfUnits);
-                t->setArmy(target->army_nb + numberOfUnits);
-            }
-        }
+        orderIssuer->setReinforcementPool(orderIssuer->getReinforcementPool() - numberOfUnits);
+        target->setArmy(target->army_nb + numberOfUnits);
+
         cout << "Deploy order executed" << endl;
+        this->effect = "Deployed " + to_string(numberOfUnits) + " to territory " + target->territory_name + " | " + to_string(target->army_nb) + " armies";
     } else {
         cout << "Deploy order invalid" << endl;
     }
@@ -110,10 +108,8 @@ Advance::Advance() : Order() {};
 
 //constructor
 Advance::Advance(Player* player, Territory* t1, Territory* t2, int number) : Order(player) {
-    this->from = new Territory;
-    *from = *t1;
-    this->target = new Territory;
-    *target = *t2;
+    from = t1;
+    target = t2;
     numberOfUnits = number;
 }
 
@@ -161,10 +157,8 @@ Airlift::Airlift():Order(){};
 
 //constructor
 Airlift::Airlift(Player* player, Territory* t1, Territory* t2, int number) : Order(player){
-    this->from = new Territory;
-    *from = *t1;
-    this->target = new Territory;
-    *target = *t2;
+    from = t1;
+    target = t2;
     numberOfUnits = number;
 }
 
@@ -209,6 +203,7 @@ void Airlift::execute(){
         from->setArmy(from->army_nb - numberOfUnits);
         target->setArmy(target->army_nb + numberOfUnits);
         cout << "Airlife order executed" << endl;
+        this->effect = "Airlifted from " + from->territory_name + " " + to_string(numberOfUnits) + " armies to territory " + target->territory_name;
     } else {
         cout << "Airlife order invalid" << endl;
     }
@@ -220,8 +215,7 @@ Bomb::Bomb():Order() {};
 
 //constructor
 Bomb::Bomb(Player* player, Territory* t1, Territory* t2) : Order(player){
-    this->target = new Territory;
-    *target = *t2;
+    target = t2;
 }
 
 //copy constructor
@@ -253,6 +247,7 @@ void Bomb::execute(){
     if (validate()) {
         target->setArmy(target->army_nb / 2);
         cout << "Bomb order executed" << endl;
+        this->effect = "Bombed to territory " + target->territory_name + " | " + to_string(target->army_nb) + " armies left";
     } else {
         cout << "Bomb order invalid" << endl;
     }
@@ -263,8 +258,9 @@ void Bomb::execute(){
 Blockade::Blockade():Order() {};
 
 //constructor
-Blockade::Blockade(Player* player, Territory* territory) : Order(player) {
-    this->target = territory;
+Blockade::Blockade(Player* player, Territory* territory, Player* neutral) : Order(player) {
+    target = territory;
+    neutral = neutral;
 }
 
 //copy constructor
@@ -285,6 +281,10 @@ void Blockade::setTarget(Territory* t) {
     target = t;
 };
 
+void Blockade::setNeutralPlayer(Player* player) {
+    neutral = player;
+};
+
 bool Blockade::validate(){
     return isTerritoryOwnedByPlayer(orderIssuer, target);
 };
@@ -292,8 +292,10 @@ bool Blockade::validate(){
 void Blockade::execute(){
     if (validate()) {
         target->setArmy(target->army_nb *2);
-        // TODO: transfer ownership to neutral
+        orderIssuer->removeTerritory(target);
+        neutral->addTerritory(target);
         cout << "Blockade order executed" << endl;
+        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + neutral->getName();
     } else {
         cout << "Blockade order invalid" << endl;
     }
@@ -305,7 +307,7 @@ Negotiate::Negotiate():Order() {};
 
 //constructor
 Negotiate::Negotiate(Player* player, Player* target) : Order(player) {
-    this->target = target;
+    target = target;
 }
 
 //copy constructor
@@ -412,19 +414,22 @@ ostream& operator<<(ostream& out, const Order& o)
     out << "Order:"<<endl ;
     out << "-------------------------------"<<endl;
     out << "ID: "<< o.orderId << endl;
-    out<<"Order Issuer: "<< o.orderIssuer->getName();
+    out << "Order Issuer: "<< o.orderIssuer->getName() << endl;
+    out << "Effect: " << o.effect << endl;
     return out;
 }
 
 ostream& operator <<(ostream &out, const Deploy &order) {
-    out << static_cast<const Order&>(order) << endl;
+    out << static_cast<const Order&>(order);
+    out << "Type: Deploy" << endl;
     out << "Target: " << order.target->territory_name << endl;
     out << "Number of armies: " << order.numberOfUnits << endl;
     return out;
 }
 
 ostream& operator <<(ostream &out, const Advance &order) {
-    out << static_cast<const Order&>(order) << endl;
+    out << static_cast<const Order&>(order);
+    out << "Type: Advance" << endl;
     out << "From: " << order.from->territory_name << endl;
     out << "Target: " << order.target->territory_name << endl;
     out << "Number of armies: " << order.numberOfUnits << endl;
@@ -432,7 +437,8 @@ ostream& operator <<(ostream &out, const Advance &order) {
 }
 
 ostream& operator <<(ostream &out, const Airlift &order) {
-    out << static_cast<const Order&>(order) << endl;
+    out << static_cast<const Order&>(order);
+    out << "Type: Airlift" << endl;
     out << "From: " << order.from->territory_name << endl;
     out << "Target: " << order.target->territory_name << endl;
     out << "Number of armies: " << order.numberOfUnits << endl;
@@ -440,19 +446,22 @@ ostream& operator <<(ostream &out, const Airlift &order) {
 }
 
 ostream& operator <<(ostream &out, const Bomb &order) {
-    out << static_cast<const Order&>(order) << endl;
+    out << static_cast<const Order&>(order);
+    out << "Type: Bomb" << endl;
     out << "Target: " << order.target->territory_name << endl;
     return out;
 }
 
 ostream& operator <<(ostream &out, const Blockade &order) {
-    out << static_cast<const Order&>(order) << endl;
+    out << static_cast<const Order&>(order);
+    out << "Type: Blockade" << endl;
     out << "Target: " << order.target->territory_name << endl;
     return out;
 }
 
 ostream& operator <<(ostream &out, const Negotiate &order) {
-    out << static_cast<const Order&>(order) << endl;
+    out << static_cast<const Order&>(order);
+    out << "Type: Negotiate" << endl;
     out << "Targetted player: " << order.target->getName() << endl;
     return out;
 }
