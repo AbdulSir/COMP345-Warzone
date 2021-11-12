@@ -154,6 +154,8 @@ class Negotiate: public Order {
         Negotiate(const Negotiate& n);
         //asssignment operator
         Negotiate& operator= (const Negotiate& n);
+        //setters
+        void setTarget(Player* target);
         bool validate();
         void execute();
         //stream insertion operators

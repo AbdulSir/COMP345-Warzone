@@ -8,18 +8,27 @@ using namespace std;
 
 int main() {
     Hand* h = new Hand;
+    Hand* h1 = new Hand;
     OrderList* orderList = new OrderList();
     Territory* firstTerritory = new Territory("A", 0, 10);
     Territory* secondTerritory = new Territory("B", 0, 10);
     Territory* thirdTerritory = new Territory("C", 0, 0);
     Territory* fourthTerritory = new Territory("D", 0, 10000);
+    Territory* fifthTerritory = new Territory("E", 0, 10);
+    Territory* sixthTerritory = new Territory("F", 0, 10);
 
     vector <Territory*> v;
     vector <Territory*> v1;
+    vector <Territory*> v2;
+
     v.push_back(firstTerritory);
     v.push_back(secondTerritory);
+    v2.push_back(fifthTerritory);
+    v2.push_back(sixthTerritory);
+
     // Player only owns A and B
     Player* player1 = new Player("testName", h, v);
+    Player* player2 = new Player("anotherName", h1, v2);
     Player* neutralPlayer = new Player("Neutral", new Hand, v1);
 
     // Deploy test cases:
@@ -145,6 +154,27 @@ int main() {
     cout << *blockadeOrder2 << endl;
 
     // Negotiate test cases:
+    cout << "-----Test case: create negotiate order with card, valid order-----" << endl;
+    h1->addToHand(new Card("diplomacy"));
+    Negotiate* negotiateOrder1 = dynamic_cast<Negotiate*>(h1->discardFromHand().play());
+    negotiateOrder1->setOrderIssuer(player1);
+    negotiateOrder1->setTarget(player2);
+
+    negotiateOrder1->execute();
+    cout << *negotiateOrder1 << endl;
+    Advance* testAttackOrder = new Advance(player1, firstTerritory, fifthTerritory, 5);
+    testAttackOrder->execute();
+    cout << *testAttackOrder << endl;
+
+    cout << "-----Test case: create negotiate order with card, target is the issuer, invalid order-----" << endl;
+    h1->addToHand(new Card("diplomacy"));
+    Negotiate* negotiateOrder2 = dynamic_cast<Negotiate*>(h1->discardFromHand().play());
+    negotiateOrder2->setOrderIssuer(player1);
+    negotiateOrder2->setTarget(player1);
+
+    negotiateOrder2->execute();
+    cout << *negotiateOrder2 << endl;
+
 
     orderList = NULL;
     firstTerritory = NULL;

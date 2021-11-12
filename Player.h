@@ -32,6 +32,7 @@ public:
     void addTerritory(Territory* t);
     void removeTerritory(Territory* t);
     void setReinforcementPool(int number);
+    void setPeacefulTerritories(vector<Territory*> v);
 
 private:
     string name;
@@ -39,4 +40,5 @@ private:
     vector <Territory*> territories;
     OrderList* orders;
     int reinforcementPool;
+    vector <Territory*> peacefulTerrtories;
 };

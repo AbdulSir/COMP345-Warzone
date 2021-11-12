@@ -136,17 +136,29 @@ Advance& Advance::operator=(const Advance& a){
 }
 
 bool Advance::validate() {
-    bool isSourceOwnedByIssuer = isTerritoryOwnedByPlayer(orderIssuer, from);
+    bool isValid = true;
+
     // TODO: modify territory class
     // hard code to true for now
     bool areTerritoriesAdjacent = true;
-
-    return isSourceOwnedByIssuer && areTerritoriesAdjacent;
+    if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
+        for (auto t: orderIssuer->getTerritories()) {
+            if (t == target) {
+                isValid = false;
+            }
+        }
+    }
+    if (!isTerritoryOwnedByPlayer(orderIssuer, from)) {
+        isValid = false;
+    }
+    if (!areTerritoriesAdjacent) {
+        isValid = false;
+    }
+    return isValid;
 };
 
 void Advance::execute() {
     if (validate()) {
-        // TODO: complete this code
         if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
             from->setArmy(from->army_nb - numberOfUnits);
             target->setArmy(target->army_nb + numberOfUnits);
@@ -266,7 +278,18 @@ bool Bomb::validate(){
     // TODO: modify territory class
     // hard code to true for now
     bool areTerritoriesAdjacent = true;
-    return !isTerritoryOwnedByPlayer(orderIssuer, target) && areTerritoriesAdjacent;
+    bool isValid = true;
+    if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
+        for (auto t: orderIssuer->getTerritories()) {
+            if (t == target) {
+                isValid = false;
+            }
+        }
+    }
+    if (!areTerritoriesAdjacent) {
+        isValid = false;
+    }
+    return isValid;
 };
 
 void Bomb::execute(){
@@ -350,6 +373,10 @@ Negotiate& Negotiate::operator=(const Negotiate& n){
     return *this;
 }
 
+void Negotiate::setTarget(Player* p) {
+    target = p;
+};
+
 bool Negotiate::validate(){
     if (target->getName() == orderIssuer->getName()) {
         return false;
@@ -359,7 +386,9 @@ bool Negotiate::validate(){
 
 void Negotiate::execute(){
     if (validate()) {
-        // TODO: complete this code
+        orderIssuer->setPeacefulTerritories(target->getTerritories());
+        target->setPeacefulTerritories(orderIssuer->getTerritories());
+        this->effect = orderIssuer->getName() + " and " + target->getName() + " have agreed not to attack each other.";
         cout << "Negotiate order executed" << endl;
     } else {
         cout << "Negotiate order invalid" << endl;

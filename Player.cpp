@@ -117,6 +117,10 @@ int Player::getReinforcementPool() {
     return reinforcementPool;
 }
 
+void Player::setPeacefulTerritories(vector<Territory*> v) {
+    peacefulTerrtories = v;
+};
+
 //stream insertion operator
 ostream& operator<<(ostream& out, const Player& p)
 {
