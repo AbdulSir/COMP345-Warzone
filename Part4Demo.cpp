@@ -175,14 +175,24 @@ int main() {
     negotiateOrder2->execute();
     cout << *negotiateOrder2 << endl;
 
-
+    h = NULL;
+    h1 = NULL;
     orderList = NULL;
     firstTerritory = NULL;
     secondTerritory = NULL;
     thirdTerritory = NULL;
+    fourthTerritory = NULL;
+    fifthTerritory = NULL;
+    sixthTerritory = NULL;
     player1 = NULL;
+    player2 = NULL;
+    neutralPlayer = NULL;
     deployOrder1 = NULL;
     deployOrder2 = NULL;
+    deployOrder3 = NULL;
+    advanceOrder1 = NULL;
+    advanceOrder2 = NULL;
+    advanceOrder3 = NULL;
     airliftOrder1 = NULL;
     airliftOrder2 = NULL;
     airliftOrder3 = NULL;
@@ -190,15 +200,27 @@ int main() {
     bombOrder2 = NULL;
     blockadeOrder1 = NULL;
     blockadeOrder2 = NULL;
+    negotiateOrder1 = NULL;
+    negotiateOrder2 = NULL;
+    testAttackOrder = NULL;
 
     //delete all pointers
     delete orderList;
-    delete firstTerritory; 
+    delete firstTerritory;
     delete secondTerritory;
-    delete thirdTerritory; 
+    delete thirdTerritory;
+    delete fourthTerritory;
+    delete fifthTerritory;
+    delete sixthTerritory;
     delete player1;
+    delete player2;
+    delete neutralPlayer;
     delete deployOrder1;
     delete deployOrder2;
+    delete deployOrder3;
+    delete advanceOrder1;
+    delete advanceOrder2;
+    delete advanceOrder3;
     delete airliftOrder1;
     delete airliftOrder2;
     delete airliftOrder3;
@@ -206,6 +228,9 @@ int main() {
     delete bombOrder2;
     delete blockadeOrder1;
     delete blockadeOrder2;
+    delete negotiateOrder1;
+    delete negotiateOrder2;
+    delete testAttackOrder;
 
     return 0;
 }
