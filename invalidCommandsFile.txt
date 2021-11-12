@@ -1,0 +1,6 @@
+loadmap g.map
+validatemap
+addplayer PlayerX
+addplayers PlayerY PlayerZ
+startgame
+replay
