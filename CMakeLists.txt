@@ -17,4 +17,3 @@ add_executable(Part4Demo Part4Demo.cpp Player.cpp Orders.cpp Cards.cpp Map.cpp)
 add_executable(OrdersDriver OrdersDriver.cpp Orders.cpp)
 
 add_executable(CommandProcessingDriver CommandProcessingDriver.cpp CommandProcessing.cpp)
-add_executable(Part4Demo Part4Demo.cpp Player.cpp Orders.cpp Cards.cpp Map.cpp)
