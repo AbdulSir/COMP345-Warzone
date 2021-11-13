@@ -9,7 +9,6 @@ using namespace std;
 
 int main(){
     GameEngine *ge = new GameEngine();
-    ge->reinforcementSetup();
-    ge->reinforcementPhase();
+    ge->mainGameLoop();
     return 0;
 }

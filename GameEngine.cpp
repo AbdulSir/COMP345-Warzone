@@ -376,13 +376,11 @@ void GameEngine::reinforcementPhase(){
         }
 
     }
-    cout << "Enmd of Reinforcement Phase" << endl;
+    cout << "End of Reinforcement Phase" << endl;
 }
 
 void GameEngine::issueOrdersPhase(){
-
     cout << "Beginning issue orders phase.";
-
         //each player adds their orders until all players are done
         for (int i=0; i < players.size(); i++){
             cout << "Player "<< i <<"\'s turn" <<endl;
