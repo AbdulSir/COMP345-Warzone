@@ -293,13 +293,13 @@ void GameEngine::mainGameLoop(){
 
         //check for players to remove
         for (int i = 0; i < players.size(); i++){
-            if (players[i].getTerritories().size() == 0){
-                cout << players[i].getName << " has been eliminated." << endl;
-                players.erase(i);
+            if (players[i]->getTerritories().size() == 0){
+                cout << players[i]->getName() << " has been eliminated." << endl;
+                players.erase(find(players.begin(), players.end(), players[i]));
             }
         }
         //check if there is a winner
-        if (players->size() == 1){
+        if (players.size() == 1){
             cout << "The winner is " << players[0]->getName();
             break;
         }
@@ -356,16 +356,16 @@ void GameEngine::reinforcementPhase(){
 
     for (auto player : players){
         //minimum added is 3 or minimum required in pool is 3??
-        if (player->getTerritories().size() < 12 && player->getTerritories.size() > 0){
+        if (player->getTerritories().size() < 12 && player->getTerritories().size() > 0){
             player->setReinforcementPool(player->getReinforcementPool()+3);
-            cout << player->getName << " has " << player->getTerritories().size() << " territories" << endl;
+            cout << player->getName() << " has " << player->getTerritories().size() << " territories" << endl;
             cout << "3 armies added to reinforcement pool" << endl;
         } 
         else {
             //add # of territories/3 rounded down to nearest int
-            player.setReinforcementPool(player.getReinforcementPool()+player.getTerritories().size()/3);
-            cout << player->getName << " has " << player->getTerritories.size() << " territories" << endl;
-            cout << player->getTerritories()->size()/3 << " armies were added to their reinforcement pool" << endl;
+            player->setReinforcementPool(player->getReinforcementPool()+player->getTerritories().size()/3);
+            cout << player->getName() << " has " << player->getTerritories().size() << " territories" << endl;
+            cout << player->getTerritories().size()/3 << " armies were added to their reinforcement pool" << endl;
         }
 
         //Apply Continent bonus to each player where applicable
@@ -394,12 +394,12 @@ void GameEngine::issueOrdersPhase(){
     cout << "Beginning issue orders phase.";
 
         //each player adds their orders until all players are done
-        for (int i=0; i < players->size(); i++){
+        for (int i=0; i < players.size(); i++){
             cout << "Player "<< i <<"\'s turn" <<endl;
             //use a while loop?
                 players[i]->issueOrder();
         }
-        cout << "End of issue orders phase" < <endl;
+        cout << "End of issue orders phase" << endl;
     }
 
 void GameEngine::executeOrdersPhase(){
@@ -407,16 +407,11 @@ void GameEngine::executeOrdersPhase(){
     // need to determine which player(s) have the most # of orders, skip the indices of those who have less
 
     //loop through players and execute all their orders
-    for (int i= 0; i < players->size(); i++){
-        OrderList orderList = players[i]->getOrders();
-
-        for (int j = 0; j < orderList->size(); j++){
-            orderList[j]->execute();
+    for (auto player: players){
+        for (auto order: player->getOrders()->getOrderList()) {
+            order->execute();
         }
-     
     }
-
-
 }
 void GameEngine::startupPhase()
 {

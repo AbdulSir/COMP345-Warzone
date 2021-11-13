@@ -485,6 +485,10 @@ void OrderList::remove(Order* order){
     cout <<"Order "<< order->orderId <<" removed from list" << endl;
 }
 
+vector<Order*> Order::getOrderList() {
+    return orderList;
+};
+
 std::string OrderList::stringToLog(){
     cout<<"\nWriting issued Order to gamelog.txt file ..."<<endl;
     std::ofstream myfile;

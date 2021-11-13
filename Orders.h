@@ -188,6 +188,7 @@ class OrderList : public ILoggable, public Subject {
         void move(Order* order, int newPosition);
         //remove order from list
         void remove(Order* order);
+        vector<Order*> getOrderList();
         // stream insertion operators
         friend ostream& operator<< (ostream& out, const OrderList& orderList);
         virtual std::string stringToLog();

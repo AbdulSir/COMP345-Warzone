@@ -11,5 +11,5 @@ int main(){
     GameEngine *ge = new GameEngine();
     ge->reinforcementSetup();
     ge->reinforcementPhase();
-
+    return 0;
 }
