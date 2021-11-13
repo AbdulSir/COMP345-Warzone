@@ -24,6 +24,8 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories){
     this->name = name;
     this->hand = hand;
     this->territories = territories;
+    this->defendList = territories;
+    this->attackList = {};
     this->orders= new OrderList();
     this->reinforcementPool = 50;
     this->willDrawCardAtTheEndOfTurn = false;
@@ -70,7 +72,7 @@ Player& Player::operator=(const Player& p){
 
 vector <Territory*> Player::toDefend(){
     cout << "Inside toDefend of Player" << endl;
-    Territory * tt1=new Territory("United Kingdome",0,5);
+    Territory * tt1=new Territory("United Kingdom",0,5);
     Territory * tt2=new Territory("Ireland",0,5);
     vector<Territory*> t={tt1,tt2};
     return t;
@@ -84,13 +86,24 @@ vector <Territory*> Player::toAttack(){
 }
 
 void Player::issueOrder(){
-    string currentOrder;
-    cout << "Inside issue order of Player" << endl;
-   
-   if (player.getReinforcementPool() != 0){
-       Deploy deployOrder = new Deploy();
-   } 
 
+    cout << "Inside issue order of Player" << endl;
+   int currentReinforcements = this.getReinforcementPool();
+    if (this.getReinforcementPool() > 0){
+        cout << "Reinforcements found, creating deploy order" << endl;
+        Deploy deployOrder = new Deploy(5);
+        currentReinforcements-=5;
+        this->orders->orderList.push_back(deployOrder);
+    } 
+    //choose to advance or play card
+        if (this->hand->handDeck->size()>0){
+            
+
+        }
+   
+
+
+/*
     switch(currentOrder) {
         case "deploy":
            // Deploy deployOrder = new Deploy();
@@ -120,8 +133,8 @@ void Player::issueOrder(){
         default:
             break;
 }
-    Order * order = new Order();
-    this->orders->orderList.push_back(order);
+*/
+    
 }
 
 vector <Territory*> Player::getTerritories() {
