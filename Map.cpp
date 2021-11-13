@@ -278,7 +278,6 @@ void Map::displayContinents()
     for (int i=0; i< num_of_continents; i++)
     {
         cout << "Continent " << i << ": ";
-        cout << continent_graph[i].size() << endl;
         for (Territory* terr:continent_graph[i])
         {
             cout << terr->getName() <<"->";
