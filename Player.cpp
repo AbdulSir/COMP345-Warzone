@@ -98,15 +98,21 @@ void Player::issueOrder(){
     cout << "Inside issue order of Player" << endl;
    int currentReinforcements = this.getReinforcementPool();
     if (this.getReinforcementPool() > 0){
+
         cout << "Reinforcements found, creating deploy order" << endl;
         Deploy deployOrder = new Deploy(5);
-        currentReinforcements-=5;
+        currentReinforcements -= 5;
         this->orders->orderList.push_back(deployOrder);
+
     } 
     //choose to advance or play card
-        if (this->hand->handDeck->size()>0){
+        if (this.toAttack.size()>0){
+            Advance advanceOrder = new Advance();
+            this->orders->orderList.push_back(deployOrder);
+        }
+        if (this.hand->handDeck->size()>0){
             
-
+            this->orders->orderList.push_back();
         }
    
 

@@ -70,5 +70,6 @@ public:
     vector<int> player_owns_all_territories(Player* p1);
     //overrite ILoggable stringToLog method
     virtual std::string stringToLog();
+    void reinforcementSetup();
 };
 
