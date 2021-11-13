@@ -76,6 +76,13 @@ int main() {
             g->cp->getCommand("win");
             cout << *(g->cp);
             
+            for(auto c: g->cp->lc) {
+                if (c->effect.find("Invalid") != string::npos)
+                    cout << c->command << " has NOT been used to transition between GameEngine states" << endl;
+                else
+                    cout << c->command << " has been used to transition between GameEngine states" << endl;
+            }
+            
             delete g->cp;
             g->cp = NULL;
             
@@ -87,7 +94,7 @@ int main() {
             cout << endl;
             
             //Reading commands from file
-            g->cp = new FileCommandProcessorAdapter(file);;
+            g->cp = new FileCommandProcessorAdapter(file);
             g->cp->getCommand("start");
             g->cp->getCommand("mapLoaded");
             g->cp->getCommand("mapValidated");
@@ -95,6 +102,13 @@ int main() {
             g->cp->getCommand("playersAdded");
             g->cp->getCommand("win");
             cout << *(g->cp);
+            
+            for(auto c: g->cp->lc) {
+                if (c->effect.find("Invalid") != string::npos)
+                    cout << c->command << " has NOT been used to transition between GameEngine states" << endl;
+                else
+                    cout << c->command << " has been used to transition between GameEngine states" << endl;
+            }
             
             delete g->cp;
             g->cp = NULL;
