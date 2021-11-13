@@ -3,7 +3,6 @@
 using namespace std;
 
 // Card driver to demonstrate the implemented functions
-
 int main() {
     // define gameDeck with pointer type
     Deck* gameDeck = new Deck(10);

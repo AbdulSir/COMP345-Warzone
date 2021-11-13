@@ -7,13 +7,6 @@
 
 using namespace std;
 
-//Dummy class
-class Player
-{
-    public:
-        Player();
-};
-
 class Territory
 {
     public:
@@ -27,8 +20,9 @@ class Territory
         string getName();
         string territory_name;
         int continent_ref;
-        Player* player1;
         int army_nb;
+        int army_bonus;
+        void setArmy(int numberOfArmy);
 };
 
 class Map
@@ -55,6 +49,8 @@ class Map
         bool map_is_connected();
         bool continents_are_connected();
         bool territory_belongs_to_one_continent();
+        bool adjacent_territory(string terr1, string terr2);
+        //bool
         int num_of_continents;
         vector<string> continents;
         vector<string> countries;
@@ -69,7 +65,6 @@ class MapLoader
 {
     public:
         MapLoader();
-        MapLoader(string file_name);
         MapLoader (const MapLoader &mL1); //Copy constructor
         MapLoader& operator= (const MapLoader& mL1); // overloaded assignment operator
         // stream insertion operators

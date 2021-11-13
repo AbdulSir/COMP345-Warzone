@@ -5,11 +5,12 @@
 #include "Player.h"
 #include <iostream>
 
+
 int main( ){
-    
+
     //create player using default constructor
     Player *p1 = new Player();
-    
+
     //create player using default constructor
     Hand *h2 = new Hand(); //pointer to hand of cards object
     Territory* spain=new Territory("Spain", 0, 5);
@@ -18,8 +19,8 @@ int main( ){
     Player *p2 = new Player("Bob", h2, t2); //player stores name, hand of cards, and territories
     cout<<endl;
     cout<<*p2<<endl;
-    
-    
+
+
     //call to toDefend method
     vector<Territory*> dt = p1->toDefend();
     //Display all territoriest to defend from collection
@@ -29,9 +30,9 @@ int main( ){
         cout << separator << d_territory->territory_name;
         separator = ", ";
     }
-    
+
     cout<<"\n"<<endl;
-    
+
     //call to toAttack method
     vector<Territory*> at = p1->toAttack();
     //Display all territoriest to attack from collection
@@ -41,9 +42,9 @@ int main( ){
         cout << separator << a_territory->territory_name;
         separator = ", ";
     }
-    
+
     cout<<"\n"<<endl;
-    
+
     //call to issueOrder method
     p1->issueOrder();
     cout<<"List of orders of the player:"<<endl;
@@ -51,14 +52,14 @@ int main( ){
         cout<<p1->getOrders()->list_orders[k]->description<<endl;
     }
     cout<<endl;
-    
-    
+
+
     //delete pointers
     for(int i=0; i < dt.size();i++){
         delete dt[i];
         dt[i]=NULL;
     }
-    
+
     for(int j=0; j < at.size();j++){
         delete at[j];
         at[j]=NULL;
@@ -71,3 +72,4 @@ int main( ){
 
     return 0;
 }
+

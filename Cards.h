@@ -1,22 +1,12 @@
-#ifndef Cards_H
-#define Cards_H
+#pragma once
 
+#include "Orders.h"
 #include<string>
 #include<list>
 #include<iostream>
 using namespace std;
 
-//dummy classes
-class Order{
-    public:
-        Order();
-};
-
-class OrderList {
-    public:
-        OrderList();
-        void addToList(Order o);
-};
+class Order;
 
 class Card {
     public:
@@ -29,10 +19,9 @@ class Card {
         // overloaded assignment operator
         Card& operator= (const Card& card);
         // play the card
-        Order play();
+        Order* play();
         // stream insertion operators
         friend ostream & operator<< (ostream &out, const Card &c);
-        friend istream & operator>> (istream &in,  Card &c);
 };
 
 class Deck {
@@ -72,5 +61,3 @@ class Hand {
         // stream insertion operators
         friend ostream & operator<< (ostream &out, Hand &h);
 };
-
-#endif

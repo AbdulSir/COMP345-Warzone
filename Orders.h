@@ -1,135 +1,183 @@
-#ifndef Orders_H
-#define Orders_H
+#pragma once
+
+#include "Player.h"
+#include "Map.h"
 #include <string>
 #include <vector>
 #include <iostream>
-
 using namespace std;
 
-class Order{
-private:
-   //attributes
-    string orderID;
-    string description;
-    string effect;
-public:
-    //default constructor
-    Order();
-    //parametrized constructor
-    Order(string orderID,string description, string effect);
-    //asssignment operator
-    Order& operator= (const Order& order);
-    //copy constructor
-    Order(const Order &order);
-    
-    string getOrderID();//@return string orderID
-    string getDescription();//@return string description
-    string getEffect();//@return string effect
-    void setEffect(string e);//@return string effect
-    
-    void setOrderID(string newID);//changes name of order
-        
-    bool validate();
-    void execute();
-    
+class Player;
+class Territory;
 
-    //stream insertion operators
-    friend ostream& operator <<(ostream &out, const Order &order);
-    friend istream& operator >>(istream &in, Order &order);
-            
+// free function to determine if a territory is owned by player
+bool isTerritoryOwnedByPlayer(Player* p, Territory* t);
+class Order {
+    public:
+        int orderId;
+        static int currentId;
+        string effect;
+        // attributes
+        Player* orderIssuer;
+        //default constructor
+        Order();
+        //parametrized constructor
+        Order(Player* orderIssuer);
+        //asssignment operator
+        Order& operator= (const Order& order);
+        //copy constructor
+        Order(const Order &order);
+        // virtual ~Order();
+        void setOrderIssuer(Player* orderIssuer);
+        void setEffect(string effect);
+        bool validate();
+        virtual void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Order &order);
 };
 
-class Deploy: public Order{
-public:
-    Deploy();//default constructor
-    Deploy(string orderID, string description, string effect);//parametrized constructor
-    Deploy(const Deploy&deploy);//copy constructor
-    Deploy& operator= (const Deploy& deploy);//asssignment operator
-    bool validate();
-    void execute();
+class Deploy: public Order {
+    public:
+        // attributes
+        Territory* target;
+        int numberOfUnits;
+        //default constructor
+        Deploy();
+        //parametrized constructor
+        Deploy(Player* player, Territory* territory, int number);
+        //copy constructor
+        Deploy(const Deploy &deploy);
+        //asssignment operator
+        Deploy& operator= (const Deploy& deploy);
+        bool validate();
+        void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Deploy &order);
 };
 
-
-//copy above formatting
-class Advance: public Order{
-public:
-    Advance();//default constructor
-    Advance(string orderID,string description, string effect);//parametrized constructor
-    Advance(const Advance& ad);//copy constructor
-    Advance& operator= (const Advance& advanced);//asssignment operator
-    bool validate();
-    void execute();
-};
-
-class Bomb: public Order
-{
-public:
-    Bomb();//default constructor
-    Bomb(string orderID,string description, string effect);//parametrized constructor
-    Bomb(const Bomb& b);//copy constructor
-    Bomb& operator= (const Bomb& b);//asssignment operator
-    bool validate();
-    void execute();
-};
-
-class Blockade: public Order
-{
-public:
-    Blockade();//default constructor
-    Blockade(string orderID,string description, string effect);//parametrized constructor
-    Blockade(const Blockade& bl);//copy constructor
-    Blockade& operator= (const Blockade& bl);//asssignment operator
-    bool validate();
-    void execute();
-};
-
-class Airlift: public Order
-{
-public:
-    Airlift();//default constructor
-    Airlift(string orderID,string description, string effect);//parametrized constructor
-    Airlift(const Airlift& a);//copy constructor
-    Airlift& operator= (const Airlift& a);//asssignment operator
-    bool validate();
-    void execute();
-};
-
-class Negotiate: public Order
-{
-public:
-    Negotiate();//default constructor
-    Negotiate(string orderID,string description, string effect);//parametrized constructor
-    Negotiate(const Negotiate& n);//copy constructor
-    Negotiate& operator= (const Negotiate& n);//asssignment operator
-    bool validate();
-    void execute();
+class Advance: public Order {
+    public:
+        // attributes
+        Territory* from;
+        Territory* target;
+        int numberOfUnits;
+        //default constructor
+        Advance();
+        //parametrized constructor
+        Advance(Player* player, Territory* t1, Territory* t2, int number);
+        //copy constructor
+        Advance(const Advance& ad);
+        //asssignment operator
+        Advance& operator= (const Advance& advanced);
+        bool validate();
+        void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Advance &order);
 };
 
 
-class OrderList{
-public:
-    //vector holding all orders
-    vector<Order*> orderList;
-    //default constructor
-    OrderList();
-    //constructor
-    OrderList(const OrderList& obj);
-    //desconstructor
-    ~OrderList();
-    //assignment operator
-    OrderList& operator= (const OrderList& orderList);
-    //add order to list
-    void addOrder(Order* order);
-    //move order with list
-    void move(Order* order, int newPosition);
-    //remove order from list
-    void remove(Order* order);
-
-    // stream insertion operators
-    friend ostream& operator<< (ostream& out, const OrderList& orderList);
-    friend istream& operator>> (istream& in,  const OrderList& orderList);
+class Airlift: public Order {
+    public:
+        // attributes
+        Territory* from;
+        Territory* target;
+        int numberOfUnits;
+        //default constructor
+        Airlift();
+        //parametrized constructor
+        Airlift(Player* player, Territory* t1, Territory* t2, int number);
+        //copy constructor
+        Airlift(const Airlift& a);
+        //asssignment operator
+        Airlift& operator= (const Airlift& a);
+        //setters
+        void setFrom(Territory* from);
+        void setTarget(Territory* target);
+        void setNumberOfUnits(int number);
+        bool validate();
+        void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Airlift &order);
 };
 
+class Bomb: public Order {
+    public:
+        // attributes
+        Territory* target;
+        //default constructor
+        Bomb();
+        //parametrized constructor
+        Bomb(Player* player, Territory* t1, Territory* t2);
+        //copy constructor
+        Bomb(const Bomb& b);
+        //asssignment operator
+        Bomb& operator= (const Bomb& b);
+        //setters
+        void setTarget(Territory* target);
+        bool validate();
+        void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Bomb &order);
+};
 
-#endif
+class Blockade: public Order {
+    public:
+        // attributes
+        Territory* target;
+        Player* neutral;
+        //default constructor
+        Blockade();
+        //parametrized constructor
+        Blockade(Player* player, Territory* territory, Player* neutral);
+        //copy constructor
+        Blockade(const Blockade& bl);
+        //asssignment operator
+        Blockade& operator= (const Blockade& bl);
+        bool validate();
+        void execute();
+        //setters
+        void setTarget(Territory* target);
+        void setNeutralPlayer(Player* player);
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Blockade &order);
+};
 
+class Negotiate: public Order {
+    public:
+        // attributes
+        Player* target;
+        //default constructor
+        Negotiate();
+        //parametrized constructor
+        Negotiate(Player* player, Player* target);
+        //copy constructor
+        Negotiate(const Negotiate& n);
+        //asssignment operator
+        Negotiate& operator= (const Negotiate& n);
+        bool validate();
+        void execute();
+        //stream insertion operators
+        friend ostream& operator <<(ostream &out, const Negotiate &order);
+};
+
+class OrderList {
+    public:
+        // attributes
+        vector<Order*> orderList;
+        //default constructor
+        OrderList();
+        //constructor
+        OrderList(const OrderList& obj);
+        //desconstructor
+        ~OrderList();
+        //assignment operator
+        OrderList& operator= (const OrderList& orderList);
+        //add order to list
+        void addOrder(Order* order);
+        //move order with list
+        void move(Order* order, int newPosition);
+        //remove order from list
+        void remove(Order* order);
+        // stream insertion operators
+        friend ostream& operator<< (ostream& out, const OrderList& orderList);
+};
