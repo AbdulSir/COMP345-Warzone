@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 #include <cstdlib>
 #include <ctime>
 
@@ -55,11 +56,19 @@ bool Order::validate() {
 };
 
 void Order::execute(){
-    if (validate()){
-        cout << "Order " << orderId << " executed"<< endl;
-    } else {
-        cout << "Order "<< orderId <<" invalid! Execution failed."<<endl;
-    }
+    cout << "Executing " << orderId << endl;
+    Notify(this);
+}
+
+std::string Order::stringToLog(){
+    cout<<"\nWriting executed Order to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Order executed: ";
+    myfile <<to_string(this->orderId)<<"\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return to_string(this->orderId);
 }
 
 //Deploy Class
@@ -92,6 +101,7 @@ bool Deploy::validate() {
 };
 
 void Deploy::execute() {
+    Order::execute();
     if (validate()) {
         vector <Territory*> territories = orderIssuer->getTerritories();
         orderIssuer->setReinforcementPool(orderIssuer->getReinforcementPool() - numberOfUnits);
@@ -163,6 +173,7 @@ bool Advance::validate() {
 };
 
 void Advance::execute() {
+    Order::execute();
     if (validate()) {
         if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
             from->setArmy(from->army_nb - numberOfUnits);
@@ -244,6 +255,7 @@ bool Airlift::validate() {
 };
 
 void Airlift::execute(){
+    Order::execute();
     if (validate()) {
         from->setArmy(from->army_nb - numberOfUnits);
         target->setArmy(target->army_nb + numberOfUnits);
@@ -310,6 +322,7 @@ bool Bomb::validate(){
 };
 
 void Bomb::execute(){
+    Order::execute();
     if (validate()) {
         target->setArmy(target->army_nb / 2);
         cout << "Bomb order executed" << endl;
@@ -356,6 +369,7 @@ bool Blockade::validate(){
 };
 
 void Blockade::execute(){
+    Order::execute();
     if (validate()) {
         target->setArmy(target->army_nb *2);
         target->setOwner(neutral);
@@ -401,6 +415,7 @@ bool Negotiate::validate(){
 };
 
 void Negotiate::execute(){
+    Order::execute();
     if (validate()) {
         orderIssuer->setPeacefulTerritories(target->getTerritories());
         target->setPeacefulTerritories(orderIssuer->getTerritories());
@@ -444,7 +459,8 @@ OrderList& OrderList::operator= (const OrderList& o){
 
 //add order to orderList
 void OrderList::addOrder(Order* order){
-   orderList.push_back(order);
+    orderList.push_back(order);
+    Notify(this);
 }
 
 //move order inside orderList
@@ -467,6 +483,25 @@ void OrderList::remove(Order* order){
         }
     }
     cout <<"Order "<< order->orderId <<" removed from list" << endl;
+}
+
+std::string OrderList::stringToLog(){
+    cout<<"\nWriting issued Order to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Order issued: ";
+    std::string orderIssued;
+    for(int i=0; i<orderList.size();i++){
+        if(i!=0){
+            orderIssued=+", ";
+            myfile <<", ";
+        }
+        orderIssued=+orderList[i]->orderId;
+        myfile <<orderList[i]->orderId;
+    }
+    myfile <<"\n-------------------------------------\n";
+    myfile.close();
+    return orderIssued;
 }
 
 //stream insertion operators

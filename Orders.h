@@ -5,15 +5,18 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "LoggingObserver.h"
 using namespace std;
 
 class Player;
 class Territory;
 class Map;
+class ILoggable;
+class Subject;
 
 // free function to determine if a territory is owned by player
 bool isTerritoryOwnedByPlayer(Player* p, Territory* t);
-class Order {
+class Order : public ILoggable, public Subject {
     public:
         int orderId;
         static int currentId;
@@ -35,6 +38,7 @@ class Order {
         virtual void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Order &order);
+        virtual std::string stringToLog();
 };
 
 class Deploy: public Order {
@@ -166,7 +170,7 @@ class Negotiate: public Order {
         friend ostream& operator <<(ostream &out, const Negotiate &order);
 };
 
-class OrderList {
+class OrderList : public ILoggable, public Subject {
     public:
         // attributes
         vector<Order*> orderList;
@@ -186,4 +190,6 @@ class OrderList {
         void remove(Order* order);
         // stream insertion operators
         friend ostream& operator<< (ostream& out, const OrderList& orderList);
+        virtual std::string stringToLog();
 };
+

@@ -142,4 +142,3 @@ ostream & operator<< (ostream &out, Hand &h) {
     }
     return out;
 }
- 

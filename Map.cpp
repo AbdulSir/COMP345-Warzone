@@ -20,6 +20,7 @@ Territory::Territory(const Territory& obj)
     territory_name = obj.territory_name;
     continent_ref = obj.continent_ref;
     army_nb = obj.army_nb;
+    army_bonus = obj.army_bonus;
 }
 
 // Overloaded assignment operator
@@ -27,6 +28,7 @@ Territory& Territory::operator= (const Territory& terr) {
     territory_name = terr.territory_name;
     continent_ref = terr.continent_ref;
     army_nb = terr.army_nb;
+    army_bonus=terr.army_bonus;
     return *this;
 }
 
@@ -46,6 +48,7 @@ Territory::Territory (string terr_name, int contin_ref, int nb_of_armies)
     territory_name = terr_name;
     continent_ref = contin_ref;
     army_nb = nb_of_armies;
+    army_bonus = nb_of_armies;
 }
 
 string Territory::getName()
@@ -152,11 +155,7 @@ Map::Map(string text_contents)
     Map::createMap(text_contents);
     Map::displayMap();
     Map::displayContinents();
-    // if(Map::validate())
-        // cout << "\nThe Map is a valid map" << endl;
-    // else
-        // cout << "\nThe Map is NOT a valid map" << endl;
-    // Map::delete_pointers();
+    //Map::delete_pointers();
 }
 
 bool Map::validate()
@@ -279,6 +278,7 @@ void Map::displayContinents()
     for (int i=0; i< num_of_continents; i++)
     {
         cout << "Continent " << i << ": ";
+        cout << continent_graph[i].size() << endl;
         for (Territory* terr:continent_graph[i])
         {
             cout << terr->getName() <<"->";
@@ -376,7 +376,39 @@ void Map::delete_pointers()
 // MapLoader CLASS
 MapLoader::MapLoader()
 {
+    // Create a text string, which is used to output the text file
+    string myText;
 
+    string file_name = "";
+    cout << "Please enter the map file name: \n";
+    cin >> file_name;
+
+    if (file_name.compare(".map") != 0)
+    {
+        cout << endl;
+        //delete(map_loader.map_object);
+        //map_loader.map_object=NULL;
+        // Read from the text file
+        ifstream MyReadFile("Resources/" + file_name);
+        if(MyReadFile.fail())
+        {
+            cout << "An error happened while attempting to read the file" << endl;
+            return;
+        }
+
+        // Use a while loop together with the getline() function to read the file line by line
+        text_contents = "";
+        while (getline (MyReadFile, myText)) {
+          // Output the text from the file
+          text_contents += myText + "\n";
+        }
+        //creating a map object
+        map_object = new Map(text_contents);
+        // Close the file
+        MyReadFile.close();
+    }
+    else
+        cout <<"Sorry, wrong file format." << endl;
 }
 
 //Copy constructor

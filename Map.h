@@ -25,6 +25,7 @@ class Territory
         string territory_name;
         int continent_ref;
         int army_nb;
+        int army_bonus;
         Player* owner;
 };
 
