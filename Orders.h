@@ -10,7 +10,6 @@ using namespace std;
 
 class Player;
 class Territory;
-class Order {
 class Map;
 class ILoggable;
 class Subject;

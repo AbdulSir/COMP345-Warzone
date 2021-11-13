@@ -348,22 +348,6 @@ bool Map::territory_belongs_to_one_continent()
     return true;
 }
 
-bool Map::adjacent_territory(string terr1, string terr2)
-{
-    for (int i=0; i<territories.size(); i++)
-    {
-        if (terr1.compare(territories[i]->getName()) == 0)
-        {
-            for (Territory* terr:territory_graph[i])
-            {
-                if (terr2.compare(terr->getName()) == 0)
-                    return true;
-            }
-            return false;
-        }
-    }
-}
-
 void Map::delete_pointers()
 {
     for (int i=0; i < territories.size(); i++)

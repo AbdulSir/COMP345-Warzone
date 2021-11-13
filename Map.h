@@ -26,7 +26,6 @@ class Territory
         int continent_ref;
         int army_nb;
         int army_bonus;
-        void setArmy(int numberOfArmy);
         Player* owner;
 };
 
@@ -69,6 +68,7 @@ class MapLoader
 {
     public:
         MapLoader();
+        MapLoader(string file_name);
         MapLoader (const MapLoader &mL1); //Copy constructor
         MapLoader& operator= (const MapLoader& mL1); // overloaded assignment operator
         // stream insertion operators

@@ -393,8 +393,10 @@ vector<int> GameEngine::player_owns_all_territories(Player* p1)
             p1->continents_owned.push_back(i);
     }
     return p1->continents_owned;
+}
+
 //overrite ILoggable stringToLog method
-std::string GameEngine::stringToLog(){
+string GameEngine::stringToLog() {
     cout<<"\nWriting Game Engine new state to gamelog.txt file ..."<<endl;
     std::ofstream myfile;
     myfile.open ("gamelog.txt", std::ios_base::app);
