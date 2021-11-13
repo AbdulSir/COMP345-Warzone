@@ -12,5 +12,6 @@ add_executable(MapDriver MapDriver.cpp Player.cpp LoggingObserver.cpp Orders.cpp
 target_link_libraries(MapDriver PUBLIC Boost::boost)
 
 add_executable(Part4Demo Part4Demo.cpp Player.cpp LoggingObserver.cpp Orders.cpp Cards.cpp Map.cpp)
+add_executable(Part5Demo LoggingObserverDriver.cpp LoggingObserver.cpp GameEngine.cpp CommandProcessing.cpp Player.cpp Orders.cpp Cards.cpp Map.cpp)
 # add_executable(GameEngine GameEngineDriver.cpp GameEngine.cpp)
 # add_executable(CommandProcessingDriver CommandProcessingDriver.cpp CommandProcessing.cpp GameEngine.cpp)
