@@ -12,6 +12,9 @@ using namespace std;
 
 #pragma once
 
+class ILoggable;
+class Subject;
+
 //Command object
 class Command : public ILoggable, public Subject {
 public:

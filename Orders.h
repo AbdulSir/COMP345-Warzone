@@ -11,6 +11,8 @@ using namespace std;
 class Player;
 class Territory;
 class Map;
+class ILoggable;
+class Subject;
 
 // free function to determine if a territory is owned by player
 bool isTerritoryOwnedByPlayer(Player* p, Territory* t);

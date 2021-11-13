@@ -10,8 +10,9 @@
 #include "LoggingObserver.h"
 using namespace std;
 
+class ILoggable;
+class Subject;
 class GameEngine : public ILoggable, public Subject {
-
     
 public:
     
