@@ -45,17 +45,14 @@ ostream& operator<<(ostream& out, const Command& c) {
 void Command::saveEffect(string c) {
     if (c.find("loadmap") != string::npos) {
         string mapName = c.substr(8);
-        //map is valid
         effect = mapName + " has been loaded";
-        //map is invaid
-        effect = mapName + " is an invalid map";
     }
     else if (c.find("validatemap") != string::npos) {
-        effect =  "The map has been successfully validated";
+        effect =  "The map has been validated";
     }
     else if (c.find("addplayer") != string::npos) {
         string playerName = c.substr(10);
-        effect = "Player " + playerName + " has been successfully added to the game";
+        effect = "Player " + playerName + " has been added to the game";
     }
     else if (c == "gamestart") {
         effect = "Players have been added and the game will now begin";
@@ -81,7 +78,7 @@ std::string Command::stringToLog(){
 }
 
 
-//METHODS IN CommandProcessor
+//METHODS IN COMMANDPROCESSOR
 
 //CommandProcessor constructor
 CommandProcessor::CommandProcessor() {
@@ -102,14 +99,14 @@ CommandProcessor::~CommandProcessor() {
 }
 
 //Assignment operator
-CommandProcessor& CommandProcessor::operator= (const CommandProcessor& cp) {
+const CommandProcessor& CommandProcessor::operator= (const CommandProcessor& cp) {
     this->lc = cp.lc;
     return *this;
 }
 
 //Stream insertion operator
 ostream& operator<<(ostream& out, const CommandProcessor& cp) {
-    out << "The CommandProcessor has the following commands:" <<endl;
+    out << "\nThe List of Commands:\n" <<endl;
     for (auto c: cp.lc) {
         out << *c << endl;
     }
@@ -160,7 +157,6 @@ bool CommandProcessor::validate(string c, string gameState) {
 
 //Gets commands from the console as a string
 string CommandProcessor::readCommand() {
-    cout << "In CommandProcessor readCommand()" << endl;
     string commandStr;
     cout << "Please enter a command" << endl;
     getline(cin,commandStr);
@@ -193,7 +189,7 @@ std::string CommandProcessor::stringToLog(){
 }
 
 
-//METHODS IN FileCommandProcessorAdaptor
+//METHODS IN FILECOMMANDPROCESSORADAPTER
 
 //FileCommandProcessorAdapter constructor with file-to-be-read as parameter
 FileCommandProcessorAdapter::FileCommandProcessorAdapter(string f): CommandProcessor(), fileName(f), flr(new FileLineReader()) {
@@ -210,9 +206,11 @@ FileCommandProcessorAdapter::~FileCommandProcessorAdapter() {
 }
 
 //Assignment operator
-FileCommandProcessorAdapter& FileCommandProcessorAdapter::operator= (const FileCommandProcessorAdapter& fcpa) {
+const FileCommandProcessorAdapter& FileCommandProcessorAdapter::operator= (const FileCommandProcessorAdapter& fcpa) {
     this->fileName = fcpa.fileName;
-    this->flr = fcpa.flr;
+    if (&fcpa != this) {
+        delete flr;
+    }
     return *this;
 }
 
@@ -224,14 +222,13 @@ ostream& operator<<(ostream& out, const FileCommandProcessorAdapter& fcpa) {
 
 //Method that reads the command from a file (overrides readCommand of CommandProcessor)
 string FileCommandProcessorAdapter::readCommand() {
-    cout << "In FileCommandProcessorAdapter readCommand()" << endl;
     string command = flr->readLineFromFile(fileName);
-    cout << "Command read from file: \n" << command << endl;
+    cout << "Command read from " << fileName <<  ": " << command << endl;
     return command;
 }
 
 
-//METHODS IN FileLineReader
+//METHODS IN FILELINEREADER
 
 //FileLineReader constructor
 FileLineReader::FileLineReader() {
@@ -244,7 +241,7 @@ FileLineReader::FileLineReader(FileLineReader& f) {
 }
 
 //Assignment operator
-FileLineReader& FileLineReader::operator= (const FileLineReader& f) {
+const FileLineReader& FileLineReader::operator= (const FileLineReader& f) {
     this->currentLine = f.currentLine;
     return *this;
 }
@@ -257,18 +254,17 @@ ostream& operator<<(ostream& out, const FileLineReader& f) {
 
 //Reads a line from a file
 string FileLineReader::readLineFromFile(string fileName){
-    string line, command;
+    string command;
     int count = 0;
     input.open(fileName);
     while (true) {
         if (count == currentLine) {
-            getline (input, line);
-            command.append(line + "\n");
+            getline (input, command);
             currentLine++;
             break;
         }
         else {
-            getline (input, line);
+            getline (input, command);
             count++;
         }
     }

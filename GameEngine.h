@@ -4,18 +4,20 @@
 //  Warzone Game Engine: controls the flow of the game using the user's keyboard inputs as commands
 //
 
-
+#pragma once
+#include "CommandProcessing.h"
 #include <string>
 #include "LoggingObserver.h"
 using namespace std;
 
-#pragma once
 class GameEngine : public ILoggable, public Subject {
+
     
 public:
     
     std::string state;
     std::string command;
+    CommandProcessor* cp;
     
     //Constructors
     GameEngine();
