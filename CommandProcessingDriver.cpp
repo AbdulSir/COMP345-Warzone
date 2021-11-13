@@ -2,7 +2,7 @@
 //  CommandProccessingDriver.cpp
 //  Warzone Command Processor
 //
-/*
+
 #include "CommandProcessing.h"
 #include "GameEngine.h"
 #include <iostream>
@@ -121,4 +121,3 @@ int main() {
     g = NULL;
     
 }
-*/
