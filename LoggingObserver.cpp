@@ -43,6 +43,24 @@ Subject::~Subject(){
     delete _observers;
 }
 
+//Copy constructor
+Subject::Subject(const Subject& s): _observers(s._observers) {
+    }
+
+//Assignment operator
+Subject& Subject::operator =(const Subject& s){
+    this->_observers = s._observers;
+    return *this;
+}
+
+//Insertion stream operator
+std::ostream& operator<<(std::ostream &strm, const Subject &s) {
+    for (auto o: *s._observers) {
+        strm << o << std::endl;
+    }
+    return strm;
+}
+
 void Subject::Attach(Observer* o){
   _observers->push_back(o);
 };
@@ -80,6 +98,22 @@ LogObserver::~LogObserver(){
   //from its LogObserver
   _subject->Detach(this);
 };
+
+//Copy constructor
+LogObserver::LogObserver(const LogObserver& o): _subject(o._subject) {
+    }
+
+
+//Assignment operator
+LogObserver& LogObserver::operator =(const LogObserver& o){
+    this->_subject=o._subject;
+    return *this;
+}
+
+//Insertion stream operator
+std::ostream& operator<<(std::ostream &strm, const LogObserver &o) {
+    return strm << "\nSubject " << o._subject << std::endl;
+}
 
 
 void LogObserver::Update(ILoggable* il){

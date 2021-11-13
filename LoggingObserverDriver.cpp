@@ -127,6 +127,7 @@ int main() {
             g->end();
     }
     
+    //Create orders
     Hand* h = new Hand;
     Territory* firstTerritory = new Territory("A", 0, 10);
     Territory* secondTerritory = new Territory("B", 0, 10);
@@ -137,32 +138,73 @@ int main() {
     v.push_back(secondTerritory);
     // Player only owns A and B
     Player* player1 = new Player("testName", h, v);
+    
+    Deploy* deployOrder = new Deploy(player1, thirdTerritory, 3);
+    
+    h->addToHand(new Card("airlift"));
+    Airlift* airliftOrder = dynamic_cast<Airlift*>(h->discardFromHand().play());
+    airliftOrder->setOrderIssuer(player1);
+    airliftOrder->setFrom(firstTerritory);
+    airliftOrder->setTarget(secondTerritory);
+    airliftOrder->setNumberOfUnits(5);
+    
+    h->addToHand(new Card("bomb"));
+    Bomb* bombOrder = dynamic_cast<Bomb*>(h->discardFromHand().play());
+    bombOrder->setOrderIssuer(player1);
+    bombOrder->setTarget(thirdTerritory);
+    
+    
+    h->addToHand(new Card("blockade"));
+    Blockade* blockadeOrder = dynamic_cast<Blockade*>(h->discardFromHand().play());
+    blockadeOrder->setOrderIssuer(player1);
+    blockadeOrder->setTarget(firstTerritory);
+    
+    
+    //Create LogObservers
+    LogObserver *deployOrderObserver = new LogObserver(deployOrder);
+    LogObserver *airliftOrderObserver = new LogObserver(airliftOrder);
+    LogObserver *bombOrderObserver = new LogObserver(bombOrder);
+    LogObserver *blockadeOrderObserver = new LogObserver(blockadeOrder);
+    
 
-    // Order & OrderList test cases:
-    cout << "\n-----Test case: add deployOrder1 to orderList and execute order-----" << endl;
-    
-    Deploy* deployOrder1 = new Deploy(player1, thirdTerritory, 3);
-    LogObserver *deployOrder1Observer = new LogObserver(deployOrder1);
-    
     OrderList* orderList = new OrderList();
     LogObserver *orderListObserver = new LogObserver(orderList);
     
-    orderList->addOrder(deployOrder1);
-    
-    cout << "\n" << *deployOrder1 << endl;
-    deployOrder1->execute();
-    cout << endl;
+    //Add orders to orderList
+    orderList->addOrder(deployOrder);
+    orderList->addOrder(airliftOrder);
+    orderList->addOrder(bombOrder);
+    orderList->addOrder(blockadeOrder);
     
     //Display orderList
     cout << *orderList << endl;
+    
+    //Execute orders
+    cout << *deployOrder << endl;
+    deployOrder->execute();
+    cout << endl;
+    
+    cout << *airliftOrder << endl;
+    airliftOrder->execute();
+    cout << endl;
+    
+    cout << *bombOrder << endl;
+    bombOrder->execute();
+    cout << endl;
+    
+    cout << *blockadeOrder << endl;
+    blockadeOrder->execute();
+    cout << endl;
+
 
 
     //delete all pointers
     delete gameObserver;
-    delete deployOrder1Observer;
+    delete deployOrderObserver;
+    delete airliftOrderObserver;
+    delete bombOrderObserver;
+    delete blockadeOrderObserver;
     delete orderListObserver;
     delete g;
-    g = NULL;
-
     
 }

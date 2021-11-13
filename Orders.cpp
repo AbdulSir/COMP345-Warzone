@@ -423,10 +423,14 @@ std::string OrderList::stringToLog(){
     myfile <<"Order issued: ";
     std::string orderIssued;
     for(int i=0; i<orderList.size();i++){
+        if(i!=0){
+            orderIssued=+", ";
+            myfile <<", ";
+        }
         orderIssued=+orderList[i]->orderId;
-        myfile <<orderList[i]->orderId<<"\n";
+        myfile <<orderList[i]->orderId;
     }
-    myfile <<"-------------------------------------\n";
+    myfile <<"\n-------------------------------------\n";
     myfile.close();
     return orderIssued;
 }

@@ -35,9 +35,12 @@ class Subject{
 public:
     Subject(); //default constructor
     ~Subject(); //destructor
+    Subject(const Subject& s); //copy constructor
+    Subject& operator=(const Subject& s);
     virtual void Notify(ILoggable* il);
     virtual void Attach(Observer* o);
     virtual void Detach(Observer* o);
+    friend std::ostream& operator<<(std::ostream& stream, const Subject& s); //Insertion stream operator
 
 private:
     std::list<Observer*> *_observers;
@@ -51,6 +54,9 @@ public:
     LogObserver(Subject* s); //constructor
     ~LogObserver(); //destructor
     void Update(ILoggable* il);
+    LogObserver(const LogObserver& lo);
+    LogObserver& operator =(const LogObserver& lo); //Assignment operator
+    friend std::ostream& operator<<(std::ostream& stream, const LogObserver& lo); //Insertion stream operator
     
     Subject *_subject;
 };

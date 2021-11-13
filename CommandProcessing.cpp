@@ -181,7 +181,10 @@ std::string CommandProcessor::stringToLog(){
     std::string gamelog;
     for (auto it = this->lc.begin(); it != this->lc.end(); it++)
     {
-        gamelog+=(*it)->command + " ";
+        if(it != this->lc.begin()){
+            gamelog+= ", ";
+        }
+        gamelog+=(*it)->command;
     }
     myfile <<"Command: " << gamelog << "\n";
     myfile <<"-------------------------------------\n";
