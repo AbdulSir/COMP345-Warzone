@@ -6,8 +6,6 @@
 #include "Map.h"
 #include "Player.h"
 #include <string>
-#include "CommandProcessing.h"
-#include "LoggingObserver.h"
 using namespace std;
 
 #pragma once

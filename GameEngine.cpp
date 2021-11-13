@@ -63,7 +63,7 @@ void GameEngine::addPlayer() {
     std::cout << "Adding player..." << endl;
     cout << "Please enter the number of players (2-6): " << endl;;
     cin >> num_of_players;
-    while( num_of_players < 0 || num_of_players > 6)
+    while( num_of_players < 2 || num_of_players > 6)
     {
         cout << "Invalid number. Please enter a number between 2 and 6" << endl;
         cin >> num_of_players;
