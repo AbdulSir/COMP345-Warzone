@@ -143,6 +143,7 @@ bool Advance::validate() {
     if (!isTerritoryOwnedByPlayer(orderIssuer, from)) {
         isValid = false;
     }
+
     if (!areTerritoriesAdjacent) {
         isValid = false;
     }
@@ -152,6 +153,10 @@ bool Advance::validate() {
             cout << "Can not attack the player that negotiated with " << orderIssuer->getName() << "'s territory" << endl;
             isValid = false;
         }
+    }
+
+    if (from->army_nb < numberOfUnits) {
+        isValid = false;
     }
 
     return isValid;

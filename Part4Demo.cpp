@@ -119,7 +119,7 @@ int main() {
     Airlift* airliftOrder3 = dynamic_cast<Airlift*>(h->discardFromHand().play());
     airliftOrder3->setOrderIssuer(player1);
     airliftOrder3->setFrom(thirdTerritory);
-    airliftOrder3->setTarget(firstTerritory);
+    airliftOrder3->setTarget(seventhTerritory);
     airliftOrder3->setNumberOfUnits(5);
 
     airliftOrder3->execute();
