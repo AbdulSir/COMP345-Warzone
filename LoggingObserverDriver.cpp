@@ -72,16 +72,7 @@ int main() {
             std::cin >> g->command;
             g->mapValidated();
         }
-        
-        //Players added state
-        std::cout << *g;
-        while(g->state != "assign reinforcement") {
-            std::cout << "Choose one of the following:\n\t1. addPlayer\n\t2. assignCountries" << endl;
-            std::cin >> g->command;
-            g->playersAdded();
-        }
-        
-        
+
         while (g->state != "win") {
             
             //Assign reinforcement state

@@ -42,7 +42,6 @@ std::ostream& operator<<(std::ostream &strm, const GameEngine &g) {
 
 //Transition to load the map
 void GameEngine::loadMap() {
-    std::cout << "Loading map..." << endl;
     cout << "Testing" << endl;
     map_loader = new MapLoader();
     // Code for loading map
@@ -125,15 +124,6 @@ void GameEngine::gameStart() {
             j++;
         }
     }
-
-    /*
-    vector<int> valid_continents = player_owns_all_territories(players[0]);
-    cout << "Continents Size " << valid_continents.size() << endl;
-    for (int i=0; i<valid_continents.size(); i++)
-    {
-        cout << "test " << valid_continents[i] << endl;
-    }
-    */
 
     // Code for assigning countries
     state = "assign reinforcement";
