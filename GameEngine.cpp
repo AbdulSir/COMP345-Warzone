@@ -398,7 +398,7 @@ void GameEngine::executeOrdersPhase(){
 
     //loop through players and execute all their orders
     for (auto player: players){
-        for (auto order: player->getOrders()->getOrderList()) {
+        for (auto order: player->getOrders()->orderList) {
             order->execute();
         }
     }

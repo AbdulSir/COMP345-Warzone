@@ -94,58 +94,9 @@ vector <Territory*> Player::toAttack(){
 }
 
 void Player::issueOrder(){
-
-    cout << "Inside issue order of Player" << endl;
-    int currentReinforcements = this.getReinforcementPool();
-    if (this->getReinforcementPool() > 0){
-
-        cout << "Reinforcements found, creating deploy order" << endl;
-        Deploy deployOrder = new Deploy(5);
-        currentReinforcements -= 5;
-        this->orders->orderList.push_back(deployOrder);
-
-    } 
-    //choose to advance or play card
-        if (this->toAttack.size()>0){
-            Advance advanceOrder = new Advance();
-            this->orders->orderList.push_back(deployOrder);
-        }
-        if (this.hand->handDeck->size()>0){
-            this->orders->orderList.push_back();
-        }
-
-/*
-    switch(currentOrder) {
-        case "deploy":
-           // Deploy deployOrder = new Deploy();
-            Deploy order = new Deploy();
-
-    break;
-         case "advance":
-           // Advance advanceOrder = new Advance();
-           Advance order = new Advance();
-    break;
-        case "airlift":
-           //Airlift airliftOrder = new Airlift();
-           Airlift order = new Airlift();
-    break;
-         case "bomb":
-           // Bomb bombOrder = new Bomb();
-           Bomb order = new Bomb();
-    break;
-        case "blockade":
-           // Blockade blockadeOrder = new Blockade();
-           Blockade order = new Blockade();
-    break;
-         case "negotiate":
-          //  Negotiate negotiateOrder = name Negotiate();
-          Negotiate order = name Negotiate();
-    break;
-        default:
-            break;
-}
-*/
-    
+    cout << "Inside issueOrder of Player" << endl;
+    Order * order = new Order();
+    this->orders->orderList.push_back(order);
 }
 
 vector <Territory*> Player::getTerritories() {
