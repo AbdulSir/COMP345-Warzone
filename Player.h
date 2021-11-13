@@ -9,9 +9,7 @@
 #include "Map.h"
 using namespace std;
 
-class Order;
 class OrderList;
-class Card;
 class Hand;
 class Territory;
 
@@ -28,10 +26,16 @@ public:
     vector <Territory*> toAttack();
     void issueOrder();
     vector <Territory*> getTerritories();
+    vector <Territory*> getPeacefulTerritories();
     OrderList* getOrders();
     string getName();
     int getReinforcementPool();
+    void addTerritory(Territory* t);
+    void removeTerritory(Territory* t);
+    void setTerritories(vector <Territory*> v);
     void setReinforcementPool(int number);
+    void setPeacefulTerritories(vector<Territory*> v);
+    void setWillDrawCard(bool value);
 
 private:
     string name;
@@ -39,4 +43,6 @@ private:
     vector <Territory*> territories;
     OrderList* orders;
     int reinforcementPool;
+    vector <Territory*> peacefulTerrtories;
+    bool willDrawCardAtTheEndOfTurn;
 };

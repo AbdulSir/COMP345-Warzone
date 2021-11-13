@@ -16,6 +16,7 @@ Territory::Territory ()
 //Copy constructor
 Territory::Territory(const Territory& obj)
 {
+    owner = NULL;
     territory_name = obj.territory_name;
     continent_ref = obj.continent_ref;
     army_nb = obj.army_nb;
@@ -33,12 +34,15 @@ Territory& Territory::operator= (const Territory& terr) {
 ostream & operator << (ostream &out, const Territory &t1) {
     out << endl << "Territory name " << t1.territory_name << endl;
     out << "Number of armies: " << t1.army_nb << endl;
+    if (t1.owner != NULL) {
+        out << "Owner: " << t1.owner->getName() << endl;
+    }
     return out;
 }
 
 Territory::Territory (string terr_name, int contin_ref, int nb_of_armies)
 {
-    player1 = new Player();
+    owner = NULL;
     territory_name = terr_name;
     continent_ref = contin_ref;
     army_nb = nb_of_armies;
@@ -52,6 +56,31 @@ string Territory::getName()
 void Territory::setArmy(int numberOfArmy) {
     army_nb = numberOfArmy;
 }
+
+void Territory::setOwner(Player* p) {
+    if (owner != NULL) {
+        vector<Territory*> playerTerritories = owner->getTerritories();
+        playerTerritories.erase(find(playerTerritories.begin(), playerTerritories.end(), this));
+        owner->setTerritories(playerTerritories);
+    }
+    vector<Territory*> playerTerritories = p->getTerritories();
+    playerTerritories.push_back(this);
+    p->setTerritories(playerTerritories);
+    owner = p;
+};
+
+void Territory::resetOwner() {
+    if (owner != NULL) {
+        vector<Territory*> playerTerritories = owner->getTerritories();
+        playerTerritories.erase(find(playerTerritories.begin(), playerTerritories.end(), this));
+        owner->setTerritories(playerTerritories);
+    }
+    owner = NULL;
+}
+
+Player* Territory::getOwner() {
+    return owner;
+};
 
 // Map CLASS
 
@@ -68,6 +97,23 @@ Map& Map::operator= (const Map& map1) {
     territories = map1.territories;
     return *this;
 }
+
+bool Map::adjacent_territory(string terr1, string terr2) {
+    bool returnValue = false;
+    for (int i=0; i<territories.size(); i++)
+    {
+        if (terr1.compare(territories[i]->getName()) == 0)
+        {
+            for (Territory* terr:territory_graph[i])
+            {
+                if (terr2.compare(terr->getName()) == 0) {
+                    returnValue = true;
+                }
+            }
+        }
+    }
+    return returnValue;
+};
 
 // Stream insertion operators
 ostream & operator << (ostream &out, Map &m1) {
@@ -106,11 +152,11 @@ Map::Map(string text_contents)
     Map::createMap(text_contents);
     Map::displayMap();
     Map::displayContinents();
-    if(Map::validate())
-        cout << "\nThe Map is a valid map" << endl;
-    else
-        cout << "\nThe Map is NOT a valid map" << endl;
-    Map::delete_pointers();
+    // if(Map::validate())
+        // cout << "\nThe Map is a valid map" << endl;
+    // else
+        // cout << "\nThe Map is NOT a valid map" << endl;
+    // Map::delete_pointers();
 }
 
 bool Map::validate()
@@ -308,20 +354,20 @@ void Map::delete_pointers()
     {
         for (Territory* terr:continent_graph[i])
         {
-            delete(terr->player1);
-            terr->player1=NULL;
+            delete(terr->owner);
+            terr->owner=NULL;
             delete(terr);
             terr = NULL;
         }
         for (Territory* terr1:territory_graph[i])
         {
-            delete(terr1->player1);
-            terr1->player1=NULL;
+            delete(terr1->owner);
+            terr1->owner=NULL;
             delete(terr1);
             terr1 = NULL;
         }
-        delete(territories[i]->player1);
-        territories[i]->player1 = NULL;
+        delete(territories[i]->owner);
+        territories[i]->owner = NULL;
         delete(territories[i]);
         territories[i]=NULL;
     }

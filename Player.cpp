@@ -6,6 +6,7 @@
 #include <iostream>
 #include <ostream>
 #include <string>
+
 using namespace std;
 
 //Default constructor
@@ -15,6 +16,7 @@ Player::Player(){
     this->orders= new OrderList();
     this->name = "Anonymous";
     this->reinforcementPool = 50;
+    this->willDrawCardAtTheEndOfTurn = false;
 }
 
 //Constructor
@@ -24,6 +26,7 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories){
     this->territories = territories;
     this->orders= new OrderList();
     this->reinforcementPool = 50;
+    this->willDrawCardAtTheEndOfTurn = false;
 }
 
 //Copy constructor
@@ -37,6 +40,7 @@ Player::Player(const Player& p){
     this->territories= temp_t;
     for (int i=0; i<p.territories.size(); i++)
         territories[i] = new Territory(*p.territories[i]);
+    this->willDrawCardAtTheEndOfTurn = p.willDrawCardAtTheEndOfTurn;
 }
 
 //Destructor
@@ -60,6 +64,7 @@ Player& Player::operator=(const Player& p){
     this->territories= temp_t;
     for (int i=0; i<p.territories.size(); i++)
         territories[i] = new Territory(*p.territories[i]);
+    this->willDrawCardAtTheEndOfTurn = p.willDrawCardAtTheEndOfTurn;
     return *this;
 }
 
@@ -100,9 +105,37 @@ void Player::setReinforcementPool(int number) {
     reinforcementPool = number;
 };
 
+void Player::setWillDrawCard(bool value) {
+    willDrawCardAtTheEndOfTurn = value;
+};
+
+void Player::addTerritory(Territory* t) {
+    territories.push_back(t);
+};
+
+void Player::removeTerritory(Territory* t) {
+    for (int i=0; i<territories.size(); i++) {
+        if (territories[i] == t) {
+            territories.erase(find(territories.begin(), territories.end(), t));
+        }
+    }
+};
+
 int Player::getReinforcementPool() {
     return reinforcementPool;
 }
+
+void Player::setPeacefulTerritories(vector<Territory*> v) {
+    peacefulTerrtories = v;
+};
+
+void Player::setTerritories(vector <Territory*> v) {
+    territories = v;
+};
+
+vector <Territory*> Player::getPeacefulTerritories() {
+    return peacefulTerrtories;
+};
 
 //stream insertion operator
 ostream& operator<<(ostream& out, const Player& p)

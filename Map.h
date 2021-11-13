@@ -19,10 +19,13 @@ class Territory
         friend ostream & operator << (ostream &out, const Territory &t1);// stream insertion operator
         string getName();
         void setArmy(int numberOfArmy);
+        void setOwner(Player* p);
+        void resetOwner();
+        Player* getOwner();
         string territory_name;
         int continent_ref;
         int army_nb;
-        Player* player1;
+        Player* owner;
 };
 
 class Map
@@ -49,6 +52,7 @@ class Map
         bool map_is_connected();
         bool continents_are_connected();
         bool territory_belongs_to_one_continent();
+        bool adjacent_territory(string terr1, string terr2);
         int num_of_continents;
         vector<string> continents;
         vector<string> countries;
