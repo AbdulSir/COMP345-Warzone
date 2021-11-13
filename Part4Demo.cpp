@@ -34,15 +34,14 @@ int main() {
     vector <Territory*> v;
     vector <Territory*> v1;
     vector <Territory*> v2;
-
-    v.push_back(firstTerritory);
-    v.push_back(secondTerritory);
-    v2.push_back(fifthTerritory);
     
-    // Player only owns A and B
     Player* player1 = new Player("testName", h, v);
     Player* player2 = new Player("anotherName", h1, v2);
     Player* neutralPlayer = new Player("Neutral", new Hand, v1);
+
+    firstTerritory->setOwner(player1);
+    secondTerritory->setOwner(player1);
+    fifthTerritory->setOwner(player2);
 
     // Deploy test cases:
     cout << "-----Test case: player does deploy order but the target territory does not belong to the player-----" << endl;

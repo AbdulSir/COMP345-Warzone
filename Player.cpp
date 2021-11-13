@@ -129,6 +129,10 @@ void Player::setPeacefulTerritories(vector<Territory*> v) {
     peacefulTerrtories = v;
 };
 
+void Player::setTerritories(vector <Territory*> v) {
+    territories = v;
+};
+
 vector <Territory*> Player::getPeacefulTerritories() {
     return peacefulTerrtories;
 };

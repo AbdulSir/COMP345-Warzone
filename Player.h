@@ -32,6 +32,7 @@ public:
     int getReinforcementPool();
     void addTerritory(Territory* t);
     void removeTerritory(Territory* t);
+    void setTerritories(vector <Territory*> v);
     void setReinforcementPool(int number);
     void setPeacefulTerritories(vector<Territory*> v);
     void setWillDrawCard(bool value);

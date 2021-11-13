@@ -183,6 +183,7 @@ void Advance::execute() {
             if (target->army_nb == 0) {
                 orderIssuer->addTerritory(target);
                 target->setArmy(numberOfUnits);
+                target->setOwner(orderIssuer);
                 this->effect = "Attack success, " + orderIssuer->getName() + " now own " + target->territory_name + ", and the territory now has " + to_string(target->army_nb) + " armies";
                 orderIssuer->setWillDrawCard(true);
             } else {
@@ -357,10 +358,9 @@ bool Blockade::validate(){
 void Blockade::execute(){
     if (validate()) {
         target->setArmy(target->army_nb *2);
-        orderIssuer->removeTerritory(target);
-        neutral->addTerritory(target);
+        target->setOwner(neutral);
         cout << "Blockade order executed" << endl;
-        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + neutral->getName() + " and this territory has " + to_string(target->army_nb) + " armies";
+        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + target->getOwner()->getName() + " and this territory has " + to_string(target->army_nb) + " armies";
     } else {
         cout << "Blockade order invalid" << endl;
     }
