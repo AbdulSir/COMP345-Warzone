@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int main()
+/*int main()
 {
     vector <vector <int> > v1;
     string file_name = "";
@@ -24,4 +24,4 @@ int main()
         cout <<"Sorry, wrong file format." << endl;
 
     return 0;
-}
+}*/

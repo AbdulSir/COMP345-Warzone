@@ -16,6 +16,14 @@ Player::Player(){
     this->orders= new OrderList();
     this->name = "Anonymous";
     this->reinforcementPool = 50;
+}
+
+Player::Player(string name){
+    this->hand = new Hand();
+    this->territories={};
+    this->orders= new OrderList();
+    this->name = name;
+    this->reinforcementPool = 50;
     this->willDrawCardAtTheEndOfTurn = false;
 }
 
@@ -101,10 +109,19 @@ string Player::getName() {
     return name;
 }
 
+Hand* Player::getHand()
+{
+    return hand;
+}
+
 void Player::setReinforcementPool(int number) {
     reinforcementPool = number;
 };
 
+void Player::setName(string name)
+{
+    this->name = name;
+}
 void Player::setWillDrawCard(bool value) {
     willDrawCardAtTheEndOfTurn = value;
 };

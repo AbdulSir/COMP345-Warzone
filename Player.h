@@ -9,6 +9,8 @@
 #include "Map.h"
 using namespace std;
 
+class Order;
+class Card;
 class OrderList;
 class Hand;
 class Territory;
@@ -17,6 +19,7 @@ class Territory;
 class Player{
 public:
     Player(); //default constructor
+    Player(string name);
     Player(string name, Hand * hand, vector <Territory*> territories); // constructor
     Player(const Player &p); //copy constructor
     ~Player(); //destructor
@@ -26,6 +29,9 @@ public:
     vector <Territory*> toAttack();
     void issueOrder();
     vector <Territory*> getTerritories();
+    Hand* getHand();
+    void setName(string name);
+    vector <int> continents_owned;
     vector <Territory*> getPeacefulTerritories();
     OrderList* getOrders();
     string getName();
