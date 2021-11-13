@@ -140,20 +140,25 @@ bool Advance::validate() {
     bool isValid = true;
 
     bool areTerritoriesAdjacent = map->adjacent_territory(from->getName(), target->getName());
-
-    if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
-        for (auto t: orderIssuer->getTerritories()) {
-            if (t == target) {
-                isValid = false;
-            }
-        }
-    }
     if (!isTerritoryOwnedByPlayer(orderIssuer, from)) {
         isValid = false;
     }
+
     if (!areTerritoriesAdjacent) {
         isValid = false;
     }
+
+    for (auto t: orderIssuer->getPeacefulTerritories()) {
+        if (t->getName() == target->getName()) {
+            cout << "Can not attack the player that negotiated with " << orderIssuer->getName() << "'s territory" << endl;
+            isValid = false;
+        }
+    }
+
+    if (from->army_nb < numberOfUnits) {
+        isValid = false;
+    }
+
     return isValid;
 };
 
@@ -178,6 +183,7 @@ void Advance::execute() {
             if (target->army_nb == 0) {
                 orderIssuer->addTerritory(target);
                 target->setArmy(numberOfUnits);
+                target->setOwner(orderIssuer);
                 this->effect = "Attack success, " + orderIssuer->getName() + " now own " + target->territory_name + ", and the territory now has " + to_string(target->army_nb) + " armies";
                 orderIssuer->setWillDrawCard(true);
             } else {
@@ -289,14 +295,16 @@ bool Bomb::validate(){
         }
     }
     if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
-        for (auto t: orderIssuer->getTerritories()) {
-            if (t == target) {
-                isValid = false;
-            }
-        }
+        isValid = false;
     }
     if (!areTerritoriesAdjacent) {
         isValid = false;
+    }
+
+    for (auto t: orderIssuer->getPeacefulTerritories()) {
+        if (t->getName() == target->getName()) {
+            isValid = false;
+        }
     }
     return isValid;
 };
@@ -350,10 +358,9 @@ bool Blockade::validate(){
 void Blockade::execute(){
     if (validate()) {
         target->setArmy(target->army_nb *2);
-        orderIssuer->removeTerritory(target);
-        neutral->addTerritory(target);
+        target->setOwner(neutral);
         cout << "Blockade order executed" << endl;
-        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + neutral->getName() + " and this territory has " + to_string(target->army_nb) + " armies";
+        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + target->getOwner()->getName() + " and this territory has " + to_string(target->army_nb) + " armies";
     } else {
         cout << "Blockade order invalid" << endl;
     }

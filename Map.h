@@ -19,10 +19,13 @@ class Territory
         friend ostream & operator << (ostream &out, const Territory &t1);// stream insertion operator
         string getName();
         void setArmy(int numberOfArmy);
+        void setOwner(Player* p);
+        void resetOwner();
+        Player* getOwner();
         string territory_name;
         int continent_ref;
         int army_nb;
-        Player* player1;
+        Player* owner;
 };
 
 class Map

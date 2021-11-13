@@ -10,7 +10,6 @@ int main() {
     MapLoader* map_loader = new MapLoader("europe.map");
     Map* m = map_loader->map_object;
     cout << endl << endl;
-    Deck* gameDeck = new Deck(10);
 
     Hand* h = new Hand;
     Hand* h1 = new Hand;
@@ -23,7 +22,19 @@ int main() {
     Territory* fifthTerritory = m->territories[4];
     Territory* sixthTerritory = m->territories[5];
     Territory* seventhTerritory = m->territories[6];
+
+    vector <Territory*> v;
+    vector <Territory*> v1;
+    vector <Territory*> v2;
     
+    Player* player1 = new Player("testName", h, v);
+    Player* player2 = new Player("anotherName", h1, v2);
+    Player* neutralPlayer = new Player("Neutral", new Hand, v1);
+
+    firstTerritory->setOwner(player1);
+    secondTerritory->setOwner(player1);
+    fifthTerritory->setOwner(player2);
+
     cout << *firstTerritory << endl;
     cout << *secondTerritory << endl;
     cout << *thirdTerritory << endl;
@@ -31,20 +42,6 @@ int main() {
     cout << *fifthTerritory << endl;
     cout << *sixthTerritory << endl;
     cout << *seventhTerritory << endl;
-
-    vector <Territory*> v;
-    vector <Territory*> v1;
-    vector <Territory*> v2;
-
-    v.push_back(firstTerritory);
-    v.push_back(secondTerritory);
-    v2.push_back(fifthTerritory);
-    v2.push_back(sixthTerritory);
-
-    // Player only owns A and B
-    Player* player1 = new Player("testName", h, v);
-    Player* player2 = new Player("anotherName", h1, v2);
-    Player* neutralPlayer = new Player("Neutral", new Hand, v1);
 
     // Deploy test cases:
     cout << "-----Test case: player does deploy order but the target territory does not belong to the player-----" << endl;
@@ -79,13 +76,13 @@ int main() {
     cout << *advanceOrder2 << endl;
 
     cout << "-----Test case: player does advance order, target is enemy's territory, guaranteed to lose-----" << endl;
-    thirdTerritory->setArmy(1000);
-    Advance* advanceOrder3 = new Advance(player1, secondTerritory, thirdTerritory, 1, m);
+    fourthTerritory->setArmy(1000);
+    Advance* advanceOrder3 = new Advance(player1, firstTerritory, fourthTerritory, 1, m);
     advanceOrder3->execute();
     cout << *advanceOrder3 << endl;
 
     cout << "-----Test case: player does advance order, target not adjacent-----" << endl;
-    Advance* advanceOrder4 = new Advance(player1, firstTerritory, seventhTerritory, 10, m);
+    Advance* advanceOrder4 = new Advance(player1, secondTerritory, fifthTerritory, 10, m);
     advanceOrder4->execute();
     cout << *advanceOrder4 << endl;
 
@@ -110,7 +107,7 @@ int main() {
     Airlift* airliftOrder2 = dynamic_cast<Airlift*>(h->discardFromHand().play());
     airliftOrder2->setOrderIssuer(player1);
     airliftOrder2->setFrom(firstTerritory);
-    airliftOrder2->setTarget(thirdTerritory);
+    airliftOrder2->setTarget(fourthTerritory);
     airliftOrder2->setNumberOfUnits(5);
 
     airliftOrder2->execute();
@@ -121,7 +118,7 @@ int main() {
     Airlift* airliftOrder3 = dynamic_cast<Airlift*>(h->discardFromHand().play());
     airliftOrder3->setOrderIssuer(player1);
     airliftOrder3->setFrom(thirdTerritory);
-    airliftOrder3->setTarget(firstTerritory);
+    airliftOrder3->setTarget(seventhTerritory);
     airliftOrder3->setNumberOfUnits(5);
 
     airliftOrder3->execute();
@@ -132,12 +129,12 @@ int main() {
     h->addToHand(new Card("bomb"));
     Bomb* bombOrder1 = dynamic_cast<Bomb*>(h->discardFromHand().play());
     bombOrder1->setOrderIssuer(player1);
-    bombOrder1->setTarget(thirdTerritory);
+    bombOrder1->setTarget(fourthTerritory);
     bombOrder1->setMap(m);
 
-    cout << "Before execution C: " << *thirdTerritory << endl;
+    cout << "Before execution: " << *fourthTerritory << endl;
     bombOrder1->execute();
-    cout << "After execution C: " << *thirdTerritory << endl;
+    cout << "After execution: " << *fourthTerritory << endl;
     cout << *bombOrder1 << endl;
 
     cout << "-----Test case: create bomb order with card but target is the player's territory-----" << endl;
@@ -153,8 +150,8 @@ int main() {
     cout << "-----Test case: create bomb order with card but target is not adjacent to any player's territory-----" << endl;
     h->addToHand(new Card("bomb"));
     Bomb* bombOrder3 = dynamic_cast<Bomb*>(h->discardFromHand().play());
-    bombOrder3->setOrderIssuer(player1);
-    bombOrder3->setTarget(seventhTerritory);
+    bombOrder3->setOrderIssuer(player2);
+    bombOrder3->setTarget(secondTerritory);
     bombOrder3->setMap(m);
 
     bombOrder3->execute();
@@ -177,7 +174,7 @@ int main() {
     h->addToHand(new Card("blockade"));
     Blockade* blockadeOrder2 = dynamic_cast<Blockade*>(h->discardFromHand().play());
     blockadeOrder2->setOrderIssuer(player1);
-    blockadeOrder2->setTarget(thirdTerritory);
+    blockadeOrder2->setTarget(fifthTerritory);
     blockadeOrder2->setNeutralPlayer(neutralPlayer);
 
     blockadeOrder2->execute();
@@ -205,6 +202,8 @@ int main() {
     negotiateOrder2->execute();
     cout << *negotiateOrder2 << endl;
 
+    map_loader = NULL;
+    m = NULL;
     h = NULL;
     h1 = NULL;
     orderList = NULL;
@@ -235,6 +234,10 @@ int main() {
     testAttackOrder = NULL;
 
     //delete all pointers
+    delete map_loader;
+    delete m;
+    delete h;
+    delete h1;
     delete orderList;
     delete firstTerritory;
     delete secondTerritory;
