@@ -39,6 +39,7 @@ std::ostream& operator<<(std::ostream &strm, const GameEngine &g) {
 //Transition to load the map
 void GameEngine::loadMap() {
     std::cout << "Loading map..." << endl;
+    cout << "Testing" << endl;
     map_loader = new MapLoader();
     // Code for loading map
     state = "map loaded";
