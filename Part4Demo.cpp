@@ -77,8 +77,8 @@ int main() {
     cout << *advanceOrder2 << endl;
 
     cout << "-----Test case: player does advance order, target is enemy's territory, guaranteed to lose-----" << endl;
-    thirdTerritory->setArmy(1000);
-    Advance* advanceOrder3 = new Advance(player1, secondTerritory, thirdTerritory, 1, m);
+    fourthTerritory->setArmy(1000);
+    Advance* advanceOrder3 = new Advance(player1, firstTerritory, fourthTerritory, 1, m);
     advanceOrder3->execute();
     cout << *advanceOrder3 << endl;
 
@@ -108,7 +108,7 @@ int main() {
     Airlift* airliftOrder2 = dynamic_cast<Airlift*>(h->discardFromHand().play());
     airliftOrder2->setOrderIssuer(player1);
     airliftOrder2->setFrom(firstTerritory);
-    airliftOrder2->setTarget(thirdTerritory);
+    airliftOrder2->setTarget(fourthTerritory);
     airliftOrder2->setNumberOfUnits(5);
 
     airliftOrder2->execute();
@@ -175,7 +175,7 @@ int main() {
     h->addToHand(new Card("blockade"));
     Blockade* blockadeOrder2 = dynamic_cast<Blockade*>(h->discardFromHand().play());
     blockadeOrder2->setOrderIssuer(player1);
-    blockadeOrder2->setTarget(thirdTerritory);
+    blockadeOrder2->setTarget(fifthTerritory);
     blockadeOrder2->setNeutralPlayer(neutralPlayer);
 
     blockadeOrder2->execute();

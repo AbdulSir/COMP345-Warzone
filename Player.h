@@ -26,6 +26,7 @@ public:
     vector <Territory*> toAttack();
     void issueOrder();
     vector <Territory*> getTerritories();
+    vector <Territory*> getPeacefulTerritories();
     OrderList* getOrders();
     string getName();
     int getReinforcementPool();

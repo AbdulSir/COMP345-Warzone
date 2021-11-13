@@ -146,6 +146,14 @@ bool Advance::validate() {
     if (!areTerritoriesAdjacent) {
         isValid = false;
     }
+
+    for (auto t: orderIssuer->getPeacefulTerritories()) {
+        if (t->getName() == target->getName()) {
+            cout << "Can not attack the player that negotiated with " << orderIssuer->getName() << "'s territory" << endl;
+            isValid = false;
+        }
+    }
+
     return isValid;
 };
 
@@ -285,6 +293,12 @@ bool Bomb::validate(){
     }
     if (!areTerritoriesAdjacent) {
         isValid = false;
+    }
+
+    for (auto t: orderIssuer->getPeacefulTerritories()) {
+        if (t->getName() == target->getName()) {
+            isValid = false;
+        }
     }
     return isValid;
 };

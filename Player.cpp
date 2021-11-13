@@ -129,6 +129,10 @@ void Player::setPeacefulTerritories(vector<Territory*> v) {
     peacefulTerrtories = v;
 };
 
+vector <Territory*> Player::getPeacefulTerritories() {
+    return peacefulTerrtories;
+};
+
 //stream insertion operator
 ostream& operator<<(ostream& out, const Player& p)
 {
