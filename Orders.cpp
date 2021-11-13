@@ -56,11 +56,7 @@ bool Order::validate() {
 };
 
 void Order::execute(){
-    if (validate()){
-        cout << "Order " << orderId << " executed"<< endl;
-    } else {
-        cout << "Order "<< orderId <<" invalid! Execution failed."<<endl;
-    }
+    cout << "Executing " << orderId << endl;
     Notify(this);
 }
 
