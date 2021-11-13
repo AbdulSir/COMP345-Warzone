@@ -129,25 +129,58 @@ int main() {
     
     //Create orders
     Hand* h = new Hand;
+    Hand* h1 = new Hand;
+    
     Territory* firstTerritory = new Territory("A", 0, 10);
     Territory* secondTerritory = new Territory("B", 0, 10);
-    Territory* thirdTerritory = new Territory("C", 0, 10);
 
     vector <Territory*> v;
-    // Player only owns A and B
+    vector <Territory*> v1;
+    vector <Territory*> v2;
+    
     Player* player1 = new Player("testName", h, v);
+    Player* player2 = new Player("anotherName", h1, v2);
+    Player* neutralPlayer = new Player("Neutral", new Hand, v1);
+    
     firstTerritory->setOwner(player1);
     secondTerritory->setOwner(player1);
+    
     Deploy* deployOrder = new Deploy(player1, firstTerritory, 3);
+    
+    h->addToHand(new Card("airlift"));
+    Airlift* airliftOrder1 = dynamic_cast<Airlift*>(h->discardFromHand().play());
+    airliftOrder1->setOrderIssuer(player1);
+    airliftOrder1->setFrom(firstTerritory);
+    airliftOrder1->setTarget(secondTerritory);
+    airliftOrder1->setNumberOfUnits(5);
+
+    
+    h->addToHand(new Card("blockade"));
+    Blockade* blockadeOrder1 = dynamic_cast<Blockade*>(h->discardFromHand().play());
+    blockadeOrder1->setOrderIssuer(player1);
+    blockadeOrder1->setTarget(firstTerritory);
+    blockadeOrder1->setNeutralPlayer(neutralPlayer);
+
+    
+    h1->addToHand(new Card("diplomacy"));
+    Negotiate* negotiateOrder1 = dynamic_cast<Negotiate*>(h1->discardFromHand().play());
+    negotiateOrder1->setOrderIssuer(player1);
+    negotiateOrder1->setTarget(player2);
     
     //Create LogObservers
     LogObserver *deployOrderObserver = new LogObserver(deployOrder);
+    LogObserver *airliftOrderObserver = new LogObserver(airliftOrder1);
+    LogObserver *blockadeOrderObserver = new LogObserver(blockadeOrder1);
+    LogObserver *negotiateOrderObserver = new LogObserver(negotiateOrder1);
 
     OrderList* orderList = new OrderList();
     LogObserver *orderListObserver = new LogObserver(orderList);
     
     //Add orders to orderList
     orderList->addOrder(deployOrder);
+    orderList->addOrder(airliftOrder1);
+    orderList->addOrder(blockadeOrder1);
+    orderList->addOrder(negotiateOrder1);
     
     //Display orderList
     cout << *orderList << endl;
@@ -156,6 +189,16 @@ int main() {
     cout << *deployOrder << endl;
     deployOrder->execute();
     cout << endl;
+    
+    airliftOrder1->execute();
+    cout << *airliftOrder1 << endl;
+    
+    blockadeOrder1->execute();
+    cout << *blockadeOrder1 << endl;
+    
+    negotiateOrder1->execute();
+    cout << *negotiateOrder1 << endl;
+
 
     gameObserver = NULL;
     deployOrderObserver = NULL;
@@ -165,6 +208,10 @@ int main() {
     //delete all pointers
     delete gameObserver;
     delete deployOrderObserver;
+    delete airliftOrderObserver;
+    delete blockadeOrderObserver;
+    delete negotiateOrderObserver;
     delete orderListObserver;
     delete g;
 }
+
