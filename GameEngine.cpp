@@ -7,6 +7,7 @@
 #include "GameEngine.h"
 #include <string>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 
@@ -41,64 +42,75 @@ void GameEngine::loadMap() {
     std::cout << "Loading map..." << endl;
     // Code for loading map
     state = "map loaded";
+    Notify(this);
 }
 
 void GameEngine::validateMap() {
     std::cout << "Validating map..." << endl;
     // Code for validating map
     state = "map validated";
+    Notify(this);
 }
 
 void GameEngine::addPlayer() {
     std::cout << "Adding player..." << endl;
     // Code for adding a player
     state = "players added";
+    Notify(this);
 }
 
 void GameEngine::assignCountries() {
     std::cout << "Assigning countries..." <<endl;
     // Code for assigning countries
     state = "assign reinforcement";
+    Notify(this);
 }
 
 void GameEngine::issueOrder() {
     std::cout << "Issuing orders... " << endl;
     // Code for issuing orders
     state = "issue orders";
+    Notify(this);
 }
 
 void GameEngine::endIssueOrders() {
     std::cout << "Ending issued orders... " <<endl;
     // Code for ending issued orders
     state = "execute orders";
+    Notify(this);
 }
 
 void GameEngine::execOrder() {
     std::cout << "Executing orders... " <<endl;
     // Code for executing orders
     state = "execute orders";
+    Notify(this);
 }
 
 void GameEngine::endExecOrders() {
     std::cout << "Ending executed orders... " <<endl;
     // Code for ending orders
     state = "assign reinforcement";
+    Notify(this);
 }
 
 void GameEngine:: win() {
     std::cout << "END OF GAME: Congratulations to the winner!" << endl;
     // Code relevant to the win state
     state = "win";
+    Notify(this);
 }
 
 void GameEngine::play() {
     std::cout << "Starting a new game...\n" <<endl;
     state = "start";
+    Notify(this);
 }
 
 void GameEngine::end() {
     std::cout << "--END OF PROGRAM: Thank you for playing Warzone--" <<endl;
     state = "end";
+    Notify(this);
 }
 
 
@@ -191,4 +203,16 @@ void GameEngine::executeOrders() {
         win();
     else
         std::cout << "ERROR: Invalid command for " << state << " state" << endl;
+}
+
+//overrite ILoggable stringToLog method
+std::string GameEngine::stringToLog(){
+    cout<<"\nWriting Game Engine new state to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Game Engine new state: ";
+    myfile <<this->state<<"\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return this->state;
 }
