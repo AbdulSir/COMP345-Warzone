@@ -386,8 +386,6 @@ MapLoader::MapLoader()
     if (file_name.compare(".map") != 0)
     {
         cout << endl;
-        //delete(map_loader.map_object);
-        //map_loader.map_object=NULL;
         // Read from the text file
         ifstream MyReadFile("Resources/" + file_name);
         if(MyReadFile.fail())
