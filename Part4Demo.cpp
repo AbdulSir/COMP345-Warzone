@@ -22,14 +22,6 @@ int main() {
     Territory* fifthTerritory = m->territories[4];
     Territory* sixthTerritory = m->territories[5];
     Territory* seventhTerritory = m->territories[6];
-    
-    cout << *firstTerritory << endl;
-    cout << *secondTerritory << endl;
-    cout << *thirdTerritory << endl;
-    cout << *fourthTerritory << endl;
-    cout << *fifthTerritory << endl;
-    cout << *sixthTerritory << endl;
-    cout << *seventhTerritory << endl;
 
     vector <Territory*> v;
     vector <Territory*> v1;
@@ -42,6 +34,14 @@ int main() {
     firstTerritory->setOwner(player1);
     secondTerritory->setOwner(player1);
     fifthTerritory->setOwner(player2);
+
+    cout << *firstTerritory << endl;
+    cout << *secondTerritory << endl;
+    cout << *thirdTerritory << endl;
+    cout << *fourthTerritory << endl;
+    cout << *fifthTerritory << endl;
+    cout << *sixthTerritory << endl;
+    cout << *seventhTerritory << endl;
 
     // Deploy test cases:
     cout << "-----Test case: player does deploy order but the target territory does not belong to the player-----" << endl;
