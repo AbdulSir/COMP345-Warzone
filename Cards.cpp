@@ -3,6 +3,8 @@
 using namespace std;
 #include <string>
 #include <list>
+#include <cstdlib>
+#include <ctime>
 
 // Card class
 Card::Card() {}
@@ -53,6 +55,7 @@ Deck& Deck::operator= (const Deck& anotherDeck) {
 
 Deck::Deck(int deckLength) {
     Card* cardToAdd;
+    srand (time (0));
     for (int i=0; i<deckLength; i++) {
         int random = rand() % 5;
         string cardType;

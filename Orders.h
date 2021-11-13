@@ -5,14 +5,19 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "LoggingObserver.h"
 using namespace std;
 
 class Player;
 class Territory;
+class Order {
+class Map;
+class ILoggable;
+class Subject;
 
 // free function to determine if a territory is owned by player
 bool isTerritoryOwnedByPlayer(Player* p, Territory* t);
-class Order {
+class Order : public ILoggable, public Subject {
     public:
         int orderId;
         static int currentId;
@@ -34,6 +39,7 @@ class Order {
         virtual void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Order &order);
+        virtual std::string stringToLog();
 };
 
 class Deploy: public Order {
@@ -61,10 +67,11 @@ class Advance: public Order {
         Territory* from;
         Territory* target;
         int numberOfUnits;
+        Map* map;
         //default constructor
         Advance();
         //parametrized constructor
-        Advance(Player* player, Territory* t1, Territory* t2, int number);
+        Advance(Player* player, Territory* t1, Territory* t2, int number, Map* m);
         //copy constructor
         Advance(const Advance& ad);
         //asssignment operator
@@ -104,16 +111,18 @@ class Bomb: public Order {
     public:
         // attributes
         Territory* target;
+        Map* map;
         //default constructor
         Bomb();
         //parametrized constructor
-        Bomb(Player* player, Territory* t1, Territory* t2);
+        Bomb(Player* player, Territory* t1, Territory* t2, Map* m);
         //copy constructor
         Bomb(const Bomb& b);
         //asssignment operator
         Bomb& operator= (const Bomb& b);
         //setters
         void setTarget(Territory* target);
+        void setMap(Map* m);
         bool validate();
         void execute();
         //stream insertion operators
@@ -154,13 +163,15 @@ class Negotiate: public Order {
         Negotiate(const Negotiate& n);
         //asssignment operator
         Negotiate& operator= (const Negotiate& n);
+        //setters
+        void setTarget(Player* target);
         bool validate();
         void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Negotiate &order);
 };
 
-class OrderList {
+class OrderList : public ILoggable, public Subject {
     public:
         // attributes
         vector<Order*> orderList;
@@ -180,4 +191,6 @@ class OrderList {
         void remove(Order* order);
         // stream insertion operators
         friend ostream& operator<< (ostream& out, const OrderList& orderList);
+        virtual std::string stringToLog();
 };
+

@@ -4,6 +4,9 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -53,11 +56,19 @@ bool Order::validate() {
 };
 
 void Order::execute(){
-    if (validate()){
-        cout << "Order " << orderId << " executed"<< endl;
-    } else {
-        cout << "Order "<< orderId <<" invalid! Execution failed."<<endl;
-    }
+    cout << "Executing " << orderId << endl;
+    Notify(this);
+}
+
+std::string Order::stringToLog(){
+    cout<<"\nWriting executed Order to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Order executed: ";
+    myfile <<to_string(this->orderId)<<"\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return to_string(this->orderId);
 }
 
 //Deploy Class
@@ -90,6 +101,7 @@ bool Deploy::validate() {
 };
 
 void Deploy::execute() {
+    Order::execute();
     if (validate()) {
         vector <Territory*> territories = orderIssuer->getTerritories();
         orderIssuer->setReinforcementPool(orderIssuer->getReinforcementPool() - numberOfUnits);
@@ -107,10 +119,11 @@ void Deploy::execute() {
 Advance::Advance() : Order() {};
 
 //constructor
-Advance::Advance(Player* player, Territory* t1, Territory* t2, int number) : Order(player) {
+Advance::Advance(Player* player, Territory* t1, Territory* t2, int number, Map* m) : Order(player) {
     from = t1;
     target = t2;
     numberOfUnits = number;
+    map = m;
 }
 
 //copy constructor
@@ -134,17 +147,60 @@ Advance& Advance::operator=(const Advance& a){
 }
 
 bool Advance::validate() {
-    bool isSourceOwnedByIssuer = isTerritoryOwnedByPlayer(orderIssuer, from);
-    // TODO: modify territory class
-    // hard code to true for now
-    bool areTerritoriesAdjacent = true;
+    bool isValid = true;
 
-    return isSourceOwnedByIssuer && areTerritoriesAdjacent;
+    bool areTerritoriesAdjacent = map->adjacent_territory(from->getName(), target->getName());
+    if (!isTerritoryOwnedByPlayer(orderIssuer, from)) {
+        isValid = false;
+    }
+
+    if (!areTerritoriesAdjacent) {
+        isValid = false;
+    }
+
+    for (auto t: orderIssuer->getPeacefulTerritories()) {
+        if (t->getName() == target->getName()) {
+            cout << "Can not attack the player that negotiated with " << orderIssuer->getName() << "'s territory" << endl;
+            isValid = false;
+        }
+    }
+
+    if (from->army_nb < numberOfUnits) {
+        isValid = false;
+    }
+
+    return isValid;
 };
 
 void Advance::execute() {
+    Order::execute();
     if (validate()) {
-        // TODO: complete this code
+        if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
+            from->setArmy(from->army_nb - numberOfUnits);
+            target->setArmy(target->army_nb + numberOfUnits);
+            this->effect = "Moved " + to_string(numberOfUnits) + " armies from " + from->getName() + " to " + target->getName();
+        } else {
+            srand (time (0));
+            while (true) {
+                if (numberOfUnits == 0 || target->army_nb == 0) break;
+                int attackerNumber = rand() % 60 + 1;
+                int defenderNumber = rand() & 70 + 1;
+                if (attackerNumber > defenderNumber) {
+                    target->setArmy(target->army_nb -1);
+                } else if (defenderNumber > attackerNumber) {
+                    numberOfUnits = numberOfUnits-1;
+                }
+            }
+            if (target->army_nb == 0) {
+                orderIssuer->addTerritory(target);
+                target->setArmy(numberOfUnits);
+                target->setOwner(orderIssuer);
+                this->effect = "Attack success, " + orderIssuer->getName() + " now own " + target->territory_name + ", and the territory now has " + to_string(target->army_nb) + " armies";
+                orderIssuer->setWillDrawCard(true);
+            } else {
+                this->effect = "Attack failed, " + target->territory_name + " still has " + to_string(target->army_nb) + " armies"; 
+            }
+        }
         cout << "Advance order executed" << endl;
     } else {
         cout << "Advance order invalid" << endl;
@@ -199,6 +255,7 @@ bool Airlift::validate() {
 };
 
 void Airlift::execute(){
+    Order::execute();
     if (validate()) {
         from->setArmy(from->army_nb - numberOfUnits);
         target->setArmy(target->army_nb + numberOfUnits);
@@ -214,8 +271,9 @@ void Airlift::execute(){
 Bomb::Bomb():Order() {};
 
 //constructor
-Bomb::Bomb(Player* player, Territory* t1, Territory* t2) : Order(player){
+Bomb::Bomb(Player* player, Territory* t1, Territory* t2, Map* m) : Order(player){
     target = t2;
+    map = m;
 }
 
 //copy constructor
@@ -236,14 +294,35 @@ void Bomb::setTarget(Territory* t) {
     target = t;
 };
 
+void Bomb::setMap(Map* m) {
+    map = m;
+};
+
 bool Bomb::validate(){
-    // TODO: modify territory class
-    // hard code to true for now
-    bool areTerritoriesAdjacent = true;
-    return !isTerritoryOwnedByPlayer(orderIssuer, target) && areTerritoriesAdjacent;
+    bool areTerritoriesAdjacent = false;
+    bool isValid = true;
+    for (auto t: orderIssuer->getTerritories()) {
+        if (map->adjacent_territory(t->getName(), target->getName())) {
+            areTerritoriesAdjacent = true;
+        }
+    }
+    if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
+        isValid = false;
+    }
+    if (!areTerritoriesAdjacent) {
+        isValid = false;
+    }
+
+    for (auto t: orderIssuer->getPeacefulTerritories()) {
+        if (t->getName() == target->getName()) {
+            isValid = false;
+        }
+    }
+    return isValid;
 };
 
 void Bomb::execute(){
+    Order::execute();
     if (validate()) {
         target->setArmy(target->army_nb / 2);
         cout << "Bomb order executed" << endl;
@@ -290,12 +369,12 @@ bool Blockade::validate(){
 };
 
 void Blockade::execute(){
+    Order::execute();
     if (validate()) {
         target->setArmy(target->army_nb *2);
-        orderIssuer->removeTerritory(target);
-        neutral->addTerritory(target);
+        target->setOwner(neutral);
         cout << "Blockade order executed" << endl;
-        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + neutral->getName() + " and this territory has " + to_string(target->army_nb) + " armies";
+        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + target->getOwner()->getName() + " and this territory has " + to_string(target->army_nb) + " armies";
     } else {
         cout << "Blockade order invalid" << endl;
     }
@@ -324,6 +403,10 @@ Negotiate& Negotiate::operator=(const Negotiate& n){
     return *this;
 }
 
+void Negotiate::setTarget(Player* p) {
+    target = p;
+};
+
 bool Negotiate::validate(){
     if (target->getName() == orderIssuer->getName()) {
         return false;
@@ -332,8 +415,11 @@ bool Negotiate::validate(){
 };
 
 void Negotiate::execute(){
+    Order::execute();
     if (validate()) {
-        // TODO: complete this code
+        orderIssuer->setPeacefulTerritories(target->getTerritories());
+        target->setPeacefulTerritories(orderIssuer->getTerritories());
+        this->effect = orderIssuer->getName() + " and " + target->getName() + " have agreed not to attack each other.";
         cout << "Negotiate order executed" << endl;
     } else {
         cout << "Negotiate order invalid" << endl;
@@ -373,7 +459,8 @@ OrderList& OrderList::operator= (const OrderList& o){
 
 //add order to orderList
 void OrderList::addOrder(Order* order){
-   orderList.push_back(order);
+    orderList.push_back(order);
+    Notify(this);
 }
 
 //move order inside orderList
@@ -396,6 +483,25 @@ void OrderList::remove(Order* order){
         }
     }
     cout <<"Order "<< order->orderId <<" removed from list" << endl;
+}
+
+std::string OrderList::stringToLog(){
+    cout<<"\nWriting issued Order to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Order issued: ";
+    std::string orderIssued;
+    for(int i=0; i<orderList.size();i++){
+        if(i!=0){
+            orderIssued=+", ";
+            myfile <<", ";
+        }
+        orderIssued=+orderList[i]->orderId;
+        myfile <<orderList[i]->orderId;
+    }
+    myfile <<"\n-------------------------------------\n";
+    myfile.close();
+    return orderIssued;
 }
 
 //stream insertion operators

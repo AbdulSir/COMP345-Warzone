@@ -3,20 +3,26 @@
 //  COMP 345 - Assignment 1 - Team DN02
 //  Warzone Game Engine: controls the flow of the game using the user's keyboard inputs as commands
 //
+#pragma once
 #include "Map.h"
 #include "Player.h"
+
+#include "CommandProcessing.h"
 #include <string>
+#include "LoggingObserver.h"
 using namespace std;
 
-#pragma once
-class GameEngine {
-
+class ILoggable;class Subject;
+class GameEngine : public ILoggable, public Subject {
+    
 public:
 
     std::string state;
     std::string command;
     MapLoader* map_loader;
     vector <Player*> players;
+    CommandProcessor* cp;
+    
     //Constructors
     GameEngine();
     GameEngine(const GameEngine& g);
@@ -55,6 +61,7 @@ public:
 
     void startupPhase();
     vector<int> player_owns_all_territories(Player* p1);
-
+    //overrite ILoggable stringToLog method
+    virtual std::string stringToLog();
 };
 

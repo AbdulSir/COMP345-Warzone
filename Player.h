@@ -10,9 +10,10 @@
 using namespace std;
 
 class Order;
-class OrderList;
 class Card;
+class OrderList;
 class Hand;
+class Territory;
 
 //Player class declaration
 class Player{
@@ -28,15 +29,19 @@ public:
     vector <Territory*> toAttack();
     void issueOrder();
     vector <Territory*> getTerritories();
+    Hand* getHand();
+    void setName(string name);
+    vector <int> continents_owned;
+    vector <Territory*> getPeacefulTerritories();
     OrderList* getOrders();
     string getName();
-    Hand* getHand();
     int getReinforcementPool();
     void addTerritory(Territory* t);
     void removeTerritory(Territory* t);
+    void setTerritories(vector <Territory*> v);
     void setReinforcementPool(int number);
-    void setName(string name);
-    vector <int> continents_owned;
+    void setPeacefulTerritories(vector<Territory*> v);
+    void setWillDrawCard(bool value);
 
 private:
     string name;
@@ -44,4 +49,6 @@ private:
     vector <Territory*> territories;
     OrderList* orders;
     int reinforcementPool;
+    vector <Territory*> peacefulTerrtories;
+    bool willDrawCardAtTheEndOfTurn;
 };

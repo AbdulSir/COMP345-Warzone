@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <math.h>
+#include <fstream>
 using namespace std;
 
 
@@ -43,6 +44,7 @@ void GameEngine::loadMap() {
     map_loader = new MapLoader();
     // Code for loading map
     state = "map loaded";
+    Notify(this);
 }
 
 void GameEngine::validateMap() {
@@ -56,6 +58,9 @@ void GameEngine::validateMap() {
         cout << "\nThe Map is NOT a valid map" << endl;
 
     // Code for validating map;
+    // Code for validating map
+    state = "map validated";
+    Notify(this);
 }
 
 void GameEngine::addPlayer() {
@@ -75,6 +80,7 @@ void GameEngine::addPlayer() {
         players.push_back(new Player(player_name));
     }
     state = "players added";
+    Notify(this);
 }
 
 void GameEngine::gameStart() {
@@ -128,46 +134,54 @@ void GameEngine::gameStart() {
 
     // Code for assigning countries
     state = "assign reinforcement";
+    Notify(this);
 }
 
 void GameEngine::issueOrder() {
     std::cout << "Issuing orders... " << endl;
     // Code for issuing orders
     state = "issue orders";
+    Notify(this);
 }
 
 void GameEngine::endIssueOrders() {
     std::cout << "Ending issued orders... " <<endl;
     // Code for ending issued orders
     state = "execute orders";
+    Notify(this);
 }
 
 void GameEngine::execOrder() {
     std::cout << "Executing orders... " <<endl;
     // Code for executing orders
     state = "execute orders";
+    Notify(this);
 }
 
 void GameEngine::endExecOrders() {
     std::cout << "Ending executed orders... " <<endl;
     // Code for ending orders
     state = "assign reinforcement";
+    Notify(this);
 }
 
 void GameEngine:: win() {
     std::cout << "END OF GAME: Congratulations to the winner!" << endl;
     // Code relevant to the win state
     state = "win";
+    Notify(this);
 }
 
 void GameEngine::play() {
     std::cout << "Starting a new game...\n" <<endl;
     state = "start";
+    Notify(this);
 }
 
 void GameEngine::end() {
     std::cout << "--END OF PROGRAM: Thank you for playing Warzone--" <<endl;
     state = "end";
+    Notify(this);
 }
 
 
@@ -379,4 +393,14 @@ vector<int> GameEngine::player_owns_all_territories(Player* p1)
             p1->continents_owned.push_back(i);
     }
     return p1->continents_owned;
+//overrite ILoggable stringToLog method
+std::string GameEngine::stringToLog(){
+    cout<<"\nWriting Game Engine new state to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Game Engine new state: ";
+    myfile <<this->state<<"\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return this->state;
 }
