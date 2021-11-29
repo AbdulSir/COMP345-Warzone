@@ -25,6 +25,8 @@ public:
     ~Player(); //destructor
     Player& operator =(const Player& p); // assignment operator
     friend ostream& operator << (ostream &out, const Player& p); // stream insertion operator
+    vector <Territory*> defendList;
+    vector <Territory*> attackList;
     vector <Territory*> toDefend();
     vector <Territory*> toAttack();
     void issueOrder();

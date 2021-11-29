@@ -32,6 +32,8 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories){
     this->name = name;
     this->hand = hand;
     this->territories = territories;
+    this->defendList = territories;
+    this->attackList = {};
     this->orders= new OrderList();
     this->reinforcementPool = 50;
     this->willDrawCardAtTheEndOfTurn = false;
@@ -78,7 +80,7 @@ Player& Player::operator=(const Player& p){
 
 vector <Territory*> Player::toDefend(){
     cout << "Inside toDefend of Player" << endl;
-    Territory * tt1=new Territory("United Kingdome",0,5);
+    Territory * tt1=new Territory("United Kingdom",0,5);
     Territory * tt2=new Territory("Ireland",0,5);
     vector<Territory*> t={tt1,tt2};
     return t;

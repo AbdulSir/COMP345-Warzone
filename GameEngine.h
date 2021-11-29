@@ -61,9 +61,15 @@ public:
     void issueOrders();
     void executeOrders();
 
+    //Main game loop for reinforcement, issuing orders, and orders execution phase
+    void mainGameLoop();
+    void reinforcementPhase();
+    void issueOrdersPhase();
+    void executeOrdersPhase();
     void startupPhase();
     vector<int> player_owns_all_territories(Player* p1);
     //overrite ILoggable stringToLog method
     virtual std::string stringToLog();
+    void reinforcementSetup();
 };
 
