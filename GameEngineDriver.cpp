@@ -19,6 +19,7 @@ int main() {
 
     GameEngine* gm = new GameEngine();
     gm->startupPhase();
+    
     delete(gm);
     gm=NULL;
 

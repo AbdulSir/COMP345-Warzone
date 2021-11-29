@@ -4,12 +4,15 @@
 //  Warzone Game Engine: controls the flow of the game using the user's keyboard inputs as commands
 //
 #include "GameEngine.h"
+#include "Player.h"
 #include <string>
 #include <iostream>
 #include <math.h>
 #include <fstream>
 using namespace std;
 
+
+class Player;
 
 //Constructor
 GameEngine::GameEngine() : state("start"), command("") {
@@ -266,6 +269,138 @@ void GameEngine::executeOrders() {
         std::cout << "ERROR: Invalid command for " << state << " state" << endl;
 }
 
+void GameEngine::mainGameLoop(){
+    cout << "Starting Game"<<endl;
+    int numberOfTerritories; //will territories vector be created in part 2?
+    bool gameWon = false;
+
+    while(gameWon==false){
+
+        //execute 3 main phases sequentially
+        reinforcementPhase();
+        issueOrdersPhase();
+        executeOrdersPhase();
+
+        //check for players to remove
+        for (int i = 0; i < players.size(); i++){
+            if (players[i]->getTerritories().size() == 0){
+                cout << players[i]->getName() << " has been eliminated." << endl;
+                players.erase(find(players.begin(), players.end(), players[i]));
+            }
+        }
+        //check if there is a winner
+        if (players.size() == 1){
+            cout << "The winner is " << players[0]->getName();
+            break;
+        }
+    }
+
+}
+
+void GameEngine::reinforcementSetup(){
+    map_loader = new MapLoader();
+        int num_of_players = 0;
+    std::cout << "Adding player..." << endl;
+    cout << "Please enter the number of players (2-6): " << endl;;
+    cin >> num_of_players;
+    while( num_of_players < 2 || num_of_players > 6)
+    {
+        cout << "Invalid number. Please enter a number between 2 and 6" << endl;
+        cin >> num_of_players;
+    }
+
+    for (int i=0; i < num_of_players; i++)
+    {
+        string player_name = "Player " + to_string(i+1);
+        players.push_back(new Player(player_name));
+    }
+
+    vector <Territory*> territories_instance = map_loader->map_object->territories;
+    int territory_size = territories_instance.size();
+    while (territory_size != 0)
+    {
+        for (int i=0; i<players.size(); i++)
+        {
+            if (territory_size >= 1)
+            {
+                players[i]->addTerritory(territories_instance[territory_size - 1]);
+                territory_size--;
+            }
+        }
+    }
+    for (int i=0; i<players.size(); i++)
+    {
+        vector <Territory*> territories_instance_1 = players[i]->getTerritories();
+        cout << players[i]->getName() << endl;
+        for (int j=0; j< territories_instance_1.size(); j++)
+        {
+            cout << territories_instance_1[j]->getName() << endl;
+        }
+        cout << endl;
+    }
+
+}
+
+void GameEngine::reinforcementPhase(){
+    cout << "Beginning Reinforcement Phase"<<endl;
+
+    for (auto player : players){
+        //minimum added is 3 or minimum required in pool is 3??
+        if (player->getTerritories().size() < 12 && player->getTerritories().size() > 0){
+            player->setReinforcementPool(player->getReinforcementPool()+3);
+            cout << player->getName() << " has " << player->getTerritories().size() << " territories" << endl;
+            cout << "3 armies added to reinforcement pool" << endl;
+        } 
+        else {
+            //add # of territories/3 rounded down to nearest int
+            player->setReinforcementPool(player->getReinforcementPool()+player->getTerritories().size()/3);
+            cout << player->getName() << " has " << player->getTerritories().size() << " territories" << endl;
+            cout << player->getTerritories().size()/3 << " armies were added to their reinforcement pool" << endl;
+        }
+
+        //Apply Continent bonus to each player where applicable
+        vector<int> playerContinents =  player_owns_all_territories(player);
+
+        //if player owns any continents, add bonus(es)
+        if (playerContinents.size() > 0) {
+           for (int i = 0; i < playerContinents.size(); i++){
+               vector<Territory*> player_territories = player->getTerritories();
+                for (int j=0; j<player_territories.size(); j++){
+                    if (player_territories[j]->continent_ref == playerContinents[i]){
+                         player->setReinforcementPool(player->getReinforcementPool() + player_territories[j]->army_bonus);
+                         break;
+                    }
+                
+                }
+            }
+        }
+
+    }
+    cout << "End of Reinforcement Phase" << endl;
+}
+
+void GameEngine::issueOrdersPhase(){
+    cout << "Beginning issue orders phase.";
+        //each player adds their orders until all players are done
+        for (int i=0; i < players.size(); i++){
+            cout << "Player "<< i <<"\'s turn" <<endl;
+            //use a while loop?
+                players[i]->issueOrder();
+        }
+        cout << "End of issue orders phase" << endl;
+    }
+
+void GameEngine::executeOrdersPhase(){
+    // execute orders one player at a time until all orders have been executed
+    // need to determine which player(s) have the most # of orders, skip the indices of those who have less
+
+    //loop through players and execute all their orders
+    for (auto player: players){
+        for (auto order: player->getOrders()->orderList) {
+            order->execute();
+        }
+    }
+}
 void GameEngine::startupPhase()
 {
 
