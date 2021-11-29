@@ -5,11 +5,12 @@
 
 #include "CommandProcessing.h"
 #include "GameEngine.h"
+#include "LoggingObserver.h"
 #include <iostream>
 using namespace std;
 #include <string>
-using namespace std;
 #include <fstream>
+
 
 //METHODS IN COMMAND
 
@@ -43,6 +44,11 @@ ostream& operator<<(ostream& out, const Command& c) {
 
 //Saves effect of command
 void Command::saveEffect(string c) {
+    
+    if (c.find("tournament") != string::npos) {
+        effect = "Tournament Mode activated";
+    }
+    
     if (c.find("loadmap") != string::npos) {
         string mapName = c.substr(8);
         effect = mapName + " has been loaded";
@@ -63,6 +69,18 @@ void Command::saveEffect(string c) {
     else if (c == "quit") {
         effect = "End of program";
     }
+    Notify(this);
+}
+
+//overrite ILoggable stringToLog method
+std::string Command::stringToLog(){
+    cout<<"\nWriting Command's Effect to gamelog.txt file ...\n"<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    myfile <<"Command's Effect: "<<this->effect<<"\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return this->effect;
 }
 
 
@@ -107,19 +125,74 @@ void CommandProcessor::getCommand(string gameState) {
     if (validate(commandStr, gameState)) {
         cout << commandStr << " is a valid command for the " << gameState << " state\n" <<endl;
         Command* c = new Command(commandStr);
-        c->saveEffect(commandStr);
+        LogObserver *observer = new LogObserver(c) ;
         saveCommand(c);
+        c->saveEffect(commandStr);
     }
     else {
         cout << commandStr << " is not a valid command for the " << gameState << " state\n" << endl;
         Command* c = new Command(commandStr);
-        c->effect = "No effect (Invalid command for " + gameState + " state)";
+        LogObserver *observer = new LogObserver(c) ;
         saveCommand(c);
+        c->effect = "No effect (Invalid command for " + gameState + " state)";
     }
 }
 
 //Validates if command is valid in current game state
 bool CommandProcessor::validate(string c, string gameState) {
+    
+    //Validating tournament command
+    if (c.substr(0,14) == "tournament -M " && c.find(" -M ") < c.find(" -P ") && c.find(" -P ") < c.find(" -G ") && c.find(" -G ") < c.find(" -D ") && c.length() == c.find("-D")+5 && gameState == "start") {
+        
+        //Validating the map input
+        string m = c.substr(c.find("-M")+3);
+        m = m.substr(0, m.find(" "));
+        while (m.find(",") != m.npos) {
+            string subsM = m.substr(0, m.find(","));
+            if (subsM.find(".map") == subsM.npos)
+                return false;
+            mapFiles.push_back(m.substr(0, m.find(",")));
+            m = m.substr(m.find(",")+1);
+        }
+        mapFiles.push_back(m);
+        if (mapFiles.size() < 1 || mapFiles.size() > 5 || m == "-P")
+            return false;
+        
+        //Validating the player input
+        string p = c.substr(c.find("-P")+3);
+        p = p.substr(0, p.find(" "));
+        while (p.find(",") != p.npos) {
+            playersStrat.push_back(p.substr(0, p.find(",")));
+            p = p.substr(p.find(",")+1);
+        }
+        playersStrat.push_back(p);
+        if (playersStrat.size() < 2 || playersStrat.size() > 4 || p == "-G")
+            return false;
+        for (auto i:playersStrat) {
+            if (i != "Human" && i != "Aggressive" && i != "Benevolent" && i != "Neutral" && i != "Cheater")
+                return false;
+        }
+        
+        //Validating the number of games input
+        string g = c.substr(c.find("-G")+3);
+        g = g.substr(0, g.find(" "));
+        if (g.length() != 1 || g.at(0) < 48 || g.at(0) > 57)
+            return false;
+        numGames = stoi(g);
+        if (numGames < 1 || numGames > 5)
+            return false;
+        
+        //Validating the number of turns input
+        string d = c.substr(c.find("-D")+3);
+        if (d.length() != 2 || d.at(0) < 48 || d.at(0) > 57 || d.at(1) < 48 || d.at(1) > 57)
+            return false;
+        numMaxTurns = stoi(d);
+        if (numMaxTurns < 10 || numMaxTurns > 50)
+            return false;
+        
+        return true;
+    }
+    
     if (c.substr(0,8) == "loadmap " && (gameState == "start" || gameState == "mapLoaded")) {
         if (c.substr(c.length()-4) == ".map" && c.rfind(" ") == 7 && c.find(" .map") == c.npos)
             return true;
@@ -152,6 +225,26 @@ string CommandProcessor::readCommand() {
 //Saves command in list of commands
 void CommandProcessor::saveCommand(Command* c) {
     lc.push_back(c);
+    Notify(this);
+}
+
+//overrite ILoggable stringToLog method
+std::string CommandProcessor::stringToLog(){
+    cout<<"\nWriting Command to gamelog.txt file ..."<<endl;
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
+    std::string gamelog;
+    for (auto it = this->lc.begin(); it != this->lc.end(); it++)
+    {
+        if(it != this->lc.begin()){
+            gamelog+= ", ";
+        }
+        gamelog+=(*it)->command;
+    }
+    myfile <<"Command: " << gamelog << "\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return gamelog;
 }
 
 

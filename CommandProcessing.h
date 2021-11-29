@@ -2,19 +2,23 @@
 //  CommandProcessing.h
 //  Warzone Command Processor
 //
+
 #include <string>
 using namespace std;
 #include <fstream>
 using namespace std;
 #include <list>
+#include "LoggingObserver.h"
 
 #pragma once
 
+class ILoggable;
+class Subject;
+
 //Command object
-class Command {
-private:
-    string command;
+class Command : public ILoggable, public Subject {
 public:
+    string command;
     string effect;
     
     //Constructors
@@ -30,14 +34,24 @@ public:
     
     //stream insertion operator
     friend ostream& operator<<(ostream& out, const Command& c);
+    
+    //overrite ILoggable stringToLog method
+    virtual std::string stringToLog();
+    
 };
 
 //CommandProcessor object
-class CommandProcessor {
+class CommandProcessor : public ILoggable, public Subject {
 public:
     
     //list of commands
     list<Command*> lc;
+    
+    //Attributes related to Tournament mode
+    list<string> mapFiles;
+    list<string> playersStrat;
+    int numGames;
+    int numMaxTurns;
     
     //Constructors + Destructor
     CommandProcessor();
@@ -55,6 +69,9 @@ public:
     
     //stream insertion operator
     friend ostream& operator<<(ostream& out, const CommandProcessor& cp);
+    
+    //overrite ILoggable stringToLog method
+    virtual std::string stringToLog();
     
 protected:
     
