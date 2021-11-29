@@ -7,6 +7,7 @@
 #include "Orders.h"
 #include "Cards.h"
 #include "Map.h"
+#include "PlayerStrategies.h"
 using namespace std;
 
 class Order;
@@ -14,22 +15,21 @@ class Card;
 class OrderList;
 class Hand;
 class Territory;
+class PlayerStrategy;
 
 //Player class declaration
 class Player{
 public:
+    PlayerStrategy* ps;
     Player(); //default constructor
     Player(string name);
-    Player(string name, Hand * hand, vector <Territory*> territories); // constructor
+    Player(string name, Hand * hand, vector <Territory*> territories, PlayerStrategy* ps); // constructor
     Player(const Player &p); //copy constructor
     ~Player(); //destructor
     Player& operator =(const Player& p); // assignment operator
     friend ostream& operator << (ostream &out, const Player& p); // stream insertion operator
     vector <Territory*> defendList;
     vector <Territory*> attackList;
-    vector <Territory*> toDefend();
-    vector <Territory*> toAttack();
-    void issueOrder();
     vector <Territory*> getTerritories();
     Hand* getHand();
     void setName(string name);

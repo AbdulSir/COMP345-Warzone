@@ -16,6 +16,7 @@ Player::Player(){
     this->orders= new OrderList();
     this->name = "Anonymous";
     this->reinforcementPool = 50;
+    this->ps = new Human();
 }
 
 Player::Player(string name){
@@ -25,10 +26,11 @@ Player::Player(string name){
     this->name = name;
     this->reinforcementPool = 50;
     this->willDrawCardAtTheEndOfTurn = false;
+    this->ps = new Human();
 }
 
 //Constructor
-Player::Player (string name, Hand * hand, vector <Territory*> territories){
+Player::Player (string name, Hand * hand, vector <Territory*> territories, PlayerStrategy* ps){
     this->name = name;
     this->hand = hand;
     this->territories = territories;
@@ -37,6 +39,11 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories){
     this->orders= new OrderList();
     this->reinforcementPool = 50;
     this->willDrawCardAtTheEndOfTurn = false;
+    if (ps != NULL) {
+        this->ps = ps;
+    } else {
+        this->ps = new Human();
+    }
 }
 
 //Copy constructor
@@ -51,6 +58,8 @@ Player::Player(const Player& p){
     for (int i=0; i<p.territories.size(); i++)
         territories[i] = new Territory(*p.territories[i]);
     this->willDrawCardAtTheEndOfTurn = p.willDrawCardAtTheEndOfTurn;
+    this->ps = new PlayerStrategy;
+    *ps = p.ps;
 }
 
 //Destructor
@@ -58,6 +67,7 @@ Player::~Player()
 {
     delete orders;
     delete hand;
+    delete ps;
     for (int i=0; i<territories.size(); i++){
         delete territories[i];
     }
@@ -75,28 +85,9 @@ Player& Player::operator=(const Player& p){
     for (int i=0; i<p.territories.size(); i++)
         territories[i] = new Territory(*p.territories[i]);
     this->willDrawCardAtTheEndOfTurn = p.willDrawCardAtTheEndOfTurn;
+    this->ps = new PlayerStrategy;
+    *ps = *p.ps;
     return *this;
-}
-
-vector <Territory*> Player::toDefend(){
-    cout << "Inside toDefend of Player" << endl;
-    Territory * tt1=new Territory("United Kingdom",0,5);
-    Territory * tt2=new Territory("Ireland",0,5);
-    vector<Territory*> t={tt1,tt2};
-    return t;
-}
-
-vector <Territory*> Player::toAttack(){
-    cout << "Inside toAttack of Player" << endl;
-    Territory * tt=new Territory("France",0,5);
-    vector<Territory*> t={tt};
-    return t;
-}
-
-void Player::issueOrder(){
-    cout << "Inside issueOrder of Player" << endl;
-    Order * order = new Order();
-    this->orders->orderList.push_back(order);
 }
 
 vector <Territory*> Player::getTerritories() {
