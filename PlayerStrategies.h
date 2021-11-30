@@ -1,4 +1,6 @@
-#include 'Player.h'
+#pragma once
+
+#include "Player.h"
 #include <iostream>
 class Player;
 class PlayerStrategy {
