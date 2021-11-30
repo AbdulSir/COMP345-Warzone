@@ -16,7 +16,7 @@ Player::Player(){
     this->orders= new OrderList();
     this->name = "Anonymous";
     this->reinforcementPool = 50;
-    this->ps = new Human();
+    this->ps = new Human(this);
 }
 
 Player::Player(string name){
@@ -26,7 +26,7 @@ Player::Player(string name){
     this->name = name;
     this->reinforcementPool = 50;
     this->willDrawCardAtTheEndOfTurn = false;
-    this->ps = new Human();
+    this->ps = new Human(this);
 }
 
 //Constructor
@@ -42,7 +42,7 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories, Playe
     if (ps != NULL) {
         this->ps = ps;
     } else {
-        this->ps = new Human();
+        this->ps = new Human(this);
     }
 }
 
