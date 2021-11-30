@@ -8,3 +8,7 @@ vector <Player*> players;
 Map* map;
 Player* neutralPlayer;
 
+int main() {
+
+    return 0;
+}

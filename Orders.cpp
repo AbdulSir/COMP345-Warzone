@@ -60,10 +60,10 @@ void Order::execute(){
     Notify(this);
 }
 
-std::string Order::stringToLog(){
+string Order::stringToLog(){
     cout<<"\nWriting executed Order to gamelog.txt file ..."<<endl;
-    std::ofstream myfile;
-    myfile.open ("gamelog.txt", std::ios_base::app);
+    ofstream myfile;
+    myfile.open ("gamelog.txt", ios_base::app);
     myfile <<"Order executed: ";
     myfile <<to_string(this->orderId)<<"\n";
     myfile <<"-------------------------------------\n";
@@ -485,12 +485,12 @@ void OrderList::remove(Order* order){
     cout <<"Order "<< order->orderId <<" removed from list" << endl;
 }
 
-std::string OrderList::stringToLog(){
+string OrderList::stringToLog(){
     cout<<"\nWriting issued Order to gamelog.txt file ..."<<endl;
-    std::ofstream myfile;
-    myfile.open ("gamelog.txt", std::ios_base::app);
+    ofstream myfile;
+    myfile.open ("gamelog.txt", ios_base::app);
     myfile <<"Order issued: ";
-    std::string orderIssued;
+    string orderIssued;
     for(int i=0; i<orderList.size();i++){
         if(i!=0){
             orderIssued=+", ";

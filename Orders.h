@@ -38,7 +38,7 @@ class Order : public ILoggable, public Subject {
         virtual void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Order &order);
-        virtual std::string stringToLog();
+        virtual string stringToLog();
 };
 
 class Deploy: public Order {
@@ -190,6 +190,6 @@ class OrderList : public ILoggable, public Subject {
         void remove(Order* order);
         // stream insertion operators
         friend ostream& operator<< (ostream& out, const OrderList& orderList);
-        virtual std::string stringToLog();
+        virtual string stringToLog();
 };
 
