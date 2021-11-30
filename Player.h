@@ -21,10 +21,9 @@ class PlayerStrategy;
 class Player{
 public:
     PlayerStrategy* ps;
-    Map* map;
     Player(); //default constructor
     Player(string name);
-    Player(string name, Hand * hand, vector <Territory*> territories, PlayerStrategy* ps, Map* m); // constructor
+    Player(string name, Hand * hand, vector <Territory*> territories, PlayerStrategy* ps); // constructor
     Player(const Player &p); //copy constructor
     ~Player(); //destructor
     Player& operator =(const Player& p); // assignment operator
