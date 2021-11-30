@@ -4,6 +4,9 @@
 #include <string>
 using namespace std;
 
+extern vector <Player*> players;
+extern Map* map;
+
 PlayerStrategy::PlayerStrategy(Player* p) {
     this->p = p;
 }
@@ -29,7 +32,6 @@ void Neutral::issueOrder() {
 }
 
 void Neutral::toDefend() {
-    this->isAttacked = true;
     if (isAttacked) {
         Aggressive::toDefend();
     }
@@ -69,26 +71,102 @@ void Human::issueOrder() {
     switch(command) {
         case "Deploy":
             string territoryName;
-            int armyNumber;
+            int numberOfUnits;
             cout << "Which territory would you like to deploy" << endl;
             cin >> territoryName;
             cout << "How many armies would you like to deploy";
-            cin >> armyNumber;
+            cin >> numberOfUnits;
             for (auto t: p->getTerritories()) {
                 if (t->getName() == territoryName) {
-                    p->getOrders()->addOrder(new Deploy(p, t, armyNumber))
+                    p->getOrders()->addOrder(new Deploy(p, t, numberOfUnits))
                 }
             }
             break;
         case "Advance":
+            string territoryNameFrom;
+            string territoryNameTo;
+            int numberOfUnits;
+            cout << "Which territory would you like to advance from" << endl;
+            cin >> territoryNameFrom;
+            cout << "Which territory would you like to advance to" << endl;
+            cin >> territoryNameTo;
+            cout << "How many armies would you like to advance";
+            cin >> numberOfUnits;
+            Territory* from;
+            Territory* to;
+            for (auto t: p->getTerritories()) {
+                if (t->getName() == territoryNameFrom) {
+                    from = t;
+                }
+                if (t->getName() == territoryNameTo) {
+                    to = t;
+                }
+            }
+            p->getOrders()->addOrder(new Advance(p, from, to, numberOfUnits, map))
             break;
         case "Airlift":
+            string territoryNameFrom;
+            string territoryNameTo;
+            int numberOfUnits;
+            cout << "Which territory would you like to advance from" << endl;
+            cin >> territoryNameFrom;
+            cout << "Which territory would you like to advance to" << endl;
+            cin >> territoryNameTo;
+            cout << "How many armies would you like to airlift";
+            cin >> numberOfUnits;
+            Territory* from;
+            Territory* to;
+            for (auto t: p->getTerritories()) {
+                if (t->getName() == territoryNameFrom) {
+                    from = t;
+                }
+                if (t->getName() == territoryNameTo) {
+                    to = t;
+                }
+            }
+            p->getOrders()->addOrder(new Airlift(p, from, to, numberOfUnits))
             break;
         case "Bomb":
+            string territoryNameTo;
+            cout << "Which territory would you like to bomb to" << endl;
+            cin >> territoryNameTo;
+            Territory* to;
+            for (auto t: p->getTerritories()) {
+                if (t->getName() == territoryNameTo) {
+                    to = t;
+                }
+            }
+            p->getOrders()->addOrder(new Bomb(p, to, map))
             break;
         case "Blockade":
+            string territoryNameTo;
+            cout << "Which territory would you like to blockade" << endl;
+            cin >> territoryNameTo;
+            Territory* to;
+            Player* neutral;
+            for (auto t: p->getTerritories()) {
+                if (t->getName() == territoryNameTo) {
+                    to = t;
+                }
+            }
+            for (auto p: players) {
+                if (typeid(p->ps).name() == "Neutral") {
+                    neutral = p;
+                }
+            }
+            p->getOrders()->addOrder(new Blockade(p, to, neutral))
             break;
         case "Negotiate":
+            string targetPlayerName;
+            cout << "Which player would you like to negotiate" << endl;
+            cin >> targetPlayerName;
+            Player* target;
+            for (auto p: players) {
+                if (p->getName() == targetPlayerName) {
+                    target = p;
+                }
+            }
+            p->getOrders()->addOrder(new Negotiate(p, target))
             break;
     }
 }

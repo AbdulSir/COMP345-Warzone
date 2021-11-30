@@ -271,8 +271,8 @@ void Airlift::execute(){
 Bomb::Bomb():Order() {};
 
 //constructor
-Bomb::Bomb(Player* player, Territory* t1, Territory* t2, Map* m) : Order(player){
-    target = t2;
+Bomb::Bomb(Player* player, Territory* t, Map* m) : Order(player){
+    target = t;
     map = m;
 }
 

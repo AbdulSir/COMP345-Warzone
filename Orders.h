@@ -114,7 +114,7 @@ class Bomb: public Order {
         //default constructor
         Bomb();
         //parametrized constructor
-        Bomb(Player* player, Territory* t1, Territory* t2, Map* m);
+        Bomb(Player* player, Territory* t, Map* m);
         //copy constructor
         Bomb(const Bomb& b);
         //asssignment operator
