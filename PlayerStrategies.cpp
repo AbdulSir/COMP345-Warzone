@@ -6,6 +6,7 @@ using namespace std;
 
 extern vector <Player*> players;
 extern Map* map;
+extern Player* neutralPlayer;
 
 PlayerStrategy::PlayerStrategy(Player* p) {
     this->p = p;
@@ -76,7 +77,7 @@ void Human::issueOrder() {
             cin >> territoryName;
             cout << "How many armies would you like to deploy";
             cin >> numberOfUnits;
-            for (auto t: p->getTerritories()) {
+            for (auto t: map->territories) {
                 if (t->getName() == territoryName) {
                     p->getOrders()->addOrder(new Deploy(p, t, numberOfUnits))
                 }
@@ -94,7 +95,7 @@ void Human::issueOrder() {
             cin >> numberOfUnits;
             Territory* from;
             Territory* to;
-            for (auto t: p->getTerritories()) {
+            for (auto t: map->territories) {
                 if (t->getName() == territoryNameFrom) {
                     from = t;
                 }
@@ -116,7 +117,7 @@ void Human::issueOrder() {
             cin >> numberOfUnits;
             Territory* from;
             Territory* to;
-            for (auto t: p->getTerritories()) {
+            for (auto t: map->territories) {
                 if (t->getName() == territoryNameFrom) {
                     from = t;
                 }
@@ -131,7 +132,7 @@ void Human::issueOrder() {
             cout << "Which territory would you like to bomb to" << endl;
             cin >> territoryNameTo;
             Territory* to;
-            for (auto t: p->getTerritories()) {
+            for (auto t: map->territories) {
                 if (t->getName() == territoryNameTo) {
                     to = t;
                 }
@@ -143,18 +144,12 @@ void Human::issueOrder() {
             cout << "Which territory would you like to blockade" << endl;
             cin >> territoryNameTo;
             Territory* to;
-            Player* neutral;
-            for (auto t: p->getTerritories()) {
+            for (auto t: map->territories) {
                 if (t->getName() == territoryNameTo) {
                     to = t;
                 }
             }
-            for (auto p: players) {
-                if (typeid(p->ps).name() == "Neutral") {
-                    neutral = p;
-                }
-            }
-            p->getOrders()->addOrder(new Blockade(p, to, neutral))
+            p->getOrders()->addOrder(new Blockade(p, to, neutralPlayer))
             break;
         case "Negotiate":
             string targetPlayerName;
