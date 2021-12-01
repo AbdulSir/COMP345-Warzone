@@ -39,6 +39,8 @@ void Cheater::issueOrder() {
 
 vector <Territory*> Cheater::toDefend() {
     vector <Territory*> attack;
+    //An Example of how you would call adjacent_territory_vector()
+    vector <Territory*> adjacent_terr = this->p->map->adjacent_territory_vector(this->p->getTerritories()[0]->getName()) //It takes the territory name and returns a list of territories.
     return attack;
 }
 
@@ -181,7 +183,7 @@ vector <Territory*> Aggressive::toDefend() {
 vector <Territory*> Aggressive::toAttack() {
     cout<<"Aggressive player attacks"<<endl;
     vector <Territory*> attack;
-    
+
     return attack;
 }
 

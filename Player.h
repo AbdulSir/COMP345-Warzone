@@ -21,6 +21,7 @@ class PlayerStrategy;
 class Player{
 public:
     PlayerStrategy* ps;
+    Map* map; //To be able to call adjacent_territory_vector()
     Player(); //default c*onstructor
     Player(string name);
     Player(string name, Hand * hand, vector <Territory*> territories, PlayerStrategy* ps); // constructor
@@ -44,6 +45,7 @@ public:
     void setReinforcementPool(int number);
     void setPeacefulTerritories(vector<Territory*> v);
     void setWillDrawCard(bool value);
+    void setMap(Map* m);
 
 private:
     string name;

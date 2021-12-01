@@ -51,7 +51,6 @@ class Human: public PlayerStrategy {
         vector <Territory*> toDefend();
         Human& operator =(const Human& h); //assignment operator
         friend ostream& operator << (ostream &out, const Human& h); // stream insertion operator
-        
 };
 
 class Aggressive: public PlayerStrategy {
