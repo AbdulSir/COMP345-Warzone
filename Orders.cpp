@@ -60,10 +60,10 @@ void Order::execute(){
     Notify(this);
 }
 
-string Order::stringToLog(){
+std::string Order::stringToLog(){
     cout<<"\nWriting executed Order to gamelog.txt file ..."<<endl;
-    ofstream myfile;
-    myfile.open ("gamelog.txt", ios_base::app);
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
     myfile <<"Order executed: ";
     myfile <<to_string(this->orderId)<<"\n";
     myfile <<"-------------------------------------\n";
@@ -271,8 +271,8 @@ void Airlift::execute(){
 Bomb::Bomb():Order() {};
 
 //constructor
-Bomb::Bomb(Player* player, Territory* t, Map* m) : Order(player){
-    target = t;
+Bomb::Bomb(Player* player, Territory* t1, Territory* t2, Map* m) : Order(player){
+    target = t2;
     map = m;
 }
 
@@ -485,12 +485,12 @@ void OrderList::remove(Order* order){
     cout <<"Order "<< order->orderId <<" removed from list" << endl;
 }
 
-string OrderList::stringToLog(){
+std::string OrderList::stringToLog(){
     cout<<"\nWriting issued Order to gamelog.txt file ..."<<endl;
-    ofstream myfile;
-    myfile.open ("gamelog.txt", ios_base::app);
+    std::ofstream myfile;
+    myfile.open ("gamelog.txt", std::ios_base::app);
     myfile <<"Order issued: ";
-    string orderIssued;
+    std::string orderIssued;
     for(int i=0; i<orderList.size();i++){
         if(i!=0){
             orderIssued=+", ";

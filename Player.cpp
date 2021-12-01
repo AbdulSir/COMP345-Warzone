@@ -58,8 +58,7 @@ Player::Player(const Player& p){
     for (int i=0; i<p.territories.size(); i++)
         territories[i] = new Territory(*p.territories[i]);
     this->willDrawCardAtTheEndOfTurn = p.willDrawCardAtTheEndOfTurn;
-    this->ps = new PlayerStrategy;
-    *ps = p.ps;
+    this->ps = p.ps;
 }
 
 //Destructor
@@ -85,8 +84,7 @@ Player& Player::operator=(const Player& p){
     for (int i=0; i<p.territories.size(); i++)
         territories[i] = new Territory(*p.territories[i]);
     this->willDrawCardAtTheEndOfTurn = p.willDrawCardAtTheEndOfTurn;
-    this->ps = new PlayerStrategy;
-    *ps = *p.ps;
+    this->ps = p.ps;
     return *this;
 }
 

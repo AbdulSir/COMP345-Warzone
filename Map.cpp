@@ -387,6 +387,7 @@ MapLoader::MapLoader()
         cout << endl;
         // Read from the text file
         ifstream MyReadFile("Resources/" + file_name);
+        //ifstream MyReadFile(file_name);
         if(MyReadFile.fail())
         {
             cout << "An error happened while attempting to read the file" << endl;

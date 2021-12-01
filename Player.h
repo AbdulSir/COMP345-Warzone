@@ -21,7 +21,7 @@ class PlayerStrategy;
 class Player{
 public:
     PlayerStrategy* ps;
-    Player(); //default constructor
+    Player(); //default c*onstructor
     Player(string name);
     Player(string name, Hand * hand, vector <Territory*> territories, PlayerStrategy* ps); // constructor
     Player(const Player &p); //copy constructor

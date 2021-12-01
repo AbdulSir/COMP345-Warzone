@@ -171,9 +171,9 @@ Aggressive::Aggressive(const Aggressive &a):PlayerStrategy(a) {
 vector <Territory*> Aggressive::toDefend() {
     cout<<"Aggressive player defends"<<endl;
     vector <Territory*> attack;
-    sort(p->getTerritories().begin(), p->getTerritories().end(), [](const Territory& lhs, const Territory& rhs) {
+    /*sort(p->getTerritories().begin(), p->getTerritories().end(), [](const Territory& lhs, const Territory& rhs) {
           return lhs.army_nb > rhs.army_nb;
-       });
+       });*/
     return p->getTerritories();
 }
 
@@ -220,9 +220,9 @@ void Benevolent::issueOrder() {
 vector <Territory*> Benevolent::toDefend() {
     cout<<"Benevolent player defends"<<endl;
     vector <Territory*> attack;
-    sort(p->getTerritories().begin(), p->getTerritories().end(), [](const Territory& lhs, const Territory& rhs) {
+    /*sort(p->getTerritories().begin(), p->getTerritories().end(), [](const Territory& lhs, const Territory& rhs) {
           return lhs.army_nb < rhs.army_nb;
-       });
+       });*/
     return p->getTerritories();
 
 }

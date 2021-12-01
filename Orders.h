@@ -38,7 +38,7 @@ class Order : public ILoggable, public Subject {
         virtual void execute();
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Order &order);
-        virtual string stringToLog();
+        virtual std::string stringToLog();
 };
 
 class Deploy: public Order {
@@ -114,7 +114,7 @@ class Bomb: public Order {
         //default constructor
         Bomb();
         //parametrized constructor
-        Bomb(Player* player, Territory* t, Map* m);
+        Bomb(Player* player, Territory* t1, Territory* t2, Map* m);
         //copy constructor
         Bomb(const Bomb& b);
         //asssignment operator
@@ -190,6 +190,6 @@ class OrderList : public ILoggable, public Subject {
         void remove(Order* order);
         // stream insertion operators
         friend ostream& operator<< (ostream& out, const OrderList& orderList);
-        virtual string stringToLog();
+        virtual std::string stringToLog();
 };
 
