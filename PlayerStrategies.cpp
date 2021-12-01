@@ -2,10 +2,11 @@
 #include "Orders.h"
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 extern vector <Player*> players;
-extern Map* map;
+//extern Map* map;
 extern Player* neutralPlayer;
 
 PlayerStrategy::PlayerStrategy(Player* p) {
@@ -16,7 +17,7 @@ PlayerStrategy::~PlayerStrategy(){
 }
 
 PlayerStrategy::PlayerStrategy(const PlayerStrategy &p){
-    this->p = new Player(p);
+    this->p = new Player(*p.p);
 }
 
 Neutral::Neutral(Player* p): PlayerStrategy(p) {
@@ -26,23 +27,6 @@ Neutral::Neutral(Player* p): PlayerStrategy(p) {
 Neutral::Neutral(const Neutral &n):PlayerStrategy(n) {
 }
 
-void Neutral::issueOrder() {
-    if (isAttacked) {
-        Aggressive::issueOrder();
-    }
-}
-
-void Neutral::toDefend() {
-    if (isAttacked) {
-        Aggressive::toDefend();
-    }
-}
-
-void Neutral::toAttack() {
-    if (isAttacked) {
-        Aggressive::toAttack();
-    }
-}
 
 Cheater::Cheater(Player* p): PlayerStrategy(p) {}
 
@@ -53,12 +37,14 @@ void Cheater::issueOrder() {
 
 }
 
-void Cheater::toDefend() {
-
+vector <Territory*> Cheater::toDefend() {
+    vector <Territory*> attack;
+    return attack;
 }
 
-void Cheater::toAttack() {
-
+vector <Territory*> Cheater::toAttack() {
+    vector <Territory*> attack;
+    return attack;
 }
 
 Human::Human(Player* p): PlayerStrategy(p) {}
@@ -69,6 +55,7 @@ void Human::issueOrder() {
     cout << "Which order would you like to execute" << endl;
     string command;
     cin >> command;
+    /*
     switch(command) {
         case "Deploy":
             string territoryName;
@@ -147,7 +134,7 @@ void Human::issueOrder() {
             for (auto t: map->territories) {
                 if (t->getName() == territoryNameTo) {
                     to = t;
-                }
+                }X
             }
             p->getOrders()->addOrder(new Blockade(p, to, neutralPlayer))
             break;
@@ -163,14 +150,17 @@ void Human::issueOrder() {
             }
             p->getOrders()->addOrder(new Negotiate(p, target))
             break;
-    }
+    }*/
 }
 
-void Human::toDefend() {
-
+vector <Territory*> Human::toDefend() {
+    vector <Territory*> attack;
+    return attack;
 }
 
-void Human::toAttack() {
+vector <Territory*> Human::toAttack() {
+    vector <Territory*> attack;
+    return attack;
 
 }
 
@@ -178,8 +168,69 @@ Aggressive::Aggressive(Player* p): PlayerStrategy(p) {}
 Aggressive::Aggressive(const Aggressive &a):PlayerStrategy(a) {
 }
 
+vector <Territory*> Aggressive::toDefend() {
+    cout<<"Aggressive player defends"<<endl;
+    vector <Territory*> attack;
+    sort(p->getTerritories().begin(), p->getTerritories().end(), [](const Territory& lhs, const Territory& rhs) {
+          return lhs.army_nb > rhs.army_nb;
+       });
+    return p->getTerritories();
+}
+
+
+vector <Territory*> Aggressive::toAttack() {
+    cout<<"Aggressive player attacks"<<endl;
+    vector <Territory*> attack;
+    
+    return attack;
+}
+
+void Aggressive::issueOrder() {
+    cout << "Inside issueOrder of Agressive Player" << endl;
+    this->p->getOrders()->addOrder(new Deploy(p,toDefend()[0],5));
+
+}
+
+
+
+void Neutral::issueOrder() {
+    if (isAttacked) {
+        //Aggressive::issueOrder();
+    }
+}
+
+vector <Territory*> Neutral::toDefend() {
+    vector <Territory*> attack;
+    return attack;
+}
+
+vector <Territory*> Neutral::toAttack() {
+    vector <Territory*> attack;
+    return attack;
+}
+
 Benevolent::Benevolent(Player* p): PlayerStrategy(p) {}
 Benevolent::Benevolent(const Benevolent &b):PlayerStrategy(b) {
+}
+
+void Benevolent::issueOrder() {
+    this->p->getOrders()->addOrder(new Deploy(p,toDefend()[0],5));
+}
+
+vector <Territory*> Benevolent::toDefend() {
+    cout<<"Benevolent player defends"<<endl;
+    vector <Territory*> attack;
+    sort(p->getTerritories().begin(), p->getTerritories().end(), [](const Territory& lhs, const Territory& rhs) {
+          return lhs.army_nb < rhs.army_nb;
+       });
+    return p->getTerritories();
+
+}
+
+vector <Territory*> Benevolent::toAttack() {
+    cout<<"Benevolent player refuses to attack"<<endl;
+    vector <Territory*> attack;
+    return attack;
 }
 
 ostream& operator<< (ostream &out, const PlayerStrategy& p) {
