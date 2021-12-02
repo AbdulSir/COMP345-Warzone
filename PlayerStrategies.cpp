@@ -143,7 +143,7 @@ void Human::issueOrder() {
             for (auto t: map->territories) {
                 if (t->getName() == territoryNameTo) {
                     to = t;
-                }X
+                }
             }
             p->getOrders()->addOrder(new Blockade(p, to, neutralPlayer))
             break;
