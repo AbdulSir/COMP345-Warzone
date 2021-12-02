@@ -70,6 +70,7 @@ public:
 
 class Benevolent: public PlayerStrategy {
     public:
+        Benevolent();
         Benevolent(Player* p);
         Benevolent(const Benevolent &b); //copy constructor
         void issueOrder();

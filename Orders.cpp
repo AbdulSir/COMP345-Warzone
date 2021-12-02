@@ -515,33 +515,74 @@ ostream& operator<<(ostream& out, const OrderList& o)
     return out;
 }
 
+void Order::print(ostream& out) const{
+    out << "Order:"<<endl ;
+    out << "-------------------------------"<<endl;
+    out << "ID: "<< orderId << endl;
+    out << "Order Issuer: "<< orderIssuer->getName() << endl;
+    out << "Effect: " << effect << endl;
+    
+}
+
 ostream& operator<<(ostream& out, const Order& o)
 {
-    out << "Order:"<<endl ;
+    o.print(out);
+    /*out << "Order:"<<endl ;
     out << "-------------------------------"<<endl;
     out << "ID: "<< o.orderId << endl;
     out << "Order Issuer: "<< o.orderIssuer->getName() << endl;
-    out << "Effect: " << o.effect << endl;
+    out << "Effect: " << o.effect << endl;*/
     return out;
+}
+
+void Deploy::print(ostream& out) const{
+    //out << static_cast<const Order&>(this);
+    Order::print(out);
+    out << "Type: Deploy" << endl;
+    out << "Target: " << target->territory_name << endl;
+    out << "Number of armies: " << numberOfUnits << endl;
+    
 }
 
 ostream& operator <<(ostream &out, const Deploy &order) {
-    out << static_cast<const Order&>(order);
+    order.print(out);
+    /*out << static_cast<const Order&>(order);
     out << "Type: Deploy" << endl;
     out << "Target: " << order.target->territory_name << endl;
-    out << "Number of armies: " << order.numberOfUnits << endl;
+    out << "Number of armies: " << order.numberOfUnits << endl;*/
     return out;
 }
 
+void Advance::print(ostream& out) const{
+    //out << static_cast<const Order&>(this);
+    Order::print(out);
+    out << "Type: Advance" << endl;
+    out << "From: " << from->territory_name << endl;
+    out << "Target: " << target->territory_name << endl;
+    out << "Number of armies: " << numberOfUnits << endl;
+    
+}
+
 ostream& operator <<(ostream &out, const Advance &order) {
+    order.print(out);
+    /*
     out << static_cast<const Order&>(order);
     out << "Type: Advance" << endl;
     out << "From: " << order.from->territory_name << endl;
     out << "Target: " << order.target->territory_name << endl;
-    out << "Number of armies: " << order.numberOfUnits << endl;
+    out << "Number of armies: " << order.numberOfUnits << endl;*/
     return out;
 }
 
+void Airlift::print(ostream& out) const{
+    //out << static_cast<const Order&>(this);
+    Order::print(out);
+    out << "Type: Airlift" << endl;
+    out << "From: " << from->territory_name << endl;
+    out << "Target: " << target->territory_name << endl;
+    out << "Number of armies: " << numberOfUnits << endl;
+    
+}
 ostream& operator <<(ostream &out, const Airlift &order) {
     out << static_cast<const Order&>(order);
     out << "Type: Airlift" << endl;
@@ -551,6 +592,14 @@ ostream& operator <<(ostream &out, const Airlift &order) {
     return out;
 }
 
+void Bomb::print(ostream& out) const{
+    //out << static_cast<const Order&>(this);
+    Order::print(out);
+    out << "Type: Bomb" << endl;
+    out << "Target: " << target->territory_name << endl;
+    
+}
+
 ostream& operator <<(ostream &out, const Bomb &order) {
     out << static_cast<const Order&>(order);
     out << "Type: Bomb" << endl;
@@ -558,11 +607,27 @@ ostream& operator <<(ostream &out, const Bomb &order) {
     return out;
 }
 
+void Blockade::print(ostream& out) const{
+    //out << static_cast<const Order&>(this);
+    Order::print(out);
+    out << "Type: Blockade" << endl;
+    out << "Target: " << target->territory_name << endl;
+    
+}
+
 ostream& operator <<(ostream &out, const Blockade &order) {
     out << static_cast<const Order&>(order);
     out << "Type: Blockade" << endl;
     out << "Target: " << order.target->territory_name << endl;
     return out;
+}
+
+void Negotiate::print(ostream& out) const{
+    //out << static_cast<const Order&>(this);
+    Order::print(out);
+    out << "Type: Negotiate" << endl;
+    out << "Targetted player: " << target->getName() << endl;
+    
 }
 
 ostream& operator <<(ostream &out, const Negotiate &order) {

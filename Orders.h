@@ -36,6 +36,7 @@ class Order : public ILoggable, public Subject {
         void setEffect(string effect);
         bool validate();
         virtual void execute();
+        virtual void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Order &order);
         virtual std::string stringToLog();
@@ -56,6 +57,7 @@ class Deploy: public Order {
         Deploy& operator= (const Deploy& deploy);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Deploy &order);
 };
@@ -77,6 +79,7 @@ class Advance: public Order {
         Advance& operator= (const Advance& advanced);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Advance &order);
 };
@@ -102,6 +105,7 @@ class Airlift: public Order {
         void setNumberOfUnits(int number);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Airlift &order);
 };
@@ -124,6 +128,7 @@ class Bomb: public Order {
         void setMap(Map* m);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Bomb &order);
 };
@@ -143,6 +148,7 @@ class Blockade: public Order {
         Blockade& operator= (const Blockade& bl);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //setters
         void setTarget(Territory* target);
         void setNeutralPlayer(Player* player);
@@ -166,6 +172,7 @@ class Negotiate: public Order {
         void setTarget(Player* target);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Negotiate &order);
 };
