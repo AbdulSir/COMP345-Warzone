@@ -7,7 +7,7 @@
 using namespace std;
 
 extern vector <Player*> players;
-//extern Map* map;
+extern Map* map_obj;
 extern Player* neutralPlayer;
 PlayerStrategy::PlayerStrategy() {
 }
@@ -47,7 +47,7 @@ void Cheater::issueOrder() {
 vector <Territory*> Cheater::toDefend() {
     vector <Territory*> attack;
     //An Example of how you would call adjacent_territory_vector()
-    vector <Territory*> adjacent_terr = this->p->map->adjacent_territory_vector(this->p->getTerritories()[0]->getName()); //It takes the territory name and returns a list of territories.
+    //vector <Territory*> adjacent_terr = this->p->map->adjacent_territory_vector(this->p->getTerritories()[0]->getName()); //It takes the territory name and returns a list of territories.
     return attack;
 }
 
@@ -201,7 +201,7 @@ vector <Territory*> Aggressive::toAttack() {
        return lhs->army_nb > rhs->army_nb;
     });
     
-    vector <Territory*> adjacent_terr = this->p->map->adjacent_territory_vector(territories[0]->getName());
+    vector <Territory*> adjacent_terr = map_obj->adjacent_territory_vector(territories[0]->getName());
     
     //Remove from vector non enemy territories
     for(int i=0; i<adjacent_terr.size();i++){
@@ -228,7 +228,7 @@ void Aggressive::issueOrder() {
             Bomb* bombOrder = dynamic_cast<Bomb*>(p->getHand()->discardFromHand().play());
             bombOrder->setOrderIssuer(p);
             bombOrder->setTarget(toAttack()[0]);
-            bombOrder->setMap(p->map);
+            bombOrder->setMap(map_obj);
             p->getOrders()->addOrder(bombOrder);
             
         }
@@ -236,11 +236,11 @@ void Aggressive::issueOrder() {
     
     //advance armies to strongest contry's adjacent territories
     for (int i=0; i<toAttack().size(); i++){
-        p->getOrders()->addOrder(new Advance(p,toDefend()[0],toAttack()[i], armies_attack, p->map));
+        p->getOrders()->addOrder(new Advance(p,toDefend()[0],toAttack()[i], armies_attack, map_obj));
     }
     
     if(armies_attack_remaider!=0){
-        p->getOrders()->addOrder(new Advance(p,toDefend()[0],toAttack()[0], armies_attack_remaider, p->map));
+        p->getOrders()->addOrder(new Advance(p,toDefend()[0],toAttack()[0], armies_attack_remaider, map_obj));
     }
 }
 
