@@ -118,6 +118,21 @@ bool Map::adjacent_territory(string terr1, string terr2) {
     return returnValue;
 };
 
+vector <Territory*> Map::adjacent_territory_vector(string terr1) {
+    vector <Territory*> territory_vector;
+    for (int i=0; i<territories.size(); i++)
+    {
+        if (terr1.compare(territories[i]->getName()) == 0)
+        {
+            for (Territory* terr:territory_graph[i])
+            {
+                territory_vector.push_back(terr);
+            }
+        }
+    }
+    return territory_vector;
+};
+
 // Stream insertion operators
 ostream & operator << (ostream &out, Map &m1) {
 
@@ -387,6 +402,7 @@ MapLoader::MapLoader()
         cout << endl;
         // Read from the text file
         ifstream MyReadFile("Resources/" + file_name);
+        //ifstream MyReadFile(file_name);
         if(MyReadFile.fail())
         {
             cout << "An error happened while attempting to read the file" << endl;

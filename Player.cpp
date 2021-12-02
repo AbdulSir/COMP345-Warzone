@@ -40,6 +40,7 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories, Playe
     this->reinforcementPool = 50;
     this->willDrawCardAtTheEndOfTurn = false;
     if (ps != NULL) {
+        ps->setPlayer(this);
         this->ps = ps;
     } else {
         this->ps = new Human(this);

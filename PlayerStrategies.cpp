@@ -2,11 +2,15 @@
 #include "Orders.h"
 #include <iostream>
 #include <string>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
 extern vector <Player*> players;
-extern Map* map;
+extern Map* map_obj;
 extern Player* neutralPlayer;
+PlayerStrategy::PlayerStrategy() {
+}
 
 PlayerStrategy::PlayerStrategy() {}
 
@@ -17,10 +21,12 @@ PlayerStrategy::~PlayerStrategy(){
     delete p;
 }
 
-PlayerStrategy::PlayerStrategy(const PlayerStrategy &ps){
-    this->p = new Player;
-    *p = *ps.p;
+void PlayerStrategy::setPlayer(Player* p){
+    this->p = p;
 }
+
+PlayerStrategy::PlayerStrategy(const PlayerStrategy &p){
+    this->p = new Player(*p.p);
 
 PlayerStrategy& PlayerStrategy::operator= (const PlayerStrategy& ps) {
     this->p = new Player;
@@ -41,16 +47,14 @@ void Neutral::issueOrder() {
     }
 }
 
-void Neutral::toDefend() {
-    if (isAttacked) {
-        // Aggressive::toDefend();
-    }
+vector <Territory*> Neutral::toDefend() {
+    vector <Territory*> attack;
+    return attack;
 }
 
-void Neutral::toAttack() {
-    if (isAttacked) {
-        // Aggressive::toAttack();
-    }
+vector <Territory*>  Neutral::toAttack() {
+    vector <Territory*> attack;
+    return attack;
 }
 
 Cheater::Cheater(Player* p): PlayerStrategy(p) {}
@@ -59,15 +63,31 @@ Cheater::Cheater(const Cheater &c):PlayerStrategy(c) {
 }
 
 void Cheater::issueOrder() {
-
+    vector<Territory*> to_attack = toAttack();
+    for(int i=0; i<to_attack.size(); i++){
+        to_attack[i]->setOwner(this->p);
+    }
 }
 
-void Cheater::toDefend() {
-
+vector <Territory*> Cheater::toDefend() {
+    vector <Territory*> attack;
+    //An Example of how you would call adjacent_territory_vector()
+    //vector <Territory*> adjacent_terr = this->p->map->adjacent_territory_vector(this->p->getTerritories()[0]->getName()); //It takes the territory name and returns a list of territories.
+    return attack;
 }
 
-void Cheater::toAttack() {
-
+vector <Territory*> Cheater::toAttack() {
+    vector <Territory*> attack;
+    
+    for(int i=0; i<this->p->getTerritories().size(); i++){
+        vector <Territory*> adjacent_ter = map_obj->adjacent_territory_vector(this->p->getTerritories()[i]->getName());
+        for (int j=0; j<adjacent_ter.size();j++){
+            
+            attack.push_back(adjacent_ter[j]);
+        }
+    }
+    attack.erase( unique( attack.begin(), attack.end() ), attack.end() );
+    return attack;
 }
 
 Human::Human(Player* p): PlayerStrategy(p) {}
@@ -179,44 +199,137 @@ void Human::issueOrder() {
     }
 }
 
-void Human::toDefend() {
+vector <Territory*> Human::toDefend() {
+    vector <Territory*> attack;
+    return attack;
+}
+
+vector <Territory*> Human::toAttack() {
+    vector <Territory*> attack;
+    return attack;
 
 }
 
-void Human::toAttack() {
-
+Aggressive::Aggressive(): PlayerStrategy() {
 }
 
 Aggressive::Aggressive(Player* p): PlayerStrategy(p) {}
 Aggressive::Aggressive(const Aggressive &a):PlayerStrategy(a) {
 }
 
+
+
+vector <Territory*> Aggressive::toDefend() {
+    vector <Territory*> territories = p->getTerritories();
+    //sort the player's territories in descending order
+    sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
+    {
+       return lhs->army_nb > rhs->army_nb;
+    });
+    return territories;
+}
+
+
+vector <Territory*> Aggressive::toAttack() {
+    vector <Territory*> territories = p->getTerritories();
+    //sort the player's territories in descending order
+    sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
+    {
+       return lhs->army_nb > rhs->army_nb;
+    });
+    
+    vector <Territory*> adjacent_terr = map_obj->adjacent_territory_vector(territories[0]->getName());
+    
+    //Remove from vector non enemy territories
+    for(int i=0; i<adjacent_terr.size();i++){
+        if(isTerritoryOwnedByPlayer(p, adjacent_terr[i])){
+            adjacent_terr.erase(find(adjacent_terr.begin(), adjacent_terr.end(), adjacent_terr[i]));
+        }
+    }
+
+    return adjacent_terr;
+}
+
 void Aggressive::issueOrder() {
-
+    cout << "Inside issueOrder of Agressive Player" << endl;
+    vector<Territory*> my_contries = toDefend();
+    vector<Territory*> adj_contries = toAttack();
+    
+    //deploy army to strongest contry
+    p->getOrders()->addOrder(new Deploy(p,my_contries[0], p->getReinforcementPool()));
+    
+    int armies_attack = (my_contries[0]->army_nb + p->getReinforcementPool())/adj_contries.size();
+    int armies_attack_remaider = (my_contries[0]->army_nb + p->getReinforcementPool()) % adj_contries.size();
+    
+    //issue bomb order
+    for (auto const& i : p->getHand()->handDeck) {
+        if(i->cardType=="bomb"){
+            Bomb* bombOrder = dynamic_cast<Bomb*>(p->getHand()->discardFromHand().play());
+            bombOrder->setOrderIssuer(p);
+            bombOrder->setTarget(adj_contries[0]);
+            bombOrder->setMap(map_obj);
+            p->getOrders()->addOrder(bombOrder);
+            
+        }
+    }
+    
+    //advance armies to strongest contry's adjacent territories
+    for (int i=0; i<adj_contries.size(); i++){
+        p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[i], armies_attack, map_obj));
+    }
+    
+    if(armies_attack_remaider!=0){
+        p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[0], armies_attack_remaider, map_obj));
+    }
 }
 
-void Aggressive::toAttack() {
-
+Benevolent::Benevolent(): PlayerStrategy() {
 }
-
-void Aggressive::toDefend() {
-
-}
-
 Benevolent::Benevolent(Player* p): PlayerStrategy(p) {}
 Benevolent::Benevolent(const Benevolent &b):PlayerStrategy(b) {
 }
 
 void Benevolent::issueOrder() {
-
+    cout << "Inside issueOrder of Benevolent Player" << endl;
+    vector<Territory*> weakest_contries=toDefend();
+    int armies_defend = p->getReinforcementPool()/weakest_contries.size();
+    int armies_defend_remaider =  p->getReinforcementPool()%weakest_contries.size();
+    
+    //deploy armies to weakest contries
+    for (int i=0; i<toDefend().size(); i++){
+        p->getOrders()->addOrder(new Deploy(p,weakest_contries[i], armies_defend));
+    }
+    
+    if(armies_defend_remaider!=0){
+        p->getOrders()->addOrder(new Deploy(p,weakest_contries[0], armies_defend_remaider));
+    }
+    
 }
 
-void Benevolent::toDefend() {
+vector <Territory*> Benevolent::toDefend() {
+    vector <Territory*> territories = p->getTerritories();
+    
+    //sort the player's territories in ascending order
+    sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
+    {
+       return lhs->army_nb < rhs->army_nb;
+    });
+    
+    vector <Territory*> defend_territories;
+    //push into vector the weakest contries
+    for(int i = 0; i<territories.size(); i++){
+        if(territories[i]->army_nb==territories[0]->army_nb){
+            defend_territories.push_back(territories[i]);
+        }
+    }
+    
 
+    return defend_territories;
 }
 
-void Benevolent::toAttack() {
-
+vector <Territory*> Benevolent::toAttack() {
+    vector <Territory*> attack;
+    return attack;
 }
 
 ostream& operator<< (ostream &out, const PlayerStrategy& p) {
