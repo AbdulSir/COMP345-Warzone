@@ -5,17 +5,22 @@
 #include <vector>
 #include <iostream>
 using namespace std;
+#include <regex>
 
 MapLoader* ml;
-Map* map;
+Map* map_obj;
 vector <Player*> players;
 Player* neutralPlayer;
+regex reg("[0-9]");
 
 int main() {
+    Player* a = new Player("123");
+    cout << regex_replace(typeid(*a->ps).name(), reg, "");
     GameEngine* gm = new GameEngine();
+    cout << regex_replace(typeid(*gm).name(), reg, "");
     gm->startupPhase();
     ml = gm->map_loader;
-    map = ml->map_object;
+    map_obj = ml->map_object;
     players = gm->players;
     for (auto p: players) {
         cout << *p << endl;
