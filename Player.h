@@ -16,6 +16,11 @@ class OrderList;
 class Hand;
 class Territory;
 class PlayerStrategy;
+class Neutral;
+class Human;
+class Cheater;
+class Aggressive;
+class Benevolent;
 
 //Player class declaration
 class Player{
