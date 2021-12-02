@@ -120,7 +120,7 @@ ostream& operator<<(ostream& out, const CommandProcessor& cp) {
 }
 
 //Method provided to other objects (like the GameEngine) to get commands
-void CommandProcessor::getCommand(string gameState) {
+string CommandProcessor::getCommand(string gameState) {
     string commandStr = readCommand();
     if (validate(commandStr, gameState)) {
         cout << commandStr << " is a valid command for the " << gameState << " state\n" <<endl;
@@ -128,6 +128,7 @@ void CommandProcessor::getCommand(string gameState) {
         LogObserver *observer = new LogObserver(c) ;
         saveCommand(c);
         c->saveEffect(commandStr);
+        return commandStr;
     }
     else {
         cout << commandStr << " is not a valid command for the " << gameState << " state\n" << endl;
@@ -135,6 +136,7 @@ void CommandProcessor::getCommand(string gameState) {
         LogObserver *observer = new LogObserver(c) ;
         saveCommand(c);
         c->effect = "No effect (Invalid command for " + gameState + " state)";
+        return "";
     }
 }
 
@@ -330,4 +332,3 @@ string FileLineReader::readLineFromFile(string fileName){
     input.close();
     return command;
 }
-

@@ -62,7 +62,7 @@ public:
     const CommandProcessor& operator= (const CommandProcessor& cp);
     
     //Method to get commands
-    void getCommand(string gameState);
+    string getCommand(string gameState);
     
     //Method to validate commands
     bool validate(string c, string gameState);
