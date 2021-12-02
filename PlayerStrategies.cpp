@@ -41,7 +41,10 @@ Cheater::Cheater(const Cheater &c):PlayerStrategy(c) {
 }
 
 void Cheater::issueOrder() {
-
+    vector<Territory*> to_attack = toAttack();
+    for(int i=0; i<to_attack.size(); i++){
+        to_attack[i]->setOwner(this->p);
+    }
 }
 
 vector <Territory*> Cheater::toDefend() {
@@ -53,6 +56,15 @@ vector <Territory*> Cheater::toDefend() {
 
 vector <Territory*> Cheater::toAttack() {
     vector <Territory*> attack;
+    
+    for(int i=0; i<this->p->getTerritories().size(); i++){
+        vector <Territory*> adjacent_ter = map_obj->adjacent_territory_vector(this->p->getTerritories()[i]->getName());
+        for (int j=0; j<adjacent_ter.size();j++){
+            
+            attack.push_back(adjacent_ter[j]);
+        }
+    }
+    attack.erase( unique( attack.begin(), attack.end() ), attack.end() );
     return attack;
 }
 
@@ -215,19 +227,21 @@ vector <Territory*> Aggressive::toAttack() {
 
 void Aggressive::issueOrder() {
     cout << "Inside issueOrder of Agressive Player" << endl;
+    vector<Territory*> my_contries = toDefend();
+    vector<Territory*> adj_contries = toAttack();
     
     //deploy army to strongest contry
-    p->getOrders()->addOrder(new Deploy(p,toDefend()[0], p->getReinforcementPool()));
+    p->getOrders()->addOrder(new Deploy(p,my_contries[0], p->getReinforcementPool()));
     
-    int armies_attack = (toDefend()[0]->army_nb + p->getReinforcementPool())/toAttack().size();
-    int armies_attack_remaider = (toDefend()[0]->army_nb + p->getReinforcementPool()) % toAttack().size();
+    int armies_attack = (my_contries[0]->army_nb + p->getReinforcementPool())/adj_contries.size();
+    int armies_attack_remaider = (my_contries[0]->army_nb + p->getReinforcementPool()) % adj_contries.size();
     
     //issue bomb order
     for (auto const& i : p->getHand()->handDeck) {
         if(i->cardType=="bomb"){
             Bomb* bombOrder = dynamic_cast<Bomb*>(p->getHand()->discardFromHand().play());
             bombOrder->setOrderIssuer(p);
-            bombOrder->setTarget(toAttack()[0]);
+            bombOrder->setTarget(adj_contries[0]);
             bombOrder->setMap(map_obj);
             p->getOrders()->addOrder(bombOrder);
             
@@ -235,23 +249,25 @@ void Aggressive::issueOrder() {
     }
     
     //advance armies to strongest contry's adjacent territories
-    for (int i=0; i<toAttack().size(); i++){
-        p->getOrders()->addOrder(new Advance(p,toDefend()[0],toAttack()[i], armies_attack, map_obj));
+    for (int i=0; i<adj_contries.size(); i++){
+        p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[i], armies_attack, map_obj));
     }
     
     if(armies_attack_remaider!=0){
-        p->getOrders()->addOrder(new Advance(p,toDefend()[0],toAttack()[0], armies_attack_remaider, map_obj));
+        p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[0], armies_attack_remaider, map_obj));
     }
 }
 
 void Neutral::issueOrder() {
     if (isAttacked) {
+        this->p->ps = new Aggressive(this->p);
         //Aggressive::issueOrder();
     }
 }
 
 vector <Territory*> Neutral::toDefend() {
     vector <Territory*> attack;
+    this->p->ps = new Aggressive(this->p);
     return attack;
 }
 
@@ -268,16 +284,17 @@ Benevolent::Benevolent(const Benevolent &b):PlayerStrategy(b) {
 
 void Benevolent::issueOrder() {
     cout << "Inside issueOrder of Benevolent Player" << endl;
-    int armies_defend = p->getReinforcementPool()/toDefend().size();
-    int armies_defend_remaider =  p->getReinforcementPool()%toDefend().size();
+    vector<Territory*> weakest_contries=toDefend();
+    int armies_defend = p->getReinforcementPool()/weakest_contries.size();
+    int armies_defend_remaider =  p->getReinforcementPool()%weakest_contries.size();
     
     //deploy armies to weakest contries
     for (int i=0; i<toDefend().size(); i++){
-        p->getOrders()->addOrder(new Deploy(p,toDefend()[i], armies_defend));
+        p->getOrders()->addOrder(new Deploy(p,weakest_contries[i], armies_defend));
     }
     
     if(armies_defend_remaider!=0){
-        p->getOrders()->addOrder(new Deploy(p,toDefend()[0], armies_defend_remaider));
+        p->getOrders()->addOrder(new Deploy(p,weakest_contries[0], armies_defend_remaider));
     }
     
 }
