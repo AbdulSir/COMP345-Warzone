@@ -385,7 +385,7 @@ void GameEngine::issueOrdersPhase(){
         for (int i=0; i < players.size(); i++){
             cout << "Player "<< i <<"\'s turn" <<endl;
             //use a while loop?
-                players[i]->issueOrder();
+                players[i]->ps->issueOrder();
         }
         cout << "End of issue orders phase" << endl;
     }
