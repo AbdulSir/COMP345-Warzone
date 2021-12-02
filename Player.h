@@ -24,7 +24,8 @@ public:
     Map* map; //To be able to call adjacent_territory_vector()
     Player(); //default c*onstructor
     Player(string name);
-    Player(string name, Hand * hand, vector <Territory*> territories, PlayerStrategy* ps); // constructor
+    Player(PlayerStrategy *initStrategy);
+    Player(string name, Hand * hand, vector <Territory*> territories, Map * m, PlayerStrategy* ps); // constructor
     Player(const Player &p); //copy constructor
     ~Player(); //destructor
     Player& operator =(const Player& p); // assignment operator

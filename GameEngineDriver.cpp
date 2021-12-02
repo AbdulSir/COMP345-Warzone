@@ -14,7 +14,7 @@ using namespace std;
 #include <fstream>
 #include <sstream>
 #include "Map.h"
-
+/*
 int main() {
 
     GameEngine* gm = new GameEngine();
@@ -25,3 +25,4 @@ int main() {
 
     return(0);
 };
+*/

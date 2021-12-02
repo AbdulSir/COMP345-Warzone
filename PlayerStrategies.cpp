@@ -3,17 +3,24 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 extern vector <Player*> players;
 //extern Map* map;
 extern Player* neutralPlayer;
+PlayerStrategy::PlayerStrategy() {
+}
 
 PlayerStrategy::PlayerStrategy(Player* p) {
     this->p = p;
 }
 PlayerStrategy::~PlayerStrategy(){
     delete p;
+}
+
+void PlayerStrategy::setPlayer(Player* p){
+    this->p = p;
 }
 
 PlayerStrategy::PlayerStrategy(const PlayerStrategy &p){
@@ -40,7 +47,7 @@ void Cheater::issueOrder() {
 vector <Territory*> Cheater::toDefend() {
     vector <Territory*> attack;
     //An Example of how you would call adjacent_territory_vector()
-    vector <Territory*> adjacent_terr = this->p->map->adjacent_territory_vector(this->p->getTerritories()[0]->getName()) //It takes the territory name and returns a list of territories.
+    vector <Territory*> adjacent_terr = this->p->map->adjacent_territory_vector(this->p->getTerritories()[0]->getName()); //It takes the territory name and returns a list of territories.
     return attack;
 }
 
@@ -166,31 +173,51 @@ vector <Territory*> Human::toAttack() {
 
 }
 
+Aggressive::Aggressive(): PlayerStrategy() {
+}
+
 Aggressive::Aggressive(Player* p): PlayerStrategy(p) {}
 Aggressive::Aggressive(const Aggressive &a):PlayerStrategy(a) {
 }
 
+
+
 vector <Territory*> Aggressive::toDefend() {
     cout<<"Aggressive player defends"<<endl;
-    vector <Territory*> attack;
-    /*sort(p->getTerritories().begin(), p->getTerritories().end(), [](const Territory& lhs, const Territory& rhs) {
-          return lhs.army_nb > rhs.army_nb;
-       });*/
-    return p->getTerritories();
+    vector <Territory*> territories = p->getTerritories();
+    sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
+    {
+       return lhs->army_nb < rhs->army_nb;
+    });
+    return territories;
 }
 
 
 vector <Territory*> Aggressive::toAttack() {
     cout<<"Aggressive player attacks"<<endl;
-    vector <Territory*> attack;
+    vector <Territory*> territories = p->getTerritories();
+    sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
+    {
+       return lhs->army_nb > rhs->army_nb;
+    });
+    vector <Territory*> adjacent_terr = this->p->map->adjacent_territory_vector(territories[0]->getName());
 
-    return attack;
+    return adjacent_terr;
 }
 
 void Aggressive::issueOrder() {
     cout << "Inside issueOrder of Agressive Player" << endl;
-    this->p->getOrders()->addOrder(new Deploy(p,toDefend()[0],5));
+    p->getOrders()->addOrder(new Deploy(p,toDefend()[0], p->getReinforcementPool()));
+    int armies_attack = toDefend()[0]->army_nb/toAttack().size();
+    int armies_attack_remaider = toDefend()[0]->army_nb%toAttack().size();
 
+    for (int i=0; i<toAttack().size(); i++){
+        p->getOrders()->addOrder(new Advance(p,toDefend()[0],toAttack()[0], armies_attack, p->map));
+    }
+    
+    if(toDefend()[0]->army_nb % toAttack().size() == 0){
+        p->getOrders()->addOrder(new Advance(p,toDefend()[0],toAttack()[0], armies_attack_remaider, p->map));
+    }
 }
 
 
@@ -216,17 +243,18 @@ Benevolent::Benevolent(const Benevolent &b):PlayerStrategy(b) {
 }
 
 void Benevolent::issueOrder() {
-    this->p->getOrders()->addOrder(new Deploy(p,toDefend()[0],5));
+    cout << "Inside issueOrder of Benevolent Player" << endl;
+    p->getOrders()->addOrder(new Deploy(p,toDefend()[0], 5));
 }
 
 vector <Territory*> Benevolent::toDefend() {
     cout<<"Benevolent player defends"<<endl;
-    vector <Territory*> attack;
-    /*sort(p->getTerritories().begin(), p->getTerritories().end(), [](const Territory& lhs, const Territory& rhs) {
-          return lhs.army_nb < rhs.army_nb;
-       });*/
-    return p->getTerritories();
-
+    vector <Territory*> territories = p->getTerritories();
+    sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
+    {
+       return lhs->army_nb < rhs->army_nb;
+    });
+    return territories;
 }
 
 vector <Territory*> Benevolent::toAttack() {

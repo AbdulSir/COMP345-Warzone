@@ -30,7 +30,7 @@ Player::Player(string name){
 }
 
 //Constructor
-Player::Player (string name, Hand * hand, vector <Territory*> territories, PlayerStrategy* ps){
+Player::Player (string name, Hand * hand, vector <Territory*> territories, Map * m, PlayerStrategy* ps){
     this->name = name;
     this->hand = hand;
     this->territories = territories;
@@ -39,7 +39,9 @@ Player::Player (string name, Hand * hand, vector <Territory*> territories, Playe
     this->orders= new OrderList();
     this->reinforcementPool = 50;
     this->willDrawCardAtTheEndOfTurn = false;
+    this->map = m;
     if (ps != NULL) {
+        ps->setPlayer(this);
         this->ps = ps;
     } else {
         this->ps = new Human(this);

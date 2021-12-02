@@ -7,7 +7,7 @@
 using namespace std;
 /*
 int main() {
-    MapLoader* map_loader = new MapLoader("europe.map");
+    MapLoader* map_loader = new MapLoader("europe2.map");
     Map* m = map_loader->map_object;
     cout << endl << endl;
 
@@ -267,4 +267,5 @@ int main() {
 
     return 0;
 }
-*/
+
+ */
