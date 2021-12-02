@@ -5,13 +5,12 @@
 #include <vector>
 #include <iostream>
 using namespace std;
-#include <regex>
 
 MapLoader* ml;
 Map* map_obj;
 vector <Player*> players;
 Player* neutralPlayer;
-regex reg("[0-9]");
+
 
 int main() {
     Player* a = new Player("123");

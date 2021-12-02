@@ -7,6 +7,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
+#include <regex>
 
 using namespace std;
 
@@ -174,7 +175,13 @@ bool Advance::validate() {
 
 void Advance::execute() {
     Order::execute();
+    regex reg("[0-9]");
     if (validate()) {
+
+        if (regex_replace(typeid(*target->owner->ps).name(), reg, "") == "Neutral") {
+            target->owner->ps = new Aggressive(target->owner);
+        }
+
         if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
             from->setArmy(from->army_nb - numberOfUnits);
             target->setArmy(target->army_nb + numberOfUnits);

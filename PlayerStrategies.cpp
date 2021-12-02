@@ -33,18 +33,12 @@ PlayerStrategy& PlayerStrategy::operator= (const PlayerStrategy& ps) {
     return *this;
 }
 
-Neutral::Neutral(Player* p): PlayerStrategy(p) {
-    isAttacked = false;
-}
+Neutral::Neutral(Player* p): PlayerStrategy(p) {}
 
 Neutral::Neutral(const Neutral &n):PlayerStrategy(n) {
 }
 
-void Neutral::issueOrder() {
-    if (isAttacked) {
-        // Aggressive::issueOrder();
-    }
-}
+void Neutral::issueOrder() {}
 
 vector <Territory*> Neutral::toDefend() {
     vector <Territory*> attack;

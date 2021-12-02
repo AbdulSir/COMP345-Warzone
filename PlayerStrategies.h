@@ -24,7 +24,6 @@ public:
 
 class Neutral: public PlayerStrategy {
 public:
-    bool isAttacked;
     Neutral(Player* p);
     Neutral(const Neutral &n); //copy constructor
     void issueOrder();
