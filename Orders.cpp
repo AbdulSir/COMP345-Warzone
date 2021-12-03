@@ -117,7 +117,7 @@ void Deploy::execute() {
         vector <Territory*> territories = orderIssuer->getTerritories();
         orderIssuer->setReinforcementPool(orderIssuer->getReinforcementPool() - numberOfUnits);
         target->setArmy(target->army_nb + numberOfUnits);
-
+        
         cout << "Deploy order executed" << endl;
         this->effect = "Deployed " + to_string(numberOfUnits) + " to territory " + target->territory_name + " | " + to_string(target->army_nb) + " armies";
     } else {
@@ -159,27 +159,27 @@ Advance& Advance::operator=(const Advance& a){
 
 bool Advance::validate() {
     bool isValid = true;
-
+    
     bool areTerritoriesAdjacent = map->adjacent_territory(from->getName(), target->getName());
     if (!isTerritoryOwnedByPlayer(orderIssuer, from)) {
         isValid = false;
     }
-
+    
     if (!areTerritoriesAdjacent) {
         isValid = false;
     }
-
+    
     for (auto t: orderIssuer->getPeacefulTerritories()) {
         if (t->getName() == target->getName()) {
             cout << "Can not attack the player that negotiated with " << orderIssuer->getName() << "'s territory" << endl;
             isValid = false;
         }
     }
-
+    
     if (from->army_nb < numberOfUnits) {
         isValid = false;
     }
-
+    
     return isValid;
 };
 
@@ -187,17 +187,18 @@ void Advance::execute() {
     Order::execute();
     regex reg("[0-9]");
     if (validate()) {
-
-        if (regex_replace(typeid(*target->owner->ps).name(), reg, "") == "Neutral") {
+        
+        if (target->owner != NULL && regex_replace(typeid(*target->owner->ps).name(), reg, "") == "Neutral") {
             target->owner->ps = new Aggressive(target->owner);
         }
-
+        
         if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
             from->setArmy(from->army_nb - numberOfUnits);
             target->setArmy(target->army_nb + numberOfUnits);
             this->effect = "Moved " + to_string(numberOfUnits) + " armies from " + from->getName() + " to " + target->getName();
         } else {
             srand (time (0));
+            from->setArmy(from->army_nb - numberOfUnits);
             while (true) {
                 if (numberOfUnits == 0 || target->army_nb == 0) break;
                 int attackerNumber = rand() % 60 + 1;
@@ -209,13 +210,12 @@ void Advance::execute() {
                 }
             }
             if (target->army_nb == 0) {
-                orderIssuer->addTerritory(target);
                 target->setArmy(numberOfUnits);
                 target->setOwner(orderIssuer);
                 this->effect = "Attack success, " + orderIssuer->getName() + " now own " + target->territory_name + ", and the territory now has " + to_string(target->army_nb) + " armies";
                 orderIssuer->setWillDrawCard(true);
             } else {
-                this->effect = "Attack failed, " + target->territory_name + " still has " + to_string(target->army_nb) + " armies"; 
+                this->effect = "Attack failed, " + target->territory_name + " still has " + to_string(target->army_nb) + " armies";
             }
         }
         cout << "Advance order executed" << endl;
@@ -324,19 +324,19 @@ bool Bomb::validate(){
             areTerritoriesAdjacent = true;
         }
     }
-
+    
     if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
         isValid = false;
     }
-
+    
     if (!areTerritoriesAdjacent) {
         isValid = false;
     }
-
+    
     if (!hasCardType("bomb", orderIssuer)) {
         isValid = false;
     }
-
+    
     for (auto t: orderIssuer->getPeacefulTerritories()) {
         if (t->getName() == target->getName()) {
             isValid = false;

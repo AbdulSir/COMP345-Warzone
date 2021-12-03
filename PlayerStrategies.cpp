@@ -82,7 +82,7 @@ vector <Territory*> Cheater::toDefend() {
 
 vector <Territory*> Cheater::toAttack() {
     vector <Territory*> attack;
-
+    
     for(int i=0; i<this->p->getTerritories().size(); i++){
         vector <Territory*> adjacent_ter = map_obj->adjacent_territory_vector(this->p->getTerritories()[i]->getName());
         for (int j=0; j<adjacent_ter.size();j++){
@@ -180,9 +180,9 @@ void Human::issueOrder() {
                 }
                 p->getOrders()->addOrder(new Airlift(p, from, to, numberOfUnits));
             } else {
-                cout << "You do not have a airlift card :(" << endl;
+                cout << "You do not have a airlift card haha!!" << endl;
             }
-
+            
         }
         if (command == "Bomb") {
             if (hasCard("bomb", p)) {
@@ -198,7 +198,7 @@ void Human::issueOrder() {
                 }
                 p->getOrders()->addOrder(new Bomb(p, to, map_obj));
             } else {
-                cout << "You do not have a bomb card :(" << endl;
+                cout << "You do not have a bomb card haha!!" << endl;
             }
         }
         if (command == "Blockade") {
@@ -215,27 +215,27 @@ void Human::issueOrder() {
                 }
                 p->getOrders()->addOrder(new Blockade(p, to, neutralPlayer));
             } else {
-                cout << "You do not have a blockade card :(" << endl;
+                cout << "You do not have a blockade card haha!!" << endl;
             }
-        } 
+        }
         if (command == "Negotiate") {
             if (hasCard("diplomacy", p)) {
                 string targetPlayerName;
                 cout << "Which player would you like to negotiate" << endl;
                 cout << "Player list:" << endl;
-                for (auto p: players) {
+                for (auto p: players_obj) {
                     cout << p->getName() << endl;
                 }
                 cin >> targetPlayerName;
                 Player* target;
-                for (auto p: players) {
+                for (auto p: players_obj) {
                     if (p->getName() == targetPlayerName) {
                         target = p;
                     }
                 }
                 p->getOrders()->addOrder(new Negotiate(p, target));
             } else {
-                cout << "You do not have a diplomacy card :(" << endl;
+                cout << "You do not have a diplomacy card haha!!" << endl;
             }
         }
     }
@@ -277,9 +277,9 @@ vector <Territory*> Aggressive::toDefend() {
     vector <Territory*> territories = p->getTerritories();
     //sort the player's territories in descending order
     sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
-    {
-       return lhs->army_nb > rhs->army_nb;
-    });
+         {
+             return lhs->army_nb > rhs->army_nb;
+         });
     return territories;
 }
 
@@ -289,19 +289,20 @@ vector <Territory*> Aggressive::toAttack() {
     vector <Territory*> territories = p->getTerritories();
     //sort the player's territories in descending order
     sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
-    {
-       return lhs->army_nb > rhs->army_nb;
-    });
-    
-    vector <Territory*> adjacent_terr = map_obj->adjacent_territory_vector(territories[0]->getName());
-    
-    //Remove from vector non enemy territories
-    for(int i=0; i<adjacent_terr.size();i++){
-        if(!isTerritoryOwnedByPlayer(p, adjacent_terr[i])){
-            attack.push_back(adjacent_terr[i]);
+         {
+             return lhs->army_nb > rhs->army_nb;
+         });
+    if(territories.size()!=0){
+        vector <Territory*> adjacent_terr = map_obj->adjacent_territory_vector(territories[0]->getName());
+        
+        //Remove from vector non enemy territories
+        for(int i=0; i<adjacent_terr.size();i++){
+            if(!isTerritoryOwnedByPlayer(p, adjacent_terr[i])){
+                attack.push_back(adjacent_terr[i]);
+            }
         }
     }
-
+    
     return attack;
 }
 
@@ -311,29 +312,29 @@ void Aggressive::issueOrder() {
     vector<Territory*> adj_contries = toAttack();
     
     //deploy army to strongest contry
-    p->getOrders()->addOrder(new Deploy(p,my_contries[0], p->getReinforcementPool()));
-    
-    int armies_attack = (my_contries[0]->army_nb + p->getReinforcementPool())/adj_contries.size();
-    int armies_attack_remaider = (my_contries[0]->army_nb + p->getReinforcementPool()) % adj_contries.size();
-    
-    //issue bomb order
-    for (auto const& i : p->getHand()->handDeck) {
-        if(i->cardType=="bomb"){
-            Bomb* bombOrder = dynamic_cast<Bomb*>(p->getHand()->discardFromHand().play());
-            bombOrder->setOrderIssuer(p);
-            bombOrder->setTarget(adj_contries[0]);
-            bombOrder->setMap(map_obj);
-            p->getOrders()->addOrder(bombOrder);
+    if(my_contries.size()!=0){
+        p->getOrders()->addOrder(new Deploy(p,my_contries[0], p->getReinforcementPool()));
+    }
+    //if enemy territories around
+    if (adj_contries.size() != 0) {
+        int armies_attack = (my_contries[0]->army_nb + p->getReinforcementPool())/adj_contries.size();
+        int armies_attack_remaider = (my_contries[0]->army_nb + p->getReinforcementPool()) % adj_contries.size();
+        
+        //issue bomb order
+        for (auto const& i : p->getHand()->handDeck) {
+            if(i->cardType=="bomb"){
+                p->getOrders()->addOrder(new Bomb(p, adj_contries[0], map_obj));
+            }
         }
-    }
-    
-    //advance armies to strongest contry's adjacent territories
-    for (int i=0; i<adj_contries.size(); i++){
-        p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[i], armies_attack, map_obj));
-    }
-    
-    if(armies_attack_remaider!=0){
-        p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[0], armies_attack_remaider, map_obj));
+        
+        //advance armies to strongest contry's adjacent territories
+        for (int i=0; i<adj_contries.size(); i++){
+            p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[i], armies_attack, map_obj));
+        }
+        
+        if(armies_attack_remaider!=0){
+            p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[0], armies_attack_remaider, map_obj));
+        }
     }
 }
 
@@ -346,16 +347,20 @@ Benevolent::Benevolent(const Benevolent &b):PlayerStrategy(b) {
 void Benevolent::issueOrder() {
     cout << "Inside issueOrder of Benevolent Player" << endl;
     vector<Territory*> weakest_contries=toDefend();
-    int armies_defend = p->getReinforcementPool()/weakest_contries.size();
-    int armies_defend_remaider =  p->getReinforcementPool()%weakest_contries.size();
     
-    //deploy armies to weakest contries
-    for (int i=0; i<toDefend().size(); i++){
-        p->getOrders()->addOrder(new Deploy(p,weakest_contries[i], armies_defend));
-    }
-    
-    if(armies_defend_remaider!=0){
-        p->getOrders()->addOrder(new Deploy(p,weakest_contries[0], armies_defend_remaider));
+    if(weakest_contries.size()!=0){
+        
+        int armies_defend = p->getReinforcementPool()/weakest_contries.size();
+        int armies_defend_remaider =  p->getReinforcementPool()%weakest_contries.size();
+        
+        //deploy armies to weakest contries
+        for (int i=0; i<weakest_contries.size(); i++){
+            p->getOrders()->addOrder(new Deploy(p,weakest_contries[i], armies_defend));
+        }
+        
+        if(armies_defend_remaider!=0){
+            p->getOrders()->addOrder(new Deploy(p,weakest_contries[0], armies_defend_remaider));
+        }
     }
     
 }
@@ -365,9 +370,10 @@ vector <Territory*> Benevolent::toDefend() {
     
     //sort the player's territories in ascending order
     sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
-    {
-       return lhs->army_nb < rhs->army_nb;
-    });
+         {
+             return lhs->army_nb < rhs->army_nb;
+         });
+    
     
     vector <Territory*> defend_territories;
     //push into vector the weakest contries
@@ -376,7 +382,6 @@ vector <Territory*> Benevolent::toDefend() {
             defend_territories.push_back(territories[i]);
         }
     }
-
     return defend_territories;
 }
 

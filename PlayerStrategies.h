@@ -7,7 +7,7 @@
 class Player;
 class Map;
 
-extern vector <Player*> players;
+extern vector <Player*> players_obj;
 extern Map* map_obj;
 extern Player* neutralPlayer;
 bool hasCard(string a, Player* p);
@@ -75,13 +75,13 @@ public:
 };
 
 class Benevolent: public PlayerStrategy {
-    public:
-        Benevolent();
-        Benevolent(Player* p);
-        Benevolent(const Benevolent &b); //copy constructor
-        void issueOrder();
-        vector <Territory*> toAttack();
-        vector <Territory*> toDefend();
-        Benevolent& operator =(const Benevolent& b); //assignment operator
-        friend ostream& operator << (ostream &out, const Benevolent& b); // stream insertion operator
+public:
+    Benevolent();
+    Benevolent(Player* p);
+    Benevolent(const Benevolent &b); //copy constructor
+    void issueOrder();
+    vector <Territory*> toAttack();
+    vector <Territory*> toDefend();
+    Benevolent& operator =(const Benevolent& b); //assignment operator
+    friend ostream& operator << (ostream &out, const Benevolent& b); // stream insertion operator
 };
