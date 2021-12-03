@@ -89,116 +89,125 @@ Human::Human(const Human &h):PlayerStrategy(h) {
 }
 
 void Human::issueOrder() {
-    cout << "Which order would you like to execute" << endl;
     string command;
-    cin >> command;
-    if (command ==  "Deploy") {
-        string territoryName;
-        int numberOfUnits;
-        cout << "Which territory would you like to deploy" << endl;
-        cin >> territoryName;
-        cout << "How many armies would you like to deploy";
-        cin >> numberOfUnits;
-        for (auto t: map_obj->territories) {
-            if (t->getName() == territoryName) {
-                p->getOrders()->addOrder(new Deploy(p, t, numberOfUnits));
+    while (true) {
+        cout << "Which order would you like to execute, type exit to end order issuing" << endl;
+        cin >> command;
+        if (command == "exit") {
+            break;
+        }
+        if (command ==  "Deploy") {
+            string territoryName;
+            int numberOfUnits;
+            cout << "Which territory would you like to deploy" << endl;
+            cin >> territoryName;
+            cout << "How many armies would you like to deploy" << endl;
+            cin >> numberOfUnits;
+            for (auto t: map_obj->territories) {
+                if (t->getName() == territoryName) {
+                    p->getOrders()->addOrder(new Deploy(p, t, numberOfUnits));
+                }
             }
         }
-    }
-
-    if (command == "Advance") {
-        string territoryNameFrom;
-        string territoryNameTo;
-        int numberOfUnits;
-        cout << "Which territory would you like to advance from" << endl;
-        cin >> territoryNameFrom;
-        cout << "Which territory would you like to advance to" << endl;
-        cin >> territoryNameTo;
-        cout << "How many armies would you like to advance";
-        cin >> numberOfUnits;
-        Territory* from;
-        Territory* to;
-        for (auto t: map_obj->territories) {
-            if (t->getName() == territoryNameFrom) {
-                from = t;
+        if (command == "Advance") {
+            string territoryNameFrom;
+            string territoryNameTo;
+            int numberOfUnits;
+            cout << "Which territory would you like to advance from" << endl;
+            cin >> territoryNameFrom;
+            cout << "Which territory would you like to advance to" << endl;
+            cin >> territoryNameTo;
+            cout << "How many armies would you like to advance";
+            cin >> numberOfUnits;
+            Territory* from;
+            Territory* to;
+            for (auto t: map_obj->territories) {
+                if (t->getName() == territoryNameFrom) {
+                    from = t;
+                }
+                if (t->getName() == territoryNameTo) {
+                    to = t;
+                }
             }
-            if (t->getName() == territoryNameTo) {
-                to = t;
-            }
+            p->getOrders()->addOrder(new Advance(p, from, to, numberOfUnits, map_obj));
         }
-        p->getOrders()->addOrder(new Advance(p, from, to, numberOfUnits, map_obj));
-    }
-
-    if (command == "Airlift") {
-        string territoryNameFrom;
-        string territoryNameTo;
-        int numberOfUnits;
-        cout << "Which territory would you like to advance from" << endl;
-        cin >> territoryNameFrom;
-        cout << "Which territory would you like to advance to" << endl;
-        cin >> territoryNameTo;
-        cout << "How many armies would you like to airlift";
-        cin >> numberOfUnits;
-        Territory* from;
-        Territory* to;
-        for (auto t: map_obj->territories) {
-            if (t->getName() == territoryNameFrom) {
-                from = t;
+        if (command == "Airlift") {
+            string territoryNameFrom;
+            string territoryNameTo;
+            int numberOfUnits;
+            cout << "Which territory would you like to advance from" << endl;
+            cin >> territoryNameFrom;
+            cout << "Which territory would you like to advance to" << endl;
+            cin >> territoryNameTo;
+            cout << "How many armies would you like to airlift";
+            cin >> numberOfUnits;
+            Territory* from;
+            Territory* to;
+            for (auto t: map_obj->territories) {
+                if (t->getName() == territoryNameFrom) {
+                    from = t;
+                }
+                if (t->getName() == territoryNameTo) {
+                    to = t;
+                }
             }
-            if (t->getName() == territoryNameTo) {
-                to = t;
-            }
+            p->getOrders()->addOrder(new Airlift(p, from, to, numberOfUnits));
         }
-        p->getOrders()->addOrder(new Airlift(p, from, to, numberOfUnits));
-    }
-
-    if (command == "Bomb") {
-        string territoryNameTo;
-        cout << "Which territory would you like to bomb to" << endl;
-        cin >> territoryNameTo;
-        Territory* to;
-        for (auto t: map_obj->territories) {
-            if (t->getName() == territoryNameTo) {
-                to = t;
+        if (command == "Bomb") {
+            string territoryNameTo;
+            cout << "Which territory would you like to bomb to" << endl;
+            cin >> territoryNameTo;
+            Territory* to;
+            for (auto t: map_obj->territories) {
+                if (t->getName() == territoryNameTo) {
+                    to = t;
+                }
             }
+            p->getOrders()->addOrder(new Bomb(p, to, map_obj));
         }
-        p->getOrders()->addOrder(new Bomb(p, to, map_obj));
-    }
-
-    if (command == "Blockade") {
-        string territoryNameTo;
-        cout << "Which territory would you like to blockade" << endl;
-        cin >> territoryNameTo;
-        Territory* to;
-        for (auto t: map_obj->territories) {
-            if (t->getName() == territoryNameTo) {
-                to = t;
+        if (command == "Blockade") {
+            string territoryNameTo;
+            cout << "Which territory would you like to blockade" << endl;
+            cin >> territoryNameTo;
+            Territory* to;
+            for (auto t: map_obj->territories) {
+                if (t->getName() == territoryNameTo) {
+                    to = t;
+                }
             }
-        }
-        p->getOrders()->addOrder(new Blockade(p, to, neutralPlayer));
-    } 
-
-    if (command == "Negotiate") {
-        string targetPlayerName;
-        cout << "Which player would you like to negotiate" << endl;
-        cin >> targetPlayerName;
-        Player* target;
-        for (auto p: players) {
-            if (p->getName() == targetPlayerName) {
-                target = p;
+            p->getOrders()->addOrder(new Blockade(p, to, neutralPlayer));
+        } 
+        if (command == "Negotiate") {
+            string targetPlayerName;
+            cout << "Which player would you like to negotiate" << endl;
+            cin >> targetPlayerName;
+            Player* target;
+            for (auto p: players) {
+                if (p->getName() == targetPlayerName) {
+                    target = p;
+                }
             }
+            p->getOrders()->addOrder(new Negotiate(p, target));
         }
-        p->getOrders()->addOrder(new Negotiate(p, target));
     }
 }
 
 vector <Territory*> Human::toDefend() {
-    vector <Territory*> attack;
-    return attack;
+    vector <Territory*> territories = p->getTerritories();
+    return territories;
 }
 
 vector <Territory*> Human::toAttack() {
     vector <Territory*> attack;
+    
+    for(int i=0; i<this->p->getTerritories().size(); i++){
+        vector <Territory*> adjacent_ter = map_obj->adjacent_territory_vector(this->p->getTerritories()[i]->getName());
+        for (int j=0; j<adjacent_ter.size();j++){
+            
+            attack.push_back(adjacent_ter[j]);
+        }
+    }
+    attack.erase( unique( attack.begin(), attack.end() ), attack.end() );
     return attack;
 
 }
