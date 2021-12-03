@@ -1,341 +1,462 @@
 #include "Orders.h"
+#include "Player.h"
 #include <string>
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+#include <regex>
 
 using namespace std;
 
-//Order Class
-
-//default constructor
-Order::Order(){
-    this->orderID = "";
-    this->description = "";
-    this->effect = "";
-    cout << "Default Order: " << "-" << " Created in Base Class" <<endl;
-};
-
-//parametrized constructor
-Order::Order(string orderID, string description, string effect){
-    this->orderID = orderID;
-    this->effect = effect;
-    this->description=description;
-    cout << "Order:  " << orderID << " Created in Base Class" <<endl;
-};
-
-//Copy constructor
-Order::Order(const Order& obj){
-    this->orderID = obj.orderID;
-    this->description = obj.description;
-    this->effect = obj.effect;
+bool hasCardType(string type, Player* p) {
+    bool returnValue = false;
+    for (auto c: p->getHand()->handDeck) {
+        if (c->cardType == type) {
+            returnValue = true;
+        }
+    }
+    return returnValue;
 }
 
-//assignment operator
+bool isTerritoryOwnedByPlayer(Player* p, Territory* territory) {
+    vector <Territory*> territories = p->getTerritories();
+    bool returnValue = false;
+    for (auto t: territories) {
+        if (t->territory_name == territory->territory_name) {
+            returnValue = true;
+        }
+    }
+    return returnValue;
+};
+
+// Order Class
+
+int Order::currentId = 0;
+// default constructor
+Order::Order(): orderId(currentId++), effect("None") {};
+
+// parametrized constructor
+Order::Order(Player* player) : orderId(currentId++) {
+    this->orderIssuer = player;
+    this->effect = "None";
+};
+
+Order::Order(const Order &o) {
+    orderId = o.orderId;
+    this->orderIssuer = new Player;
+    *orderIssuer = *o.orderIssuer;
+}
+
+// assignment operator
 Order& Order::operator= (const Order& order){
-    this->orderID = order.orderID;
-    this->description = order.description;
-    this->effect = order.effect;
+    this->orderId = order.orderId;
+    this->orderIssuer = new Player;
+    *orderIssuer = *order.orderIssuer;
     return *this;
 };
 
-//@return string orderID
-string Order::getOrderID(){
-    return orderID;
-}
-
-//@return string description
-string Order::getDescription(){
-    return description;
+void Order::setOrderIssuer(Player* player) {
+    orderIssuer = player;
 };
 
-//@return string description
-string Order::getEffect(){
-    return effect;
+bool Order::validate() {
+    return true;
 };
 
-//set effect
-void Order::setEffect(string e){
-    effect=e;
-};
-
-bool Order::validate(){
-    return (description == "" || description == "deploy" || description == "advance" || description == "bomb" || description == "blockade" || description == "airlift" || description == "negotiate");
-};
-
-//execute order - for each Order subclass
 void Order::execute(){
-        if (validate()){
-            cout <<"Order "<< orderID <<" executed"<<endl;
-            effect="*default effect*";
-            
-        }
-        else
-            cout << "Order "<< orderID <<" invalid! Execution failed."<<endl;
+    cout << "Executing " << orderId << endl;
+    Notify(this);
 }
 
-//stream insertion operator
-ostream& operator<<(ostream& out, const Order& o)
-{
-    out << "Order:"<<endl ;
-    out << "-------------------------------"<<endl;
-    out<<"Order "<<endl;
-    out<<"ID: "<<o.orderID<<endl;
-    out<<"Description: "<<o.description<<endl;
-    out<<"Effect: "<<o.effect<<endl;
-    out<<endl;
-    return out;
+string Order::stringToLog(){
+    cout<<"\nWriting executed Order to gamelog.txt file ..."<<endl;
+    ofstream myfile;
+    myfile.open ("gamelog.txt", ios_base::app);
+    myfile <<"Order executed: ";
+    myfile <<to_string(this->orderId)<<"\n";
+    myfile <<"-------------------------------------\n";
+    myfile.close();
+    return to_string(this->orderId);
 }
-
 
 //Deploy Class
-
-//default constructor
-Deploy::Deploy(): Order(){
-    cout << "Default Deploy: " << "-" << " Created in Subclass" <<endl;
-};
+Deploy::Deploy() : Order() {}
 
 //constructor
-Deploy::Deploy(string orderID,string description,  string effect) : Order(orderID,description,effect){
-    cout << "Deploy: " << orderID << " Created in Subclass" <<endl;
+Deploy::Deploy(Player* player, Territory* territory, int number) : Order(player) {
+    target = territory;
+    numberOfUnits = number;
 }
 
 //copy constructor
-Deploy::Deploy(const Deploy& d) : Order(d){
-  cout << "Inside copy constructor of Deploy" << endl;
+Deploy::Deploy(const Deploy& d) : Order(d) {
+    this->target = new Territory;
+    *target = *d.target;
+    numberOfUnits = d.numberOfUnits;
 }
 
 //assignment operator
-Deploy& Deploy::operator=(const Deploy& d){
-  cout << "Inside operator = of Deploy" << endl;
-  Order::operator= (d);
-  return *this;
+Deploy& Deploy::operator=(const Deploy& d) {
+    Order::operator= (d);
+    this->target = new Territory;
+    *target = *d.target;
+    numberOfUnits = d.numberOfUnits;
+    return *this;
 }
 
-//return true if Deploy is valid else false
-bool Deploy::validate(){
-    return (getDescription() == "deploy");
+bool Deploy::validate() {
+    return isTerritoryOwnedByPlayer(orderIssuer, target) && orderIssuer->getReinforcementPool() >= numberOfUnits;
 };
 
-//check if Deploy is valid and if valid set effect
-void Deploy::execute(){
-        if (validate()){
-            cout << "Deploy order "<< getOrderID() <<" executed"<<endl;
-            setEffect("Place some armies on one of the current player’s territories. ");
-            
-        }
-        else
-            cout << "Deploy order "<< getOrderID() <<" invalid! Execution failed."<<endl;
+void Deploy::execute() {
+    Order::execute();
+    if (validate()) {
+        vector <Territory*> territories = orderIssuer->getTerritories();
+        orderIssuer->setReinforcementPool(orderIssuer->getReinforcementPool() - numberOfUnits);
+        target->setArmy(target->army_nb + numberOfUnits);
+        
+        cout << "Deploy order executed" << endl;
+        this->effect = "Deployed " + to_string(numberOfUnits) + " to territory " + target->territory_name + " | " + to_string(target->army_nb) + " armies";
+    } else {
+        cout << "Deploy order invalid" << endl;
+    }
 }
-
-
 
 //Advance Class
-
 //default constructor
-Advance::Advance():Order(){
-    cout << "Default Advance: " << "-" << " Created in Subclass" <<endl;
-};
+Advance::Advance() : Order() {};
 
 //constructor
-Advance::Advance(string orderID,string description, string effect) : Order(orderID,description,effect){
-    cout << "Advance: " << orderID << " Created in Subclass" <<endl;
+Advance::Advance(Player* player, Territory* t1, Territory* t2, int number, Map* m) : Order(player) {
+    from = t1;
+    target = t2;
+    numberOfUnits = number;
+    map = m;
 }
 
 //copy constructor
 Advance::Advance(const Advance& a) : Order(a){
-  cout << "Inside copy constructor of Advance" << endl;
+    this->from = new Territory;
+    *target = *a.from;
+    this->target = new Territory;
+    *target = *a.target;
+    numberOfUnits = a.numberOfUnits;
 }
 
 //assignment operator
-Advance& Advance::operator=(const Advance& ad){
-  cout << "Inside operator = of Advance" << endl;
-  Order::operator= (ad);
-  return *this;
+Advance& Advance::operator=(const Advance& a){
+    Order::operator= (a);
+    this->from = new Territory;
+    *from = *a.from;
+    this->target = new Territory;
+    *target = *a.target;
+    numberOfUnits = a.numberOfUnits;
+    return *this;
 }
 
-//return true if Advance is valid else false
-bool Advance::validate(){
-    return (getDescription() == "advance");
-};
-
-//check if Advance is valid and if valid set effect
-void Advance::execute(){
-    if (validate()){
-        cout << "Advance order "<< getOrderID() <<" executed"<<endl;
-        setEffect("Move some armies from one of the current player’s territories (source) to an adjacent  territory(target).");
+bool Advance::validate() {
+    bool isValid = true;
+    
+    bool areTerritoriesAdjacent = map->adjacent_territory(from->getName(), target->getName());
+    if (!isTerritoryOwnedByPlayer(orderIssuer, from)) {
+        isValid = false;
     }
-    else
-        cout << "Not executed because advance order"<<endl;
+    
+    if (!areTerritoriesAdjacent) {
+        isValid = false;
+    }
+    
+    for (auto t: orderIssuer->getPeacefulTerritories()) {
+        if (t->getName() == target->getName()) {
+            cout << "Can not attack the player that negotiated with " << orderIssuer->getName() << "'s territory" << endl;
+            isValid = false;
+        }
+    }
+    
+    if (from->army_nb < numberOfUnits) {
+        isValid = false;
+    }
+    
+    return isValid;
 };
 
+void Advance::execute() {
+    Order::execute();
+    regex reg("[0-9]");
+    if (validate()) {
+        
+        if (target->owner != NULL && regex_replace(typeid(*target->owner->ps).name(), reg, "") == "Neutral") {
+            target->owner->ps = new Aggressive(target->owner);
+        }
+        
+        if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
+            from->setArmy(from->army_nb - numberOfUnits);
+            target->setArmy(target->army_nb + numberOfUnits);
+            this->effect = "Moved " + to_string(numberOfUnits) + " armies from " + from->getName() + " to " + target->getName();
+        } else {
+            srand (time (0));
+            while (true) {
+                if (numberOfUnits == 0 || target->army_nb == 0) break;
+                int attackerNumber = rand() % 60 + 1;
+                int defenderNumber = rand() % 70 + 1;
+                if (attackerNumber > defenderNumber) {
+                    target->setArmy(target->army_nb -1);
+                } else if (defenderNumber > attackerNumber) {
+                    numberOfUnits = numberOfUnits-1;
+                }
+            }
+            if (target->army_nb == 0) {
+                orderIssuer->addTerritory(target);
+                target->setArmy(numberOfUnits);
+                target->setOwner(orderIssuer);
+                this->effect = "Attack success, " + orderIssuer->getName() + " now own " + target->territory_name + ", and the territory now has " + to_string(target->army_nb) + " armies";
+                orderIssuer->setWillDrawCard(true);
+            } else {
+                this->effect = "Attack failed, " + target->territory_name + " still has " + to_string(target->army_nb) + " armies";
+            }
+        }
+        cout << "Advance order executed" << endl;
+    } else {
+        cout << "Advance order invalid" << endl;
+    }
+};
 
-//Bomb Class
-
+//Airlift Class
 //default constructor
-Bomb::Bomb():Order(){
-    cout << "Default Bomb: " << "-" << " Created in Subclass" <<endl;
-};
+Airlift::Airlift():Order(){};
 
 //constructor
-Bomb::Bomb(string orderID,string description,string effect) : Order(orderID,description,effect){
-    cout << "Bomb: " << orderID << " Created in Subclass" <<endl;
+Airlift::Airlift(Player* player, Territory* t1, Territory* t2, int number) : Order(player){
+    from = t1;
+    target = t2;
+    numberOfUnits = number;
+}
+
+//copy constructor
+Airlift::Airlift(const Airlift& a) : Order(a) {
+    this->from = new Territory;
+    *target = *a.from;
+    this->target = new Territory;
+    *target = *a.target;
+    numberOfUnits = a.numberOfUnits;
+}
+
+//assignment operator
+Airlift& Airlift::operator=(const Airlift& a) {
+    Order::operator= (a);
+    this->from = new Territory;
+    *from = *a.from;
+    this->target = new Territory;
+    *target = *a.target;
+    numberOfUnits = a.numberOfUnits;
+    return *this;
+}
+
+void Airlift::setFrom(Territory* t) {
+    from = t;
+};
+
+void Airlift::setTarget(Territory* t) {
+    target = t;
+};
+
+void Airlift::setNumberOfUnits(int n) {
+    numberOfUnits = n;
+};
+
+bool Airlift::validate() {
+    return isTerritoryOwnedByPlayer(orderIssuer, from) && isTerritoryOwnedByPlayer(orderIssuer, target) && hasCardType("airlift", orderIssuer);
+};
+
+void Airlift::execute(){
+    Order::execute();
+    if (validate()) {
+        orderIssuer->getHand()->removeCardFromHand("airlift");
+        from->setArmy(from->army_nb - numberOfUnits);
+        target->setArmy(target->army_nb + numberOfUnits);
+        cout << "Airlift order executed" << endl;
+        this->effect = "Airlifted from " + from->territory_name + " " + to_string(numberOfUnits) + " armies to territory " + target->territory_name;
+    } else {
+        cout << "Airlift order invalid" << endl;
+    }
+}
+
+//Bomb Class
+//default constructor
+Bomb::Bomb():Order() {};
+
+//constructor
+Bomb::Bomb(Player* player, Territory* t, Map* m) : Order(player){
+    target = t;
+    map = m;
 }
 
 //copy constructor
 Bomb::Bomb(const Bomb& b) : Order(b){
-  cout << "Inside copy constructor of Bomb" << endl;
+    this->target = new Territory;
+    *target = *b.target;
 }
 
 //assignment operator
 Bomb& Bomb::operator=(const Bomb& b){
-  cout << "Inside operator = of Bomb" << endl;
-  Order::operator= (b);
-  return *this;
+    Order::operator= (b);
+    this->target = new Territory;
+    *target = *b.target;
+    return *this;
 }
 
-//return true if Bomb is valid else false
-bool Bomb::validate(){
-    return (getDescription() == "bomb");
+void Bomb::setTarget(Territory* t) {
+    target = t;
 };
 
-//check if Bomb is valid and if valid set effect
-void Bomb::execute(){
-        if (validate()){
-            cout << "Bomb order "<< getOrderID() <<" executed"<<endl;
-            setEffect("Target country loses half of their army units.");
-            
-        }
-        else
-            cout << "Bomb order "<< getOrderID() <<" invalid! Execution failed."<<endl;
-}
+void Bomb::setMap(Map* m) {
+    map = m;
+};
 
+bool Bomb::validate(){
+    bool areTerritoriesAdjacent = false;
+    bool isValid = true;
+    for (auto t: orderIssuer->getTerritories()) {
+        if (map->adjacent_territory(t->getName(), target->getName())) {
+            areTerritoriesAdjacent = true;
+        }
+    }
+    
+    if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
+        isValid = false;
+    }
+    
+    if (!areTerritoriesAdjacent) {
+        isValid = false;
+    }
+    
+    if (!hasCardType("bomb", orderIssuer)) {
+        isValid = false;
+    }
+    
+    for (auto t: orderIssuer->getPeacefulTerritories()) {
+        if (t->getName() == target->getName()) {
+            isValid = false;
+        }
+    }
+    return isValid;
+};
+
+void Bomb::execute(){
+    Order::execute();
+    if (validate()) {
+        orderIssuer->getHand()->removeCardFromHand("bomb");
+        target->setArmy(target->army_nb / 2);
+        cout << "Bomb order executed" << endl;
+        this->effect = "Bombed to territory " + target->territory_name + " | " + to_string(target->army_nb) + " armies left";
+    } else {
+        cout << "Bomb order invalid" << endl;
+    }
+}
 
 //Blockade Class
-
 //default constructor
-Blockade::Blockade():Order(){
-    cout << "Default Blockade: " << "-" << " Created in Subclass" <<endl;
-};
+Blockade::Blockade():Order() {};
 
 //constructor
-Blockade::Blockade(string orderID,string description, string effect) : Order(orderID,description,effect){
-    cout << "Blockade: " << orderID << " Created in Subclass" <<endl;
+Blockade::Blockade(Player* player, Territory* territory, Player* neutral) : Order(player) {
+    target = territory;
+    neutral = neutral;
 }
 
 //copy constructor
 Blockade::Blockade(const Blockade& bl) : Order(bl){
-  cout << "Inside copy constructor of Blockade" << endl;
+    this->target = new Territory;
+    *target = *bl.target;
 }
 
 //assignment operator
-Blockade& Blockade::operator=(const Blockade& bl){
-  cout << "Inside operator = of Blockade" << endl;
-  Order::operator= (bl);
-  return *this;
+Blockade& Blockade::operator=(const Blockade& b){
+    Order::operator= (b);
+    this->target = new Territory;
+    *target = *b.target;
+    return *this;
 }
 
-//return true if Blockade is valid else false
+void Blockade::setTarget(Territory* t) {
+    target = t;
+};
+
+void Blockade::setNeutralPlayer(Player* player) {
+    neutral = player;
+};
+
 bool Blockade::validate(){
-    return (getDescription() == "blockade");
+    return isTerritoryOwnedByPlayer(orderIssuer, target) && hasCardType("blockade", orderIssuer);
 };
 
-//check if Blockade is valid and if valid set effect
 void Blockade::execute(){
-        if (validate()){
-            cout << "Blockade order executed"<<endl;
-            setEffect("Target territory’s army units count is tripled, and the territory becomes neutral.");
-            
-        }
-        else
-            cout << "Blockade order "<< getOrderID() <<" invalid! Execution failed."<<endl;
+    Order::execute();
+    if (validate()) {
+        orderIssuer->getHand()->removeCardFromHand("blockade");
+        target->setArmy(target->army_nb *2);
+        target->setOwner(neutral);
+        cout << "Blockade order executed" << endl;
+        this->effect = "Blockaded " + target->territory_name + ", it now belongs to " + target->getOwner()->getName() + " and this territory has " + to_string(target->army_nb) + " armies";
+    } else {
+        cout << "Blockade order invalid" << endl;
+    }
 }
-
-
-//Airlift Class
-
-//default constructor
-Airlift::Airlift():Order(){
-    cout << "Default Airlift: " << "-" << " Created in Subclass" <<endl;
-}
-
-//constructor
-Airlift::Airlift(string orderID,string description, string effect) : Order(orderID,description,effect){
-    cout << "Airlift: " << orderID << " Created in Subclass" <<endl;
-}
-
-//copy constructor
-Airlift::Airlift(const Airlift& a) : Order(a){
-  cout << "Inside copy constructor of Airlift" << endl;
-}
-
-//assignment operator
-Airlift& Airlift::operator=(const Airlift& a){
-  cout << "Inside operator = of Airlift" << endl;
-  Order::operator= (a);
-  return *this;
-}
-
-//return true if Airlift is valid else false
-bool Airlift::validate(){
-    return (getDescription() == "airlift");
-};
-
-//check if Airlift is valid and if valid set effect
-void Airlift::execute(){
-        if (validate()){
-            cout << "Airlift order executed"<<endl;
-            setEffect("Move any number of army units from one of your territories to another territory, even if they are not adjacent.");
-            
-        }
-        else
-            cout << "Airlift order "<< getOrderID() <<" invalid! Execution failed."<<endl;
-}
-
 
 //Negotiate Class
-
 //default constructor
-Negotiate::Negotiate():Order(){
-    cout << "Default Negotiate: " << "-" << " Created in Subclass" <<endl;
-};
+Negotiate::Negotiate():Order() {};
 
 //constructor
-Negotiate::Negotiate(string orderID,string description, string effect) : Order(orderID,description,effect){
-    cout << "Negotiate: " << orderID << " Created in Subclass" <<endl;
+Negotiate::Negotiate(Player* player, Player* target) : Order(player) {
+    target = target;
 }
 
 //copy constructor
 Negotiate::Negotiate(const Negotiate& n) : Order(n){
-  cout << "Inside copy constructor of Negotiate" << endl;
+    this->target = new Player;
+    *target = *n.target;
 }
 
 //assignment operator
 Negotiate& Negotiate::operator=(const Negotiate& n){
-  cout << "Inside operator = of Negotiate" << endl;
-  Order::operator= (n);
-  return *this;
+    Order::operator= (n);
+    this->target = new Player;
+    *target = *n.target;
+    return *this;
 }
 
-//return true if negotiate is valid else false
-bool Negotiate::validate(){
-    return (getDescription() == "negotiate");
+void Negotiate::setTarget(Player* p) {
+    target = p;
 };
 
-//check if negotiate is valid and if valid set effect
+bool Negotiate::validate(){
+    if (target->getName() == orderIssuer->getName()) {
+        return false;
+    }
+    if (!hasCardType("diplomacy", orderIssuer)) {
+        return false;
+    }
+    return true;
+};
+
 void Negotiate::execute(){
-        if (validate()){
-            cout << "Negotiate order "<< getOrderID() <<" executed"<<endl;
-            setEffect("Prevent attacks between the current player and another player until the end of the turn.");
-            
-        }
-        else
-            cout << "Negotiate order "<< getOrderID() <<" invalid! Execution failed."<<endl;
+    Order::execute();
+    if (validate()) {
+        orderIssuer->getHand()->removeCardFromHand("diplomacy");
+        orderIssuer->setPeacefulTerritories(target->getTerritories());
+        target->setPeacefulTerritories(orderIssuer->getTerritories());
+        this->effect = orderIssuer->getName() + " and " + target->getName() + " have agreed not to attack each other.";
+        cout << "Negotiate order executed" << endl;
+    } else {
+        cout << "Negotiate order invalid" << endl;
+    }
 }
 
-
 //OrderList Class
-
 //default constructor
 OrderList::OrderList(){
     this->orderList={};
@@ -368,32 +489,13 @@ OrderList& OrderList::operator= (const OrderList& o){
 
 //add order to orderList
 void OrderList::addOrder(Order* order){
-   orderList.push_back(order);
-}
-
-//stream insertion operator
-ostream& operator<<(ostream& out, const OrderList& o)
-{
-    out << "OrderList has the following orders:"<<endl ;
-    out << "-------------------------------"<<endl;
-    for(int i =0; i<o.orderList.size();i++){
-        out<<"Order "<<endl;
-        out<<"ID: "<<o.orderList[i]->getOrderID()<<endl;
-        out<<"Description: "<<o.orderList[i]->getDescription()<<endl;
-        out<<"Effect: "<<o.orderList[i]->getEffect()<<endl;
-        out<<endl;
-    }
-    return out;
-}
-
-// stream extraction operator
-istream& operator>>(istream &in, OrderList& o) {
-    return in;
+    orderList.push_back(order);
+    Notify(this);
 }
 
 //move order inside orderList
 void OrderList::move(Order* order, int newPosition){
-    cout<<"Move order "<<order->getOrderID()<<" to index "<<newPosition<<endl;
+    cout<<"Move order "<<order->orderId<<" to index "<<newPosition<<endl;
     //remove order from list
     for(int i=0; i<orderList.size();i++){
         if(orderList[i]==order){
@@ -410,10 +512,126 @@ void OrderList::remove(Order* order){
             orderList.erase(find(orderList.begin(),orderList.end(),order));
         }
     }
-    cout <<"Order "<< order->getOrderID()<<" removed from list" << endl;
+    cout <<"Order "<< order->orderId <<" removed from list" << endl;
 }
 
+string OrderList::stringToLog(){
+    cout<<"\nWriting issued Order to gamelog.txt file ..."<<endl;
+    ofstream myfile;
+    myfile.open ("gamelog.txt", ios_base::app);
+    myfile <<"Order issued: ";
+    string orderIssued;
+    for(int i=0; i<orderList.size();i++){
+        if(i!=0){
+            orderIssued=+", ";
+            myfile <<", ";
+        }
+        orderIssued=+orderList[i]->orderId;
+        myfile <<orderList[i]->orderId;
+    }
+    myfile <<"\n-------------------------------------\n";
+    myfile.close();
+    return orderIssued;
+}
 
-        
-  
+//stream insertion operators
+ostream& operator<<(ostream& out, const OrderList& o)
+{
+    out << "OrderList has the following orders:"<<endl ;
+    for(int i =0; i<o.orderList.size();i++){
+        out << endl ;
+        out<< *o.orderList[i] <<endl;
+    }
+    return out;
+}
 
+void Order::print(ostream& out) const{
+    out << "Order:"<<endl ;
+    out << "-------------------------------"<<endl;
+    out << "ID: "<< orderId << endl;
+    out << "Order Issuer: "<< orderIssuer->getName() << endl;
+    out << "Effect: " << effect << endl;
+    
+}
+
+ostream& operator<<(ostream& out, const Order& o)
+{
+    o.print(out);
+    return out;
+}
+
+void Deploy::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Deploy" << endl;
+    out << "Target: " << target->territory_name << endl;
+    out << "Number of armies: " << numberOfUnits << endl;
+    
+}
+
+ostream& operator <<(ostream &out, const Deploy &order) {
+    order.print(out);
+    return out;
+}
+
+void Advance::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Advance" << endl;
+    out << "From: " << from->territory_name << endl;
+    out << "Target: " << target->territory_name << endl;
+    out << "Number of armies: " << numberOfUnits << endl;
+    
+}
+
+ostream& operator <<(ostream &out, const Advance &order) {
+    order.print(out);
+    return out;
+}
+
+void Airlift::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Airlift" << endl;
+    out << "From: " << from->territory_name << endl;
+    out << "Target: " << target->territory_name << endl;
+    out << "Number of armies: " << numberOfUnits << endl;
+    
+}
+ostream& operator <<(ostream &out, const Airlift &order) {
+    order.print(out);
+    return out;
+}
+
+void Bomb::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Bomb" << endl;
+    out << "Target: " << target->territory_name << endl;
+    
+}
+
+ostream& operator <<(ostream &out, const Bomb &order) {
+    order.print(out);
+    return out;
+}
+
+void Blockade::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Blockade" << endl;
+    out << "Target: " << target->territory_name << endl;
+    
+}
+
+ostream& operator <<(ostream &out, const Blockade &order) {
+    order.print(out);
+    return out;
+}
+
+void Negotiate::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Negotiate" << endl;
+    out << "Targetted player: " << target->getName() << endl;
+    
+}
+
+ostream& operator <<(ostream &out, const Negotiate &order) {
+    order.print(out);
+    return out;
+}

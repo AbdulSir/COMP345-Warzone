@@ -1,0 +1,38 @@
+
+Tournament mode:
+M: lotr.map, ameroki.map, 
+P: Cheater, Benevolent, 
+G: 4
+D: 10
+
+Results:
+		Game 1			Game 2			Game 3			Game 4		
+lotr.map	DRAW: No winner		DRAW: No winner		DRAW: No winner		DRAW: No winner	
+ameroki.map	DRAW: No winner		DRAW: No winner		DRAW: No winner		DRAW: No winner	
+
+
+Tournament mode:
+M: tube.map, geoscape.map, risk.map, 
+P: Cheater, Neutral, Aggressive, 
+G: 2
+D: 21
+
+Results:
+		Game 1			Game 2		
+tube.map	DRAW: No winner		DRAW: No winner	
+geoscape.map	DRAW: No winner		DRAW: No winner	
+risk.map	DRAW: No winner		DRAW: No winner	
+
+
+Tournament mode:
+M: tube.map, geoscape.map, risk.map, 
+P: Cheater, Neutral, Aggressive, 
+G: 2
+D: 21
+
+Results:
+		Game 1			Game 2		
+tube.map	DRAW: No winner		DRAW: No winner	
+geoscape.map	DRAW: No winner		DRAW: No winner	
+risk.map	DRAW: No winner		DRAW: No winner	
+

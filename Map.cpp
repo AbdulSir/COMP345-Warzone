@@ -11,14 +11,16 @@ using namespace std;
 // Territory CLASS
 Territory::Territory ()
 {
-
+    
 }
 //Copy constructor
 Territory::Territory(const Territory& obj)
 {
+    owner = NULL;
     territory_name = obj.territory_name;
     continent_ref = obj.continent_ref;
     army_nb = obj.army_nb;
+    army_bonus = obj.army_bonus;
 }
 
 // Overloaded assignment operator
@@ -26,31 +28,27 @@ Territory& Territory::operator= (const Territory& terr) {
     territory_name = terr.territory_name;
     continent_ref = terr.continent_ref;
     army_nb = terr.army_nb;
+    army_bonus=terr.army_bonus;
     return *this;
 }
 
 // Stream insertion operators
-ostream & operator << (ostream &out, const Territory &terr) {
-    out << terr.territory_name << endl;
+ostream & operator << (ostream &out, const Territory &t1) {
+    out << endl << "Territory name " << t1.territory_name << endl;
+    out << "Number of armies: " << t1.army_nb << endl;
+    if (t1.owner != NULL) {
+        out << "Owner: " << t1.owner->getName() << endl;
+    }
     return out;
-}
-
-istream & operator >> (istream &in,  Territory &terr) {
-    cout << "Enter territory name ";
-    in >> terr.territory_name;
-    cout << "Enter continent ref ";
-    in >> terr.continent_ref;
-    cout << "Enter number of armies for that territory ";
-    in >> terr.army_nb;
-    return in;
 }
 
 Territory::Territory (string terr_name, int contin_ref, int nb_of_armies)
 {
-    player1 = new Player();
+    owner = NULL;
     territory_name = terr_name;
     continent_ref = contin_ref;
     army_nb = nb_of_armies;
+    army_bonus = nb_of_armies;
 }
 
 string Territory::getName()
@@ -58,11 +56,40 @@ string Territory::getName()
     return territory_name;
 }
 
+void Territory::setArmy(int numberOfArmy) {
+    army_nb = numberOfArmy;
+}
+
+void Territory::setOwner(Player* p) {
+    if (owner != NULL) {
+        vector<Territory*> playerTerritories = owner->getTerritories();
+        playerTerritories.erase(find(playerTerritories.begin(), playerTerritories.end(), this));
+        owner->setTerritories(playerTerritories);
+    }
+    vector<Territory*> playerTerritories = p->getTerritories();
+    playerTerritories.push_back(this);
+    p->setTerritories(playerTerritories);
+    owner = p;
+};
+
+void Territory::resetOwner() {
+    if (owner != NULL) {
+        vector<Territory*> playerTerritories = owner->getTerritories();
+        playerTerritories.erase(find(playerTerritories.begin(), playerTerritories.end(), this));
+        owner->setTerritories(playerTerritories);
+    }
+    owner = NULL;
+}
+
+Player* Territory::getOwner() {
+    return owner;
+};
+
 // Map CLASS
 
 Map::Map()
 {
-
+    
 }
 
 //Copy constructor
@@ -74,9 +101,41 @@ Map& Map::operator= (const Map& map1) {
     return *this;
 }
 
+bool Map::adjacent_territory(string terr1, string terr2) {
+    bool returnValue = false;
+    for (int i=0; i<territories.size(); i++)
+    {
+        if (terr1.compare(territories[i]->getName()) == 0)
+        {
+            for (Territory* terr:territory_graph[i])
+            {
+                if (terr2.compare(terr->getName()) == 0) {
+                    returnValue = true;
+                }
+            }
+        }
+    }
+    return returnValue;
+};
+
+vector <Territory*> Map::adjacent_territory_vector(string terr1) {
+    vector <Territory*> territory_vector;
+    for (int i=0; i<territories.size(); i++)
+    {
+        if (terr1.compare(territories[i]->getName()) == 0)
+        {
+            for (Territory* terr:territory_graph[i])
+            {
+                territory_vector.push_back(terr);
+            }
+        }
+    }
+    return territory_vector;
+};
+
 // Stream insertion operators
 ostream & operator << (ostream &out, Map &m1) {
-
+    
     for (int i=0; i< m1.territories.size(); i++)
     {
         cout << "Territory " << m1.territories[i]->territory_name << endl;
@@ -111,11 +170,7 @@ Map::Map(string text_contents)
     Map::createMap(text_contents);
     Map::displayMap();
     Map::displayContinents();
-    if(Map::validate())
-        cout << "\nThe Map is a valid map" << endl;
-    else
-        cout << "\nThe Map is NOT a valid map" << endl;
-    Map::delete_pointers();
+    //Map::delete_pointers();
 }
 
 bool Map::validate()
@@ -124,17 +179,17 @@ bool Map::validate()
         cout << "\nThe map is a connected graph" << endl;
     else
         cout << "\nThe map is NOT a connected graph" << endl;
-
+    
     if (Map::continents_are_connected())
         cout << "\nContinents are connected subgraphs" << endl;
     else
         cout << "\nContinents are NOT connected subgraphs" << endl;
-
+    
     if (Map::territory_belongs_to_one_continent())
         cout << "\nTerritories belong to only one continent" << endl;
     else
         cout << "\nTerritories DO NOT belong to only one continent" << endl;
-
+    
     if (Map::map_is_connected()==true && Map::continents_are_connected()==true && Map::territory_belongs_to_one_continent()==true)
         return true;
     else
@@ -313,20 +368,20 @@ void Map::delete_pointers()
     {
         for (Territory* terr:continent_graph[i])
         {
-            delete(terr->player1);
-            terr->player1=NULL;
+            delete(terr->owner);
+            terr->owner=NULL;
             delete(terr);
             terr = NULL;
         }
         for (Territory* terr1:territory_graph[i])
         {
-            delete(terr1->player1);
-            terr1->player1=NULL;
+            delete(terr1->owner);
+            terr1->owner=NULL;
             delete(terr1);
             terr1 = NULL;
         }
-        delete(territories[i]->player1);
-        territories[i]->player1 = NULL;
+        delete(territories[i]->owner);
+        territories[i]->owner = NULL;
         delete(territories[i]);
         territories[i]=NULL;
     }
@@ -335,7 +390,38 @@ void Map::delete_pointers()
 // MapLoader CLASS
 MapLoader::MapLoader()
 {
-
+    // Create a text string, which is used to output the text file
+    string myText;
+    
+    string file_name = "";
+    cout << "Please enter the map file name: \n";
+    cin >> file_name;
+    
+    if (file_name.compare(".map") != 0)
+    {
+        cout << endl;
+        // Read from the text file
+        ifstream MyReadFile("Resources/" + file_name);
+        //ifstream MyReadFile(file_name);
+        if(MyReadFile.fail())
+        {
+            cout << "An error happened while attempting to read the file" << endl;
+            return;
+        }
+        
+        // Use a while loop together with the getline() function to read the file line by line
+        text_contents = "";
+        while (getline (MyReadFile, myText)) {
+            // Output the text from the file
+            text_contents += myText + "\n";
+        }
+        //creating a map object
+        map_object = new Map(text_contents);
+        // Close the file
+        MyReadFile.close();
+    }
+    else
+        cout <<"Sorry, wrong file format." << endl;
 }
 
 //Copy constructor
@@ -372,7 +458,8 @@ MapLoader::MapLoader(string file_name)
     // Create a text string, which is used to output the text file
     string myText;
     // Read from the text file
-    ifstream MyReadFile("Resources/" + file_name);
+    //    ifstream MyReadFile("Resources/" + file_name);
+    ifstream MyReadFile(file_name);
     if(MyReadFile.fail())
     {
         cout << "An error happened while attempting to read the file" << endl;
@@ -381,17 +468,11 @@ MapLoader::MapLoader(string file_name)
     // Use a while loop together with the getline() function to read the file line by line
     text_contents = "";
     while (getline (MyReadFile, myText)) {
-      // Output the text from the file
-      text_contents += myText + "\n";
+        // Output the text from the file
+        text_contents += myText + "\n";
     }
     //creating a map object
     map_object = new Map(text_contents);
     // Close the file
     MyReadFile.close();
-}
-
-//Dummy Player CLASS
-Player::Player ()
-{
-
 }

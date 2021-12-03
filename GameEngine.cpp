@@ -17,7 +17,7 @@ class Player;
 
 //Constructor
 GameEngine::GameEngine() : state("start"), command("") {
-    string choice;
+    string choice, command;
     do {
         cout << "Please enter one of the following:" << endl
         << "\t-console to enter commands in the console" << endl
@@ -27,34 +27,60 @@ GameEngine::GameEngine() : state("start"), command("") {
         if (choice == "-console") {
             //Reading commands from console
             cp = new CommandProcessor();
+            command = cp->getCommand(state);
+            if (command.find("tournament") != command.npos) {
+                tournamentMode();
+            }
+            else if (command != "") {
+                startupPhase();
+            }
             break;
         }
         else if (choice.substr(0,6) == "-file "){
             string file = choice.substr(6);
             //Reading commands from file
+            ofstream output;
+            output.open("tournamentOutput.txt", ofstream::out | ofstream::trunc);
+            output.close();
             cp = new FileCommandProcessorAdapter(file);
+            do {
+                command = cp->getCommand(state);
+                if (command.find("tournament") != command.npos) {
+                    tournamentMode();
+                }
+                else if (command.find("load") != command.npos ){
+                    map_loader = new MapLoader(command.substr(8));
+                    map_obj = map_loader->map_object;
+                    state = "map loaded";
+                    Notify(this);
+                    startupPhase();
+                }
+            } while (command != "");
             break;
         }
     } while (true);
     
     //Start state of game
-    string s;
-    while (true) {
-        s = cp->getCommand("start");
-        if (s.find("tournament") != s.npos) {
-            tournamentMode();
-            break;
-        }
-        else if (s != "") {
-            map_loader = new MapLoader(s.substr(8));
-            state = "map loaded";
-            Notify(this);
-            startupPhase();
-            break;
-        }
-        else
-            cout << "Invalid command for " << state << " state" << endl;
-    }
+    //    string s;
+    //    while (true) {
+    //        s = cp->getCommand("start");
+    //        if (s.find("tournament") != s.npos) {
+    //            tournamentMode();
+    //            break;
+    //        }
+    //        else if (s != "") {
+    //            map_loader = new MapLoader(s.substr(8));
+    //            map_obj = map_loader->map_object;
+    //            state = "map loaded";
+    //            Notify(this);
+    //            startupPhase();
+    //            break;
+    //        }
+    //        else {
+    //            cout << "Invalid command for " << state << " state" << endl;
+    //            continue;
+    //        }
+    //    }
 }
 
 //Copy constructor
@@ -129,29 +155,37 @@ void GameEngine::addPlayer() {
         cin >> ps;
         switch (ps.at(0)) {
             case 'A': {
-                players.emplace(players.begin(), new Player("Aggressive", new Hand, {}, map_loader->map_object, new Aggressive));
+                Player* aggressivePlayer = new Player("Aggressive");
+                aggressivePlayer->ps = new Aggressive(aggressivePlayer);
+                players.emplace(players.begin(), aggressivePlayer);
                 break;
             }
-                //            case 'B': {
-                //                    players.emplace(players.begin(), new Player("Benevolent", new Hand, {}, map_loader->map_object, new Benevolent));
-                //                break;
-                //            }
-                //            case 'N': {
-                //                    players.emplace(players.begin(), new Player("Neutral", new Hand, {}, map_loader->map_object, new Neutral));
-                //                break;
-                //            }
-                //            case 'H': {
-                //                    players.emplace(players.begin(), new Player("Human", new Hand, {}, map_loader->map_object, new Human));
-                //                break;
-                //            }
-                //            default: {
-                //                    players.emplace(players.begin(), new Player("Cheater", new Hand, {}, map_loader->map_object, new Cheater));
-                //            }
-            default: {
-                players.emplace(players.begin(), new Player("Aggressive", new Hand, {}, map_loader->map_object, new Aggressive));;
+            case 'B': {
+                Player* benevolentPlayer = new Player("Benevolent");
+                benevolentPlayer->ps = new Benevolent(benevolentPlayer);
+                players.emplace(players.begin(), benevolentPlayer);
+                break;
             }
-        }    }
-    
+            case 'N': {
+                Player* neutralPlayer = new Player("Neutral");
+                neutralPlayer->ps = new Neutral(neutralPlayer);
+                players.emplace(players.begin(), neutralPlayer);
+                break;
+            }
+            case 'H': {
+                Player* humanPlayer = new Player("Human");
+                humanPlayer->ps = new Human(humanPlayer);
+                players.emplace(players.begin(), humanPlayer);
+                break;
+            }
+            default: {
+                Player* cheaterPlayer = new Player("Cheater");
+                cheaterPlayer->ps = new Cheater(cheaterPlayer);
+                players.emplace(players.begin(), cheaterPlayer);
+            }
+        }
+        players_obj = players;
+    }
     state = "players added";
     Notify(this);
 }
@@ -350,7 +384,7 @@ void GameEngine::mainGameLoop(){
     int numberOfTerritories; //will territories vector be created in part 2?
     bool gameWon = false;
     
-    for (int i=0; i<cp->numMaxTurns; i++) {
+    for (int i=0; i<50; i++) {
         if (gameWon==false){
             
             //execute 3 main phases sequentially
@@ -360,17 +394,20 @@ void GameEngine::mainGameLoop(){
             
             //check for players to remove
             for (int i = 0; i < players.size(); i++){
+                
+                cout << "bruh " << players[i]->getTerritories().size() << endl;
                 if (players[i]->getTerritories().size() == 0){
                     cout << players[i]->getName() << " has been eliminated." << endl;
                     players.erase(find(players.begin(), players.end(), players[i]));
                 }
             }
+            cout << players.size() << endl;
             //check if there is a winner
             if (players.size() == 1){
                 cout << "The winner is " << players[0]->getName();
                 gameWon = true;
                 break;
-            } else if (gameWon == false && i == cp->numMaxTurns-1) {
+            } else if (gameWon == false && i == 49) {
                 cout << "THE GAME ENDS IN A DRAW" << endl;
             }
         }
@@ -598,8 +635,8 @@ string GameEngine::stringToLog() {
 }
 
 void GameEngine::tournamentMode() {
-    ofstream output("tournamentOutput.txt");
-    output << "Tournament mode:\nM: ";
+    ofstream output("tournamentOutput.txt",fstream::in | fstream::out | fstream::app);
+    output << "\nTournament mode:\nM: ";
     for (auto map : cp->mapFiles)
         output << map << ", ";
     output << "\nP: ";
@@ -619,6 +656,7 @@ void GameEngine::tournamentMode() {
             cout << "\nCurrent State: " << state << endl;
             cout << "Loading " << currentMap << "..."<< endl;
             map_loader = new MapLoader(currentMap);
+            map_obj = map_loader->map_object;
             if (map_loader->text_contents != "") {
                 state = "map loaded";
             }
@@ -644,46 +682,54 @@ void GameEngine::tournamentMode() {
                 for (auto player : cp->playersStrat) {
                     switch (player.at(0)) {
                         case 'A': {
-                            if (random(100)%2 == 0)
-                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Aggressive));
-                            else
-                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Aggressive));
+                            Player* aggressivePlayer = new Player("Aggressive");
+                            aggressivePlayer->ps = new Aggressive(aggressivePlayer);
+                            if (random(100)%2 == 0) {
+                                players.push_back(aggressivePlayer);
+                            }
+                            else {
+                                players.emplace(players.begin(), aggressivePlayer);
+                            }
                             break;
                         }
-                            //                        case 'B': {
-                            //                            if (random(100)%2 == 0)
-                            //                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Benevolent));
-                            //                            else
-                            //                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Benevolent));
-                            //                            break;
-                            //                        }
-                            //                        case 'N': {
-                            //                            if (random(100)%2 == 0)
-                            //                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Neutral));
-                            //                            else
-                            //                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Neutral));
-                            //                            break;
-                            //                        }
-                            //                        case 'H': {
-                            //                            if (random(100)%2 == 0)
-                            //                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Human));
-                            //                            else
-                            //                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Human));
-                            //                            break;
-                            //                        }
-                            //                        default: {
-                            //                            if (random(100)%2 == 0)
-                            //                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Cheater));
-                            //                            else
-                            //                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Cheater));
-                            //                        }
-                        default: {
+                        case 'B': {
+                            Player* benevolentPlayer = new Player("Benevolent");
+                            benevolentPlayer->ps = new Benevolent(benevolentPlayer);
                             if (random(100)%2 == 0)
-                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Aggressive));
+                                players.push_back(benevolentPlayer);
                             else
-                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Aggressive));;
+                                players.emplace(players.begin(), benevolentPlayer);
+                            break;
+                        }
+                        case 'N': {
+                            Player* neutralPlayer = new Player("Neutral");
+                            neutralPlayer->ps = new Neutral(neutralPlayer);
+                            if (random(100)%2 == 0)
+                                players.push_back(neutralPlayer);
+                            else
+                                players.emplace(players.begin(), neutralPlayer);
+                            break;
+                        }
+                        case 'H': {
+                            Player* humanPlayer = new Player("Human");
+                            humanPlayer->ps = new Human(humanPlayer);
+                            if (random(100)%2 == 0)
+                                players.push_back(humanPlayer);
+                            else
+                                players.emplace(players.begin(), humanPlayer);
+                            break;
+                        }
+                        default: {
+                            Player* cheaterPlayer = new Player("Cheater");
+                            cheaterPlayer->ps = new Cheater(cheaterPlayer);
+                            if (random(100)%2 == 0)
+                                players.push_back(cheaterPlayer);
+                            else
+                                players.emplace(players.begin(), cheaterPlayer);
                         }
                     }
+                    players_obj = players;
+                    
                 }
                 state = "players added";
                 cout << "The following players have been added: " << endl;
@@ -715,6 +761,9 @@ void GameEngine::tournamentMode() {
     restart:
         state = "start";
     }
+    cp->mapFiles.clear();
+    cp->playersStrat.clear();
+    output << "\n\n";
     output.close();
 }
 
@@ -723,4 +772,3 @@ int GameEngine::random (int lim) {
     uniform_int_distribution<int> uid {0,lim};
     return uid(dre);
 }
-

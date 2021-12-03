@@ -127,7 +127,3 @@ public:
     //stream insertion operator
     friend ostream& operator<<(ostream& out, const FileCommandProcessorAdapter& fcpa);
 };
-
-
-
-

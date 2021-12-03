@@ -89,11 +89,13 @@ std::string Command::stringToLog(){
 //CommandProcessor constructor
 CommandProcessor::CommandProcessor() {
     this->lc = {};
+    this->numMaxTurns = 10;
 }
 
 //CommandProcessor copy constructor
 CommandProcessor::CommandProcessor(CommandProcessor& cp) {
     this->lc = cp.lc;
+    this->numMaxTurns = cp.numMaxTurns;
 }
 
 //CommandProcessor destructor
@@ -107,6 +109,7 @@ CommandProcessor::~CommandProcessor() {
 //Assignment operator
 const CommandProcessor& CommandProcessor::operator= (const CommandProcessor& cp) {
     this->lc = cp.lc;
+    this->numMaxTurns = cp.numMaxTurns;
     return *this;
 }
 

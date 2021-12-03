@@ -6,7 +6,7 @@
 #pragma once
 #include "Map.h"
 #include "Player.h"
-
+#include "PlayerStrategies.h"
 #include "CommandProcessing.h"
 #include <string>
 #include <random>
@@ -14,9 +14,13 @@ using namespace std;
 #include "LoggingObserver.h"
 using namespace std;
 
+extern Map* map_obj;
+extern vector <Player*> players_obj;
+
 class Player;
 class ILoggable;
 class Subject;
+class Aggressive;
 class GameEngine : public ILoggable, public Subject {
     
 public:
@@ -82,3 +86,4 @@ public:
     //Random number generator
     int random(int);
 };
+
