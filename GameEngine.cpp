@@ -156,6 +156,8 @@ void GameEngine::addPlayer() {
                 Player* humanPlayer = new Player("Human");
                 humanPlayer->ps = new Human(humanPlayer);
                 players.emplace(players.begin(), humanPlayer);
+                humanPlayer->getHand()->addToHand(new Card("bomb"));
+                humanPlayer->getHand()->addToHand(new Card("airlift"));
                 break;
             }
             default: {
@@ -386,7 +388,7 @@ void GameEngine::mainGameLoop(){
             
             //check if there is a winner
             if (players.size() == 1){
-                cout << "The winner is " << players[0]->getName();
+                cout << "The winner is " << players[0]->getName()<<endl;
                 gameWon = true;
                 break;
             } else if (gameWon == false && i == cp->numMaxTurns-1) {
@@ -695,6 +697,8 @@ void GameEngine::tournamentMode() {
                         case 'H': {
                             Player* humanPlayer = new Player("Human");
                             humanPlayer->ps = new Human(humanPlayer);
+                            humanPlayer->getHand()->addToHand(new Card("bomb"));
+                            humanPlayer->getHand()->addToHand(new Card("airlift"));
                             if (random(100)%2 == 0)
                                 players.push_back(humanPlayer);
                             else

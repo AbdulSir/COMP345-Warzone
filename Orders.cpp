@@ -412,7 +412,7 @@ Negotiate::Negotiate():Order() {};
 
 //constructor
 Negotiate::Negotiate(Player* player, Player* target) : Order(player) {
-    target = target;
+    this->target = target;
 }
 
 //copy constructor

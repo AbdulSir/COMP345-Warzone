@@ -22,33 +22,55 @@ void printTerritories(vector<Territory*> territories) {
     }
 }
 
+//PlayerStrategy
+
+//Default constructor
 PlayerStrategy::PlayerStrategy() {
 }
 
+//Constructor
 PlayerStrategy::PlayerStrategy(Player* p) {
     this->p = p;
 }
+
+//Destructor
 PlayerStrategy::~PlayerStrategy(){
     delete p;
 }
 
-void PlayerStrategy::setPlayer(Player* p){
-    this->p = p;
-}
-
+//Copy constructor
 PlayerStrategy::PlayerStrategy(const PlayerStrategy &p){
     this->p = new Player(*p.p);
 }
 
+//assignment operator
 PlayerStrategy& PlayerStrategy::operator= (const PlayerStrategy& ps) {
     this->p = new Player;
     *p = *ps.p;
     return *this;
 }
 
+void PlayerStrategy::setPlayer(Player* p){
+    this->p = p;
+}
+
+//Neutral
+
+//Default Constructor
+Neutral::Neutral(): PlayerStrategy() {
+}
+
+//Constructor
 Neutral::Neutral(Player* p): PlayerStrategy(p) {}
 
+//Copy constructor
 Neutral::Neutral(const Neutral &n):PlayerStrategy(n) {
+}
+
+//assignment operator
+Neutral& Neutral::operator =(const Neutral& n){
+    PlayerStrategy::operator=(n);
+    return *this;
 }
 
 void Neutral::issueOrder() {}
@@ -63,9 +85,23 @@ vector <Territory*>  Neutral::toAttack() {
     return attack;
 }
 
+//Cheater
+
+//Default Constructor
+Cheater::Cheater(): PlayerStrategy() {
+}
+
+//Constructor
 Cheater::Cheater(Player* p): PlayerStrategy(p) {}
 
+//Copy constructor
 Cheater::Cheater(const Cheater &c):PlayerStrategy(c) {
+}
+
+//assignment operator
+Cheater& Cheater::operator =(const Cheater& c){
+    PlayerStrategy::operator=(c);
+    return *this;
 }
 
 void Cheater::issueOrder() {
@@ -101,9 +137,23 @@ vector <Territory*> Cheater::toAttack() {
     return attack;
 }
 
+//Human
+
+//Default Constructor
+Human::Human(): PlayerStrategy() {
+}
+
+//Constructor
 Human::Human(Player* p): PlayerStrategy(p) {}
 
+//Copy constructor
 Human::Human(const Human &h):PlayerStrategy(h) {}
+
+//assignment operator
+Human& Human::operator =(const Human& h){
+    PlayerStrategy::operator=(h);
+    return *this;
+}
 
 void Human::issueOrder() {
     string command;
@@ -230,6 +280,7 @@ void Human::issueOrder() {
                 Player* target;
                 for (auto p: players_obj) {
                     if (p->getName() == targetPlayerName) {
+                        cout<<"heyyy "<<p->getName()<<endl;
                         target = p;
                     }
                 }
@@ -265,11 +316,23 @@ vector <Territory*> Human::toAttack() {
     return attack;
 }
 
+//Aggressive
+
+//Default Constructor
 Aggressive::Aggressive(): PlayerStrategy() {
 }
 
+//Constructor
 Aggressive::Aggressive(Player* p): PlayerStrategy(p) {}
+
+//Copy constructor
 Aggressive::Aggressive(const Aggressive &a):PlayerStrategy(a) {
+}
+
+//assignment operator
+Aggressive& Aggressive::operator =(const Aggressive& a){
+    PlayerStrategy::operator=(a);
+    return *this;
 }
 
 
@@ -338,10 +401,23 @@ void Aggressive::issueOrder() {
     }
 }
 
+//Benevolent
+
+//Default Constructor
 Benevolent::Benevolent(): PlayerStrategy() {
 }
+
+//Constructor
 Benevolent::Benevolent(Player* p): PlayerStrategy(p) {}
+
+//Copy constructor
 Benevolent::Benevolent(const Benevolent &b):PlayerStrategy(b) {
+}
+
+//assignment operator
+Benevolent& Benevolent::operator =(const Benevolent& b){
+    PlayerStrategy::operator=(b);
+    return *this;
 }
 
 void Benevolent::issueOrder() {
