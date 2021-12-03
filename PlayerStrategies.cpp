@@ -6,9 +6,22 @@
 #include <algorithm>
 using namespace std;
 
-extern vector <Player*> players;
-extern Map* map_obj;
-extern Player* neutralPlayer;
+bool hasCard(string type, Player* p) {
+    bool returnValue = false;
+    for (auto c: p->getHand()->handDeck) {
+        if (c->cardType == type) {
+            returnValue = true;
+        }
+    }
+    return returnValue;
+}
+
+void printTerritories(vector<Territory*> territories) {
+    for (auto t: territories) {
+        cout << t->getName() << endl;
+    }
+}
+
 PlayerStrategy::PlayerStrategy() {
 }
 
@@ -71,22 +84,28 @@ vector <Territory*> Cheater::toDefend() {
 
 vector <Territory*> Cheater::toAttack() {
     vector <Territory*> attack;
-    
+
     for(int i=0; i<this->p->getTerritories().size(); i++){
         vector <Territory*> adjacent_ter = map_obj->adjacent_territory_vector(this->p->getTerritories()[i]->getName());
         for (int j=0; j<adjacent_ter.size();j++){
-            
-            attack.push_back(adjacent_ter[j]);
+            bool matchTerr=false;
+            for(auto t: attack){
+                if( adjacent_ter[j]->getName()==t->getName()){
+                    matchTerr=true;
+                    break;
+                }
+            }
+            if(!matchTerr && !isTerritoryOwnedByPlayer(p, adjacent_ter[j])){
+                attack.push_back(adjacent_ter[j]);
+            }
         }
     }
-    attack.erase( unique( attack.begin(), attack.end() ), attack.end() );
     return attack;
 }
 
 Human::Human(Player* p): PlayerStrategy(p) {}
 
-Human::Human(const Human &h):PlayerStrategy(h) {
-}
+Human::Human(const Human &h):PlayerStrategy(h) {}
 
 void Human::issueOrder() {
     string command;
@@ -100,6 +119,8 @@ void Human::issueOrder() {
             string territoryName;
             int numberOfUnits;
             cout << "Which territory would you like to deploy" << endl;
+            cout << "List of territories to deploy:" << endl;
+            printTerritories(toDefend());
             cin >> territoryName;
             cout << "How many armies would you like to deploy" << endl;
             cin >> numberOfUnits;
@@ -114,10 +135,15 @@ void Human::issueOrder() {
             string territoryNameTo;
             int numberOfUnits;
             cout << "Which territory would you like to advance from" << endl;
+            printTerritories(toDefend());
             cin >> territoryNameFrom;
             cout << "Which territory would you like to advance to" << endl;
+            cout << "List of territories to attack:" << endl;
+            printTerritories(toAttack());
+            cout << "List of territories to advance:" << endl;
+            printTerritories(toDefend());
             cin >> territoryNameTo;
-            cout << "How many armies would you like to advance";
+            cout << "How many armies would you like to advance" << endl;
             cin >> numberOfUnits;
             Territory* from;
             Territory* to;
@@ -132,84 +158,113 @@ void Human::issueOrder() {
             p->getOrders()->addOrder(new Advance(p, from, to, numberOfUnits, map_obj));
         }
         if (command == "Airlift") {
-            string territoryNameFrom;
-            string territoryNameTo;
-            int numberOfUnits;
-            cout << "Which territory would you like to advance from" << endl;
-            cin >> territoryNameFrom;
-            cout << "Which territory would you like to advance to" << endl;
-            cin >> territoryNameTo;
-            cout << "How many armies would you like to airlift";
-            cin >> numberOfUnits;
-            Territory* from;
-            Territory* to;
-            for (auto t: map_obj->territories) {
-                if (t->getName() == territoryNameFrom) {
-                    from = t;
+            if (hasCard("airlift", p)) {
+                string territoryNameFrom;
+                string territoryNameTo;
+                int numberOfUnits;
+                cout << "Which territory would you like to advance from" << endl;
+                printTerritories(toDefend());
+                cin >> territoryNameFrom;
+                cout << "Which territory would you like to advance to" << endl;
+                printTerritories(toDefend());
+                cin >> territoryNameTo;
+                cout << "How many armies would you like to airlift";
+                cin >> numberOfUnits;
+                Territory* from;
+                Territory* to;
+                for (auto t: map_obj->territories) {
+                    if (t->getName() == territoryNameFrom) {
+                        from = t;
+                    }
+                    if (t->getName() == territoryNameTo) {
+                        to = t;
+                    }
                 }
-                if (t->getName() == territoryNameTo) {
-                    to = t;
-                }
+                p->getOrders()->addOrder(new Airlift(p, from, to, numberOfUnits));
+            } else {
+                cout << "You do not have a airlift card haha!!" << endl;
             }
-            p->getOrders()->addOrder(new Airlift(p, from, to, numberOfUnits));
+
         }
         if (command == "Bomb") {
-            string territoryNameTo;
-            cout << "Which territory would you like to bomb to" << endl;
-            cin >> territoryNameTo;
-            Territory* to;
-            for (auto t: map_obj->territories) {
-                if (t->getName() == territoryNameTo) {
-                    to = t;
+            if (hasCard("bomb", p)) {
+                string territoryNameTo;
+                cout << "Which territory would you like to bomb to" << endl;
+                printTerritories(toAttack());
+                cin >> territoryNameTo;
+                Territory* to;
+                for (auto t: map_obj->territories) {
+                    if (t->getName() == territoryNameTo) {
+                        to = t;
+                    }
                 }
+                p->getOrders()->addOrder(new Bomb(p, to, map_obj));
+            } else {
+                cout << "You do not have a bomb card haha!!" << endl;
             }
-            p->getOrders()->addOrder(new Bomb(p, to, map_obj));
         }
         if (command == "Blockade") {
-            string territoryNameTo;
-            cout << "Which territory would you like to blockade" << endl;
-            cin >> territoryNameTo;
-            Territory* to;
-            for (auto t: map_obj->territories) {
-                if (t->getName() == territoryNameTo) {
-                    to = t;
+            if (hasCard("blockade", p)) {
+                string territoryNameTo;
+                cout << "Which territory would you like to blockade" << endl;
+                printTerritories(toDefend());
+                cin >> territoryNameTo;
+                Territory* to;
+                for (auto t: map_obj->territories) {
+                    if (t->getName() == territoryNameTo) {
+                        to = t;
+                    }
                 }
+                p->getOrders()->addOrder(new Blockade(p, to, neutralPlayer));
+            } else {
+                cout << "You do not have a blockade card haha!!" << endl;
             }
-            p->getOrders()->addOrder(new Blockade(p, to, neutralPlayer));
         } 
         if (command == "Negotiate") {
-            string targetPlayerName;
-            cout << "Which player would you like to negotiate" << endl;
-            cin >> targetPlayerName;
-            Player* target;
-            for (auto p: players) {
-                if (p->getName() == targetPlayerName) {
-                    target = p;
+            if (hasCard("diplomacy", p)) {
+                string targetPlayerName;
+                cout << "Which player would you like to negotiate" << endl;
+                cout << "Player list:" << endl;
+                for (auto p: players) {
+                    cout << p->getName() << endl;
                 }
+                cin >> targetPlayerName;
+                Player* target;
+                for (auto p: players) {
+                    if (p->getName() == targetPlayerName) {
+                        target = p;
+                    }
+                }
+                p->getOrders()->addOrder(new Negotiate(p, target));
+            } else {
+                cout << "You do not have a diplomacy card haha!!" << endl;
             }
-            p->getOrders()->addOrder(new Negotiate(p, target));
         }
     }
 }
 
 vector <Territory*> Human::toDefend() {
-    vector <Territory*> territories = p->getTerritories();
-    return territories;
+    return p->getTerritories();
 }
 
 vector <Territory*> Human::toAttack() {
     vector <Territory*> attack;
-    
     for(int i=0; i<this->p->getTerritories().size(); i++){
         vector <Territory*> adjacent_ter = map_obj->adjacent_territory_vector(this->p->getTerritories()[i]->getName());
         for (int j=0; j<adjacent_ter.size();j++){
-            
-            attack.push_back(adjacent_ter[j]);
+            bool matchTerr=false;
+            for(auto t: attack){
+                if( adjacent_ter[j]->getName()==t->getName()){
+                    matchTerr=true;
+                    break;
+                }
+            }
+            if(!matchTerr && !isTerritoryOwnedByPlayer(p, adjacent_ter[j])){
+                attack.push_back(adjacent_ter[j]);
+            }
         }
     }
-    attack.erase( unique( attack.begin(), attack.end() ), attack.end() );
     return attack;
-
 }
 
 Aggressive::Aggressive(): PlayerStrategy() {
@@ -218,7 +273,6 @@ Aggressive::Aggressive(): PlayerStrategy() {
 Aggressive::Aggressive(Player* p): PlayerStrategy(p) {}
 Aggressive::Aggressive(const Aggressive &a):PlayerStrategy(a) {
 }
-
 
 
 vector <Territory*> Aggressive::toDefend() {
@@ -233,6 +287,7 @@ vector <Territory*> Aggressive::toDefend() {
 
 
 vector <Territory*> Aggressive::toAttack() {
+    vector <Territory*> attack;
     vector <Territory*> territories = p->getTerritories();
     //sort the player's territories in descending order
     sort( territories.begin( ), territories.end( ), [ ]( const auto& lhs, const auto& rhs )
@@ -244,12 +299,12 @@ vector <Territory*> Aggressive::toAttack() {
     
     //Remove from vector non enemy territories
     for(int i=0; i<adjacent_terr.size();i++){
-        if(isTerritoryOwnedByPlayer(p, adjacent_terr[i])){
-            adjacent_terr.erase(find(adjacent_terr.begin(), adjacent_terr.end(), adjacent_terr[i]));
+        if(!isTerritoryOwnedByPlayer(p, adjacent_terr[i])){
+            attack.push_back(adjacent_terr[i]);
         }
     }
 
-    return adjacent_terr;
+    return attack;
 }
 
 void Aggressive::issueOrder() {
@@ -271,7 +326,6 @@ void Aggressive::issueOrder() {
             bombOrder->setTarget(adj_contries[0]);
             bombOrder->setMap(map_obj);
             p->getOrders()->addOrder(bombOrder);
-            
         }
     }
     
@@ -324,7 +378,6 @@ vector <Territory*> Benevolent::toDefend() {
             defend_territories.push_back(territories[i]);
         }
     }
-    
 
     return defend_territories;
 }

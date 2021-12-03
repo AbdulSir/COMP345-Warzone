@@ -7,6 +7,13 @@
 class Player;
 class Map;
 
+extern vector <Player*> players;
+extern Map* map_obj;
+extern Player* neutralPlayer;
+bool hasCard(string a, Player* p);
+
+void printTerritories(vector<Territory*>);
+
 class PlayerStrategy {
 public:
     Player* p;

@@ -14,6 +14,7 @@ class Map;
 class ILoggable;
 class Subject;
 
+bool hasCardType(string a, Player* p);
 // free function to determine if a territory is owned by player
 bool isTerritoryOwnedByPlayer(Player* p, Territory* t);
 class Order : public ILoggable, public Subject {

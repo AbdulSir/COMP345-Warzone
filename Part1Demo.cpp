@@ -15,13 +15,14 @@ int main() {
     // Human strategy player
     Player* humanPlayer = new Player("Human");
     players.push_back(humanPlayer);
+    humanPlayer->getHand()->addToHand(new Card("bomb"));
     // Aggressive player
     Player* aggressivePlayer = new Player("Aggressive");
     aggressivePlayer->ps = new Aggressive(aggressivePlayer);
     players.push_back(aggressivePlayer);
     // Benevolent player
     Player* benevolentPlayer = new Player("Benevolent");
-    benevolentPlayer->ps = new Benevolent(aggressivePlayer);
+    benevolentPlayer->ps = new Benevolent(benevolentPlayer);
     players.push_back(benevolentPlayer);
     // Neutral player
     neutralPlayer = new Player("Neutral");
@@ -39,11 +40,11 @@ int main() {
         } else if (i < 10) {
             t->setOwner(aggressivePlayer);
         } else if (i < 15) {
-            t->setOwner(benevolentPlayer);
-        } else if (i < 20) {
-            t->setOwner(neutralPlayer);
-        } else if (i < 25) {
             t->setOwner(cheaterPlayer);
+        } else if (i < 20) {
+            t->setOwner(benevolentPlayer);
+        } else if (i < 25) {
+            t->setOwner(neutralPlayer);
         }
         i++;
     }
@@ -57,16 +58,26 @@ int main() {
     humanPlayer->ps->issueOrder();
     aggressivePlayer->ps->issueOrder();
     benevolentPlayer->ps->issueOrder();
-    neutralPlayer->ps->issueOrder();
-    cheaterPlayer->ps->issueOrder();
 
     for (auto p: players) {
         // cout<<*p->getOrders()<<endl;
         for (auto o: p->getOrders()->orderList) {
-            cout << *o << endl;
             o->execute();
+            cout << *o << endl;
         }
     }
 
+    neutralPlayer->ps->issueOrder();
+    for (auto o: neutralPlayer->getOrders()->orderList) {
+        o->execute();
+        cout << *o << endl;
+    }
+
+    cheaterPlayer->ps->issueOrder();
+    for (auto p: players) {
+        for (auto t: p->getTerritories()) {
+            cout << *t << endl;
+        }
+    }
     return 0;
 }
