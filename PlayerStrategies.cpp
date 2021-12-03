@@ -22,33 +22,55 @@ void printTerritories(vector<Territory*> territories) {
     }
 }
 
+//PlayerStrategy
+
+//Default constructor
 PlayerStrategy::PlayerStrategy() {
 }
 
+//Constructor
 PlayerStrategy::PlayerStrategy(Player* p) {
     this->p = p;
 }
+
+//Destructor
 PlayerStrategy::~PlayerStrategy(){
     delete p;
 }
 
-void PlayerStrategy::setPlayer(Player* p){
-    this->p = p;
-}
-
+//Copy constructor
 PlayerStrategy::PlayerStrategy(const PlayerStrategy &p){
     this->p = new Player(*p.p);
 }
 
+//assignment operator
 PlayerStrategy& PlayerStrategy::operator= (const PlayerStrategy& ps) {
     this->p = new Player;
     *p = *ps.p;
     return *this;
 }
 
+void PlayerStrategy::setPlayer(Player* p){
+    this->p = p;
+}
+
+//Neutral
+
+//Default Constructor
+Neutral::Neutral(): PlayerStrategy() {
+}
+
+//Constructor
 Neutral::Neutral(Player* p): PlayerStrategy(p) {}
 
+//Copy constructor
 Neutral::Neutral(const Neutral &n):PlayerStrategy(n) {
+}
+
+//assignment operator
+Neutral& operator =(const Neutral& n){
+    PlayerStrategy::operator=(n);
+    return *this;
 }
 
 void Neutral::issueOrder() {}
@@ -63,9 +85,23 @@ vector <Territory*>  Neutral::toAttack() {
     return attack;
 }
 
+//Cheater
+
+//Default Constructor
+Cheater::Cheater(): PlayerStrategy() {
+}
+
+//Constructor
 Cheater::Cheater(Player* p): PlayerStrategy(p) {}
 
+//Copy constructor
 Cheater::Cheater(const Cheater &c):PlayerStrategy(c) {
+}
+
+//assignment operator
+Cheater& operator =(const Cheater& c){
+    PlayerStrategy::operator=(c);
+    return *this;
 }
 
 void Cheater::issueOrder() {
@@ -101,9 +137,23 @@ vector <Territory*> Cheater::toAttack() {
     return attack;
 }
 
+//Human
+
+//Default Constructor
+Human::Human(): PlayerStrategy() {
+}
+
+//Constructor
 Human::Human(Player* p): PlayerStrategy(p) {}
 
+//Copy constructor
 Human::Human(const Human &h):PlayerStrategy(h) {}
+
+//assignment operator
+Human& operator =(const Human& h){
+    PlayerStrategy::operator=(h);
+    return *this;
+}
 
 void Human::issueOrder() {
     string command;
@@ -265,11 +315,23 @@ vector <Territory*> Human::toAttack() {
     return attack;
 }
 
+//Aggressive
+
+//Default Constructor
 Aggressive::Aggressive(): PlayerStrategy() {
 }
 
+//Constructor
 Aggressive::Aggressive(Player* p): PlayerStrategy(p) {}
+
+//Copy constructor
 Aggressive::Aggressive(const Aggressive &a):PlayerStrategy(a) {
+}
+
+//assignment operator
+Aggressive& operator =(const Aggressive& a){
+    PlayerStrategy::operator=(a);
+    return *this;
 }
 
 
@@ -313,34 +375,45 @@ void Aggressive::issueOrder() {
     //deploy army to strongest contry
     p->getOrders()->addOrder(new Deploy(p,my_contries[0], p->getReinforcementPool()));
     
-    int armies_attack = (my_contries[0]->army_nb + p->getReinforcementPool())/adj_contries.size();
-    int armies_attack_remaider = (my_contries[0]->army_nb + p->getReinforcementPool()) % adj_contries.size();
-    
-    //issue bomb order
-    for (auto const& i : p->getHand()->handDeck) {
-        if(i->cardType=="bomb"){
-            Bomb* bombOrder = dynamic_cast<Bomb*>(p->getHand()->discardFromHand().play());
-            bombOrder->setOrderIssuer(p);
-            bombOrder->setTarget(adj_contries[0]);
-            bombOrder->setMap(map_obj);
-            p->getOrders()->addOrder(bombOrder);
+    if(adj_contries.size()!=0){
+        int armies_attack = (my_contries[0]->army_nb + p->getReinforcementPool())/adj_contries.size();
+        int armies_attack_remaider = (my_contries[0]->army_nb + p->getReinforcementPool()) % adj_contries.size();
+        
+        //issue bomb order
+        for (auto const& i : p->getHand()->handDeck) {
+            if(i->cardType=="bomb"){
+                p->getOrders()->addOrder(new Bomb(p, adj_contries[0], map_obj));
+            }
         }
-    }
-    
-    //advance armies to strongest contry's adjacent territories
-    for (int i=0; i<adj_contries.size(); i++){
-        p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[i], armies_attack, map_obj));
-    }
-    
-    if(armies_attack_remaider!=0){
-        p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[0], armies_attack_remaider, map_obj));
+        
+        //advance armies to strongest contry's adjacent territories
+        for (int i=0; i<adj_contries.size(); i++){
+            p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[i], armies_attack, map_obj));
+        }
+        
+        if(armies_attack_remaider!=0){
+            p->getOrders()->addOrder(new Advance(p,my_contries[0],adj_contries[0], armies_attack_remaider, map_obj));
+        }
     }
 }
 
+//Benevolent
+
+//Default Constructor
 Benevolent::Benevolent(): PlayerStrategy() {
 }
+
+//Constructor
 Benevolent::Benevolent(Player* p): PlayerStrategy(p) {}
+
+//Copy constructor
 Benevolent::Benevolent(const Benevolent &b):PlayerStrategy(b) {
+}
+
+//assignment operator
+Benevolent& operator =(const Benevolent& b){
+    PlayerStrategy::operator=(b);
+    return *this;
 }
 
 void Benevolent::issueOrder() {

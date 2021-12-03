@@ -17,9 +17,9 @@ void printTerritories(vector<Territory*>);
 class PlayerStrategy {
 public:
     Player* p;
-    PlayerStrategy();
-    PlayerStrategy(Player* p);
-    ~PlayerStrategy();
+    PlayerStrategy(); // default constructor
+    PlayerStrategy(Player* p); // constructor
+    ~PlayerStrategy(); // destructor
     PlayerStrategy(const PlayerStrategy &p); //copy constructor
     void setPlayer(Player* p);
     virtual void issueOrder() = 0;
@@ -31,7 +31,8 @@ public:
 
 class Neutral: public PlayerStrategy {
 public:
-    Neutral(Player* p);
+    Neutral(); // default constructor
+    Neutral(Player* p); // constructor
     Neutral(const Neutral &n); //copy constructor
     void issueOrder();
     vector <Territory*> toAttack();
@@ -42,7 +43,8 @@ public:
 
 class Cheater: public PlayerStrategy {
 public:
-    Cheater(Player* p);
+    Cheater();  // default constructor
+    Cheater(Player* p); // constructor
     Cheater(const Cheater &c); //copy constructor
     void issueOrder();
     vector <Territory*> toAttack();
@@ -53,7 +55,8 @@ public:
 
 class Human: public PlayerStrategy {
 public:
-    Human(Player* p);
+    Human(); // default constructor
+    Human(Player* p); // constructor
     Human(const Human &h); //copy constructor
     void issueOrder();
     vector <Territory*> toAttack();
@@ -64,8 +67,8 @@ public:
 
 class Aggressive: public PlayerStrategy {
 public:
-    Aggressive();
-    Aggressive(Player* p);
+    Aggressive(); // default constructor
+    Aggressive(Player* p); // constructor
     Aggressive(const Aggressive &a); //copy constructor
     void issueOrder();
     vector <Territory*> toAttack();
@@ -76,8 +79,8 @@ public:
 
 class Benevolent: public PlayerStrategy {
     public:
-        Benevolent();
-        Benevolent(Player* p);
+        Benevolent(); // default constructor
+        Benevolent(Player* p); // constructor
         Benevolent(const Benevolent &b); //copy constructor
         void issueOrder();
         vector <Territory*> toAttack();
