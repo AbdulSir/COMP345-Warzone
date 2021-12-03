@@ -70,7 +70,6 @@ void Territory::setOwner(Player* p) {
     playerTerritories.push_back(this);
     p->setTerritories(playerTerritories);
     owner = p;
-    
 };
 
 void Territory::resetOwner() {
