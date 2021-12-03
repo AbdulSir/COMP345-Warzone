@@ -30,11 +30,12 @@ GameEngine::GameEngine() : state("start"), command("") {
             command = cp->getCommand(state);
             if (command.find("tournament") != command.npos) {
                 tournamentMode();
+                break;
             }
             else if (command != "") {
                 startupPhase();
+                break;
             }
-            break;
         }
         else if (choice.substr(0,6) == "-file "){
             string file = choice.substr(6);
@@ -59,28 +60,6 @@ GameEngine::GameEngine() : state("start"), command("") {
             break;
         }
     } while (true);
-    
-    //Start state of game
-    //    string s;
-    //    while (true) {
-    //        s = cp->getCommand("start");
-    //        if (s.find("tournament") != s.npos) {
-    //            tournamentMode();
-    //            break;
-    //        }
-    //        else if (s != "") {
-    //            map_loader = new MapLoader(s.substr(8));
-    //            map_obj = map_loader->map_object;
-    //            state = "map loaded";
-    //            Notify(this);
-    //            startupPhase();
-    //            break;
-    //        }
-    //        else {
-    //            cout << "Invalid command for " << state << " state" << endl;
-    //            continue;
-    //        }
-    //    }
 }
 
 //Copy constructor
@@ -115,6 +94,7 @@ std::ostream& operator<<(std::ostream &strm, const GameEngine &g) {
 //Transition to load the map
 void GameEngine::loadMap() {
     map_loader = new MapLoader();
+    map_obj = map_loader->map_object;
     //Code for loading map
     state = "map loaded";
     Notify(this);
@@ -202,6 +182,7 @@ void GameEngine::gameStart() {
         randNum = random(players.size()-1);
         if (players[randNum]->getTerritories().size() != numCperP && count != players.size()) {
             players[randNum]->addTerritory(territories_instance[territory_size - 1]);
+            //            territories_instance[territory_size - 1]->setOwner(players[randNum]);
             count++;
             territory_size--;
         }
@@ -278,6 +259,9 @@ void GameEngine:: win() {
 void GameEngine::play() {
     std::cout << "Starting a new game...\n" <<endl;
     state = "start";
+    for (auto p : players)
+        p->getTerritories().clear();
+    players.erase(players.begin(),players.end());
     Notify(this);
 }
 
@@ -384,7 +368,7 @@ void GameEngine::mainGameLoop(){
     int numberOfTerritories; //will territories vector be created in part 2?
     bool gameWon = false;
     
-    for (int i=0; i<50; i++) {
+    for (int i=0; i<cp->numMaxTurns; i++) {
         if (gameWon==false){
             
             //execute 3 main phases sequentially
@@ -395,19 +379,17 @@ void GameEngine::mainGameLoop(){
             //check for players to remove
             for (int i = 0; i < players.size(); i++){
                 
-                cout << "bruh " << players[i]->getTerritories().size() << endl;
                 if (players[i]->getTerritories().size() == 0){
                     cout << players[i]->getName() << " has been eliminated." << endl;
                     players.erase(find(players.begin(), players.end(), players[i]));
                 }
             }
-            cout << players.size() << endl;
             //check if there is a winner
             if (players.size() == 1){
                 cout << "The winner is " << players[0]->getName();
                 gameWon = true;
                 break;
-            } else if (gameWon == false && i == 49) {
+            } else if (gameWon == false && i == cp->numMaxTurns-1) {
                 cout << "THE GAME ENDS IN A DRAW" << endl;
             }
         }
@@ -517,6 +499,7 @@ void GameEngine::executeOrdersPhase(){
     for (auto player: players){
         for (auto order: player->getOrders()->orderList) {
             order->execute();
+            player->getOrders()->remove(order);
         }
     }
 }
@@ -528,6 +511,7 @@ void GameEngine::startupPhase()
         std::cout << "--NEW GAME OF WARZONE--\n";
         
         //Start state
+        loadMap();
         if (map_loader->text_contents != "") {
             state = "map loaded";
         }
@@ -562,9 +546,6 @@ void GameEngine::startupPhase()
         
         mainGameLoop();
         state = "win";
-        if (players.size() == 1) {
-            cout << "Winner: " << players[0]->getName() << endl;
-        }
         
         //Win state: "play" command triggers the start of a new game, "end" command ends the program
         std::cout << "Choose one of the following:\n\t1. play\n\t2. end" << endl;
