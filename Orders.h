@@ -14,6 +14,7 @@ class Map;
 class ILoggable;
 class Subject;
 
+bool hasCardType(string a, Player* p);
 // free function to determine if a territory is owned by player
 bool isTerritoryOwnedByPlayer(Player* p, Territory* t);
 class Order : public ILoggable, public Subject {
@@ -36,9 +37,10 @@ class Order : public ILoggable, public Subject {
         void setEffect(string effect);
         bool validate();
         virtual void execute();
+        virtual void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Order &order);
-        virtual std::string stringToLog();
+        virtual string stringToLog();
 };
 
 class Deploy: public Order {
@@ -56,6 +58,7 @@ class Deploy: public Order {
         Deploy& operator= (const Deploy& deploy);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Deploy &order);
 };
@@ -77,6 +80,7 @@ class Advance: public Order {
         Advance& operator= (const Advance& advanced);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Advance &order);
 };
@@ -102,6 +106,7 @@ class Airlift: public Order {
         void setNumberOfUnits(int number);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Airlift &order);
 };
@@ -114,7 +119,7 @@ class Bomb: public Order {
         //default constructor
         Bomb();
         //parametrized constructor
-        Bomb(Player* player, Territory* t1, Territory* t2, Map* m);
+        Bomb(Player* player, Territory* t, Map* m);
         //copy constructor
         Bomb(const Bomb& b);
         //asssignment operator
@@ -124,6 +129,7 @@ class Bomb: public Order {
         void setMap(Map* m);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Bomb &order);
 };
@@ -143,6 +149,7 @@ class Blockade: public Order {
         Blockade& operator= (const Blockade& bl);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //setters
         void setTarget(Territory* target);
         void setNeutralPlayer(Player* player);
@@ -166,6 +173,7 @@ class Negotiate: public Order {
         void setTarget(Player* target);
         bool validate();
         void execute();
+        void print(ostream& o) const;
         //stream insertion operators
         friend ostream& operator <<(ostream &out, const Negotiate &order);
 };
@@ -190,6 +198,6 @@ class OrderList : public ILoggable, public Subject {
         void remove(Order* order);
         // stream insertion operators
         friend ostream& operator<< (ostream& out, const OrderList& orderList);
-        virtual std::string stringToLog();
+        virtual string stringToLog();
 };
 

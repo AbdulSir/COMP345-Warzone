@@ -5,6 +5,7 @@ using namespace std;
 #include <list>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 
 // Card class
 Card::Card() {}
@@ -108,6 +109,16 @@ Hand& Hand::operator= (const Hand& hand) {
     handDeck = hand.handDeck;
     return *this;
 }
+
+void Hand::removeCardFromHand(string type) {
+    list<Card*>::iterator it;
+    for (it = handDeck.begin(); it != handDeck.end(); ++it){
+        if ((*it)->cardType == type) {
+            handDeck.erase(it);
+            break;
+        }
+    }
+};
 
 Card Hand::discardFromHand() {
     Card temp(*handDeck.front());

@@ -1,12 +1,14 @@
 #pragma once
 
 #include "Orders.h"
+#include "Player.h"
 #include<string>
 #include<list>
 #include<iostream>
 using namespace std;
 
 class Order;
+class Player;
 
 class Card {
     public:
@@ -56,6 +58,7 @@ class Hand {
         Hand& operator= (const Hand& hand);
         // remove card from hand and return the card
         Card discardFromHand();
+        void removeCardFromHand(string cardType);
         // add card to collection of hand
         void addToHand(Card* c);
         // stream insertion operators

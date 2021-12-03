@@ -7,8 +7,19 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
+#include <regex>
 
 using namespace std;
+
+bool hasCardType(string type, Player* p) {
+    bool returnValue = false;
+    for (auto c: p->getHand()->handDeck) {
+        if (c->cardType == type) {
+            returnValue = true;
+        }
+    }
+    return returnValue;
+}
 
 bool isTerritoryOwnedByPlayer(Player* p, Territory* territory) {
     vector <Territory*> territories = p->getTerritories();
@@ -60,10 +71,10 @@ void Order::execute(){
     Notify(this);
 }
 
-std::string Order::stringToLog(){
+string Order::stringToLog(){
     cout<<"\nWriting executed Order to gamelog.txt file ..."<<endl;
-    std::ofstream myfile;
-    myfile.open ("gamelog.txt", std::ios_base::app);
+    ofstream myfile;
+    myfile.open ("gamelog.txt", ios_base::app);
     myfile <<"Order executed: ";
     myfile <<to_string(this->orderId)<<"\n";
     myfile <<"-------------------------------------\n";
@@ -97,7 +108,7 @@ Deploy& Deploy::operator=(const Deploy& d) {
 }
 
 bool Deploy::validate() {
-    return isTerritoryOwnedByPlayer(orderIssuer, target) && orderIssuer->getReinforcementPool() > numberOfUnits;
+    return isTerritoryOwnedByPlayer(orderIssuer, target) && orderIssuer->getReinforcementPool() >= numberOfUnits;
 };
 
 void Deploy::execute() {
@@ -174,7 +185,13 @@ bool Advance::validate() {
 
 void Advance::execute() {
     Order::execute();
+    regex reg("[0-9]");
     if (validate()) {
+
+        if (regex_replace(typeid(*target->owner->ps).name(), reg, "") == "Neutral") {
+            target->owner->ps = new Aggressive(target->owner);
+        }
+
         if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
             from->setArmy(from->army_nb - numberOfUnits);
             target->setArmy(target->army_nb + numberOfUnits);
@@ -184,7 +201,7 @@ void Advance::execute() {
             while (true) {
                 if (numberOfUnits == 0 || target->army_nb == 0) break;
                 int attackerNumber = rand() % 60 + 1;
-                int defenderNumber = rand() & 70 + 1;
+                int defenderNumber = rand() % 70 + 1;
                 if (attackerNumber > defenderNumber) {
                     target->setArmy(target->army_nb -1);
                 } else if (defenderNumber > attackerNumber) {
@@ -251,12 +268,13 @@ void Airlift::setNumberOfUnits(int n) {
 };
 
 bool Airlift::validate() {
-    return isTerritoryOwnedByPlayer(orderIssuer, from) && isTerritoryOwnedByPlayer(orderIssuer, target);
+    return isTerritoryOwnedByPlayer(orderIssuer, from) && isTerritoryOwnedByPlayer(orderIssuer, target) && hasCardType("airlift", orderIssuer);
 };
 
 void Airlift::execute(){
     Order::execute();
     if (validate()) {
+        orderIssuer->getHand()->removeCardFromHand("airlift");
         from->setArmy(from->army_nb - numberOfUnits);
         target->setArmy(target->army_nb + numberOfUnits);
         cout << "Airlift order executed" << endl;
@@ -271,8 +289,8 @@ void Airlift::execute(){
 Bomb::Bomb():Order() {};
 
 //constructor
-Bomb::Bomb(Player* player, Territory* t1, Territory* t2, Map* m) : Order(player){
-    target = t2;
+Bomb::Bomb(Player* player, Territory* t, Map* m) : Order(player){
+    target = t;
     map = m;
 }
 
@@ -306,10 +324,16 @@ bool Bomb::validate(){
             areTerritoriesAdjacent = true;
         }
     }
+
     if (isTerritoryOwnedByPlayer(orderIssuer, target)) {
         isValid = false;
     }
+
     if (!areTerritoriesAdjacent) {
+        isValid = false;
+    }
+
+    if (!hasCardType("bomb", orderIssuer)) {
         isValid = false;
     }
 
@@ -324,6 +348,7 @@ bool Bomb::validate(){
 void Bomb::execute(){
     Order::execute();
     if (validate()) {
+        orderIssuer->getHand()->removeCardFromHand("bomb");
         target->setArmy(target->army_nb / 2);
         cout << "Bomb order executed" << endl;
         this->effect = "Bombed to territory " + target->territory_name + " | " + to_string(target->army_nb) + " armies left";
@@ -365,12 +390,13 @@ void Blockade::setNeutralPlayer(Player* player) {
 };
 
 bool Blockade::validate(){
-    return isTerritoryOwnedByPlayer(orderIssuer, target);
+    return isTerritoryOwnedByPlayer(orderIssuer, target) && hasCardType("blockade", orderIssuer);
 };
 
 void Blockade::execute(){
     Order::execute();
     if (validate()) {
+        orderIssuer->getHand()->removeCardFromHand("blockade");
         target->setArmy(target->army_nb *2);
         target->setOwner(neutral);
         cout << "Blockade order executed" << endl;
@@ -411,12 +437,16 @@ bool Negotiate::validate(){
     if (target->getName() == orderIssuer->getName()) {
         return false;
     }
+    if (!hasCardType("diplomacy", orderIssuer)) {
+        return false;
+    }
     return true;
 };
 
 void Negotiate::execute(){
     Order::execute();
     if (validate()) {
+        orderIssuer->getHand()->removeCardFromHand("diplomacy");
         orderIssuer->setPeacefulTerritories(target->getTerritories());
         target->setPeacefulTerritories(orderIssuer->getTerritories());
         this->effect = orderIssuer->getName() + " and " + target->getName() + " have agreed not to attack each other.";
@@ -485,12 +515,12 @@ void OrderList::remove(Order* order){
     cout <<"Order "<< order->orderId <<" removed from list" << endl;
 }
 
-std::string OrderList::stringToLog(){
+string OrderList::stringToLog(){
     cout<<"\nWriting issued Order to gamelog.txt file ..."<<endl;
-    std::ofstream myfile;
-    myfile.open ("gamelog.txt", std::ios_base::app);
+    ofstream myfile;
+    myfile.open ("gamelog.txt", ios_base::app);
     myfile <<"Order issued: ";
-    std::string orderIssued;
+    string orderIssued;
     for(int i=0; i<orderList.size();i++){
         if(i!=0){
             orderIssued=+", ";
@@ -515,59 +545,93 @@ ostream& operator<<(ostream& out, const OrderList& o)
     return out;
 }
 
-ostream& operator<<(ostream& out, const Order& o)
-{
+void Order::print(ostream& out) const{
     out << "Order:"<<endl ;
     out << "-------------------------------"<<endl;
-    out << "ID: "<< o.orderId << endl;
-    out << "Order Issuer: "<< o.orderIssuer->getName() << endl;
-    out << "Effect: " << o.effect << endl;
+    out << "ID: "<< orderId << endl;
+    out << "Order Issuer: "<< orderIssuer->getName() << endl;
+    out << "Effect: " << effect << endl;
+    
+}
+
+ostream& operator<<(ostream& out, const Order& o)
+{
+    o.print(out);
     return out;
+}
+
+void Deploy::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Deploy" << endl;
+    out << "Target: " << target->territory_name << endl;
+    out << "Number of armies: " << numberOfUnits << endl;
+    
 }
 
 ostream& operator <<(ostream &out, const Deploy &order) {
-    out << static_cast<const Order&>(order);
-    out << "Type: Deploy" << endl;
-    out << "Target: " << order.target->territory_name << endl;
-    out << "Number of armies: " << order.numberOfUnits << endl;
+    order.print(out);
     return out;
+}
+
+void Advance::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Advance" << endl;
+    out << "From: " << from->territory_name << endl;
+    out << "Target: " << target->territory_name << endl;
+    out << "Number of armies: " << numberOfUnits << endl;
+    
 }
 
 ostream& operator <<(ostream &out, const Advance &order) {
-    out << static_cast<const Order&>(order);
-    out << "Type: Advance" << endl;
-    out << "From: " << order.from->territory_name << endl;
-    out << "Target: " << order.target->territory_name << endl;
-    out << "Number of armies: " << order.numberOfUnits << endl;
+    order.print(out);
     return out;
 }
 
-ostream& operator <<(ostream &out, const Airlift &order) {
-    out << static_cast<const Order&>(order);
+void Airlift::print(ostream& out) const{
+    Order::print(out);
     out << "Type: Airlift" << endl;
-    out << "From: " << order.from->territory_name << endl;
-    out << "Target: " << order.target->territory_name << endl;
-    out << "Number of armies: " << order.numberOfUnits << endl;
+    out << "From: " << from->territory_name << endl;
+    out << "Target: " << target->territory_name << endl;
+    out << "Number of armies: " << numberOfUnits << endl;
+    
+}
+ostream& operator <<(ostream &out, const Airlift &order) {
+    order.print(out);
     return out;
+}
+
+void Bomb::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Bomb" << endl;
+    out << "Target: " << target->territory_name << endl;
+    
 }
 
 ostream& operator <<(ostream &out, const Bomb &order) {
-    out << static_cast<const Order&>(order);
-    out << "Type: Bomb" << endl;
-    out << "Target: " << order.target->territory_name << endl;
+    order.print(out);
     return out;
+}
+
+void Blockade::print(ostream& out) const{
+    Order::print(out);
+    out << "Type: Blockade" << endl;
+    out << "Target: " << target->territory_name << endl;
+    
 }
 
 ostream& operator <<(ostream &out, const Blockade &order) {
-    out << static_cast<const Order&>(order);
-    out << "Type: Blockade" << endl;
-    out << "Target: " << order.target->territory_name << endl;
+    order.print(out);
     return out;
 }
 
-ostream& operator <<(ostream &out, const Negotiate &order) {
-    out << static_cast<const Order&>(order);
+void Negotiate::print(ostream& out) const{
+    Order::print(out);
     out << "Type: Negotiate" << endl;
-    out << "Targetted player: " << order.target->getName() << endl;
+    out << "Targetted player: " << target->getName() << endl;
+    
+}
+
+ostream& operator <<(ostream &out, const Negotiate &order) {
+    order.print(out);
     return out;
 }
