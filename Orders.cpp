@@ -98,7 +98,7 @@ Deploy& Deploy::operator=(const Deploy& d) {
 }
 
 bool Deploy::validate() {
-    return isTerritoryOwnedByPlayer(orderIssuer, target) && orderIssuer->getReinforcementPool() > numberOfUnits;
+    return isTerritoryOwnedByPlayer(orderIssuer, target) && orderIssuer->getReinforcementPool() <= numberOfUnits;
 };
 
 void Deploy::execute() {
