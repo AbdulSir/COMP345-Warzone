@@ -5,6 +5,7 @@
 //
 #include "GameEngine.h"
 #include "Player.h"
+#include "PlayerStrategies.h"
 #include <string>
 #include <iostream>
 #include <math.h>
@@ -36,6 +37,7 @@ GameEngine::GameEngine() : state("start"), command("") {
         }
     } while (true);
     
+    //Start state of game
     string s;
     while (true) {
         s = cp->getCommand("start");
@@ -44,11 +46,14 @@ GameEngine::GameEngine() : state("start"), command("") {
             break;
         }
         else if (s != "") {
+            map_loader = new MapLoader(s.substr(8));
+            state = "map loaded";
+            Notify(this);
             startupPhase();
             break;
         }
         else
-            cout << "INVALID COMMAND FOR: " << state << " state" << endl;
+            cout << "Invalid command for " << state << " state" << endl;
     }
 }
 
@@ -84,7 +89,7 @@ std::ostream& operator<<(std::ostream &strm, const GameEngine &g) {
 //Transition to load the map
 void GameEngine::loadMap() {
     map_loader = new MapLoader();
-    // Code for loading map
+    //Code for loading map
     state = "map loaded";
     Notify(this);
 }
@@ -121,12 +126,31 @@ void GameEngine::addPlayer() {
         string player_name = "Player " + to_string(i+1);
         cout << "Player " << i+1 << ": Please choose your strategy [Human, Aggressive, Benevolent, Neutral, Cheater]" << endl;
         string ps;
-        //cin >> ps;
-        if (ps == "Human")
-            //
-            //players.push_back(new Player(player_name, new Hand, {}, map_loader, new HumanStrategy));
-            else if (ps == "Aggressive")
-                }
+        cin >> ps;
+        switch (ps.at(0)) {
+            case 'A': {
+                players.emplace(players.begin(), new Player("Aggressive", new Hand, {}, map_loader->map_object, new Aggressive));
+                break;
+            }
+                //            case 'B': {
+                //                    players.emplace(players.begin(), new Player("Benevolent", new Hand, {}, map_loader->map_object, new Benevolent));
+                //                break;
+                //            }
+                //            case 'N': {
+                //                    players.emplace(players.begin(), new Player("Neutral", new Hand, {}, map_loader->map_object, new Neutral));
+                //                break;
+                //            }
+                //            case 'H': {
+                //                    players.emplace(players.begin(), new Player("Human", new Hand, {}, map_loader->map_object, new Human));
+                //                break;
+                //            }
+                //            default: {
+                //                    players.emplace(players.begin(), new Player("Cheater", new Hand, {}, map_loader->map_object, new Cheater));
+                //            }
+            default: {
+                players.emplace(players.begin(), new Player("Aggressive", new Hand, {}, map_loader->map_object, new Aggressive));;
+            }
+        }    }
     
     state = "players added";
     Notify(this);
@@ -432,7 +456,7 @@ void GameEngine::reinforcementPhase(){
         }
         
     }
-    cout << "Enmd of Reinforcement Phase" << endl;
+    cout << "End of Reinforcement Phase" << endl;
 }
 
 void GameEngine::issueOrdersPhase(){
@@ -443,7 +467,7 @@ void GameEngine::issueOrdersPhase(){
     for (int i=0; i < players.size(); i++){
         cout << "Player "<< i <<"\'s turn" <<endl;
         //use a while loop?
-        players[i]->issueOrder();
+        players[i]->ps->issueOrder();
     }
     cout << "End of issue orders phase" << endl;
 }
@@ -453,11 +477,11 @@ void GameEngine::executeOrdersPhase(){
     // need to determine which player(s) have the most # of orders, skip the indices of those who have less
     
     //loop through players and execute all their orders
-    //    for (auto player: players){
-    //        for (auto order: player->getOrders()->getOrderList()) {
-    //            order->execute();
-    //        }
-    //    }
+    for (auto player: players){
+        for (auto order: player->getOrders()->orderList) {
+            order->execute();
+        }
+    }
 }
 void GameEngine::startupPhase()
 {
@@ -467,12 +491,12 @@ void GameEngine::startupPhase()
         std::cout << "--NEW GAME OF WARZONE--\n";
         
         //Start state
-        while (state != "map loaded") {
-            cout << "Current State: " << state << endl;
-            cout << endl;
-            std::cout << "Type \"loadMap\" to load a map\n";
-            std::cin >> command;
-            start();
+        if (map_loader->text_contents != "") {
+            state = "map loaded";
+        }
+        else {
+            cout << "The map could not be loaded" << endl;
+            goto endGame;
         }
         
         //Map loaded state
@@ -499,31 +523,10 @@ void GameEngine::startupPhase()
             playersAdded();
         }
         
-        
-        while (state != "win") {
-            
-            //Assign reinforcement state
-            while(state !="issue orders") {
-                cout << "Current State: " << state << endl;
-                std::cout << "Type \"issueOrder\" to issue an order" << endl;
-                std::cin >> command;
-                assignReinforcement();
-            }
-            
-            //Issue orders state
-            while(state !="execute orders") {
-                std::cout << "Choose one of the following:\n\t1. issueOrder\n\t2. endIssueOrders" << endl;
-                std::cin >> command;
-                issueOrders();
-            }
-            
-            //Execute orders state
-            while(state !="assign reinforcement" && state != "win") {
-                std::cout << "Choose one of the following:\n\t1. execOrder\n\t2. endExecOrders\n\t3. win" << endl;
-                std::cin >> command;
-                executeOrders();
-            }
-            
+        mainGameLoop();
+        state = "win";
+        if (players.size() == 1) {
+            cout << "Winner: " << players[0]->getName() << endl;
         }
         
         //Win state: "play" command triggers the start of a new game, "end" command ends the program
@@ -538,10 +541,14 @@ void GameEngine::startupPhase()
         
         if (command == "play")
             play();
-        else
+        else if (command == "end")
             end();
+        else {
+        endGame:
+            cout << "NO GAME" << endl;
+            state = "end";
+        }
     }
-    
 }
 
 vector<int> GameEngine::player_owns_all_territories(Player* p1)
@@ -603,7 +610,6 @@ void GameEngine::tournamentMode() {
         output << "\tGame " << i << "\t\t";
     }
     
-    
     cout << "--NEW TOURNAMENT OF WARZONE--\n" << endl;
     
     for (auto currentMap : cp->mapFiles) {
@@ -636,10 +642,48 @@ void GameEngine::tournamentMode() {
             while(state == "map validated") {
                 cout << "\nCurrent State: " << state << endl;
                 for (auto player : cp->playersStrat) {
-                    if (random(100)%2 == 0)
-                        players.push_back(new Player(player));
-                    else
-                        players.emplace(players.begin(), new Player(player));
+                    switch (player.at(0)) {
+                        case 'A': {
+                            if (random(100)%2 == 0)
+                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Aggressive));
+                            else
+                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Aggressive));
+                            break;
+                        }
+                            //                        case 'B': {
+                            //                            if (random(100)%2 == 0)
+                            //                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Benevolent));
+                            //                            else
+                            //                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Benevolent));
+                            //                            break;
+                            //                        }
+                            //                        case 'N': {
+                            //                            if (random(100)%2 == 0)
+                            //                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Neutral));
+                            //                            else
+                            //                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Neutral));
+                            //                            break;
+                            //                        }
+                            //                        case 'H': {
+                            //                            if (random(100)%2 == 0)
+                            //                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Human));
+                            //                            else
+                            //                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Human));
+                            //                            break;
+                            //                        }
+                            //                        default: {
+                            //                            if (random(100)%2 == 0)
+                            //                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Cheater));
+                            //                            else
+                            //                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Cheater));
+                            //                        }
+                        default: {
+                            if (random(100)%2 == 0)
+                                players.push_back(new Player(player, new Hand, {}, map_loader->map_object, new Aggressive));
+                            else
+                                players.emplace(players.begin(), new Player(player, new Hand, {}, map_loader->map_object, new Aggressive));;
+                        }
+                    }
                 }
                 state = "players added";
                 cout << "The following players have been added: " << endl;
@@ -656,10 +700,12 @@ void GameEngine::tournamentMode() {
             
             //Main game loop
             cout << "Game " << currentGame << ":" << endl;
-            for (int i=0; i<cp->numMaxTurns; i++) {
-                cout << "IN MAIN GAME LOOP: Turn " << i+1 << endl;
+            mainGameLoop();
+            if (players.size() == 1) {
+                output << "\t" << players[0]->getName() << "\t";
+            } else {
+                output << "\tDRAW: No winner\t";
             }
-            output << "\tGAME WINNER\t";
             for (auto p : players)
                 p->getTerritories().clear();
             players.erase(players.begin(),players.end());
@@ -677,3 +723,4 @@ int GameEngine::random (int lim) {
     uniform_int_distribution<int> uid {0,lim};
     return uid(dre);
 }
+
