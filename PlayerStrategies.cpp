@@ -77,8 +77,6 @@ void Cheater::issueOrder() {
 
 vector <Territory*> Cheater::toDefend() {
     vector <Territory*> attack;
-    //An Example of how you would call adjacent_territory_vector()
-    //vector <Territory*> adjacent_terr = this->p->map->adjacent_territory_vector(this->p->getTerritories()[0]->getName()); //It takes the territory name and returns a list of territories.
     return attack;
 }
 
@@ -182,7 +180,7 @@ void Human::issueOrder() {
                 }
                 p->getOrders()->addOrder(new Airlift(p, from, to, numberOfUnits));
             } else {
-                cout << "You do not have a airlift card haha!!" << endl;
+                cout << "You do not have a airlift card :(" << endl;
             }
 
         }
@@ -200,7 +198,7 @@ void Human::issueOrder() {
                 }
                 p->getOrders()->addOrder(new Bomb(p, to, map_obj));
             } else {
-                cout << "You do not have a bomb card haha!!" << endl;
+                cout << "You do not have a bomb card :(" << endl;
             }
         }
         if (command == "Blockade") {
@@ -217,7 +215,7 @@ void Human::issueOrder() {
                 }
                 p->getOrders()->addOrder(new Blockade(p, to, neutralPlayer));
             } else {
-                cout << "You do not have a blockade card haha!!" << endl;
+                cout << "You do not have a blockade card :(" << endl;
             }
         } 
         if (command == "Negotiate") {
@@ -237,7 +235,7 @@ void Human::issueOrder() {
                 }
                 p->getOrders()->addOrder(new Negotiate(p, target));
             } else {
-                cout << "You do not have a diplomacy card haha!!" << endl;
+                cout << "You do not have a diplomacy card :(" << endl;
             }
         }
     }
