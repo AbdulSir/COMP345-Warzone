@@ -1,7 +1,14 @@
 # COMP 345 WARZONE
 
-COMP 345 Warzone project
-Member List:
+## Project Description
+<p>The specific project consists in building a simple “Risk” computer game using C++. The developed program
+will have to be compatible with the rules and map files and the command-line play of the “Warzone” version of
+Risk, which can be found at: https://www.warzone.com/. A Warzone game setup consists of a connected graph
+map representing a world map, where each node is a country and each edge represents adjacency between
+countries. Two or more players can play by placing armies on countries they own, from which they can attack
+adjacent countries to conquer them. The objective of the game is to conquer all countries on the map. For futher details, read 'Project Description.pdf'</p>
+
+## Members List:
 
 - Jason
 - Bea
