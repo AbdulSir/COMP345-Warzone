@@ -63,16 +63,16 @@ Deck::Deck(int deckLength) {
         switch (random) {
             case 0:
                 cardType = "bomb";
-            break;
+                break;
             case 1:
                 cardType = "reinforcement";
-            break;
+                break;
             case 2:
                 cardType = "blockade";
-            break;
+                break;
             case 3:
                 cardType = "airlift";
-            break;
+                break;
             default:
                 cardType = "diplomacy";
         }

@@ -11,6 +11,7 @@ using namespace std;
 #include <string>
 #include <fstream>
 
+
 //METHODS IN COMMAND
 
 //Command default constructor
@@ -43,6 +44,11 @@ ostream& operator<<(ostream& out, const Command& c) {
 
 //Saves effect of command
 void Command::saveEffect(string c) {
+    
+    if (c.find("tournament") != string::npos) {
+        effect = "Tournament Mode activated";
+    }
+    
     if (c.find("loadmap") != string::npos) {
         string mapName = c.substr(8);
         effect = mapName + " has been loaded";
@@ -83,11 +89,13 @@ std::string Command::stringToLog(){
 //CommandProcessor constructor
 CommandProcessor::CommandProcessor() {
     this->lc = {};
+    this->numMaxTurns = 10;
 }
 
 //CommandProcessor copy constructor
 CommandProcessor::CommandProcessor(CommandProcessor& cp) {
     this->lc = cp.lc;
+    this->numMaxTurns = cp.numMaxTurns;
 }
 
 //CommandProcessor destructor
@@ -101,6 +109,7 @@ CommandProcessor::~CommandProcessor() {
 //Assignment operator
 const CommandProcessor& CommandProcessor::operator= (const CommandProcessor& cp) {
     this->lc = cp.lc;
+    this->numMaxTurns = cp.numMaxTurns;
     return *this;
 }
 
@@ -114,7 +123,7 @@ ostream& operator<<(ostream& out, const CommandProcessor& cp) {
 }
 
 //Method provided to other objects (like the GameEngine) to get commands
-void CommandProcessor::getCommand(string gameState) {
+string CommandProcessor::getCommand(string gameState) {
     string commandStr = readCommand();
     if (validate(commandStr, gameState)) {
         cout << commandStr << " is a valid command for the " << gameState << " state\n" <<endl;
@@ -122,6 +131,7 @@ void CommandProcessor::getCommand(string gameState) {
         LogObserver *observer = new LogObserver(c) ;
         saveCommand(c);
         c->saveEffect(commandStr);
+        return commandStr;
     }
     else {
         cout << commandStr << " is not a valid command for the " << gameState << " state\n" << endl;
@@ -129,11 +139,65 @@ void CommandProcessor::getCommand(string gameState) {
         LogObserver *observer = new LogObserver(c) ;
         saveCommand(c);
         c->effect = "No effect (Invalid command for " + gameState + " state)";
+        return "";
     }
 }
 
 //Validates if command is valid in current game state
 bool CommandProcessor::validate(string c, string gameState) {
+    
+    //Validating tournament command
+    if (c.substr(0,14) == "tournament -M " && c.find(" -M ") < c.find(" -P ") && c.find(" -P ") < c.find(" -G ") && c.find(" -G ") < c.find(" -D ") && c.length() == c.find("-D")+5 && gameState == "start") {
+        
+        //Validating the map input
+        string m = c.substr(c.find("-M")+3);
+        m = m.substr(0, m.find(" "));
+        while (m.find(",") != m.npos) {
+            string subsM = m.substr(0, m.find(","));
+            if (subsM.find(".map") == subsM.npos)
+                return false;
+            mapFiles.push_back(m.substr(0, m.find(",")));
+            m = m.substr(m.find(",")+1);
+        }
+        mapFiles.push_back(m);
+        if (mapFiles.size() < 1 || mapFiles.size() > 5 || m == "-P")
+            return false;
+        
+        //Validating the player input
+        string p = c.substr(c.find("-P")+3);
+        p = p.substr(0, p.find(" "));
+        while (p.find(",") != p.npos) {
+            playersStrat.push_back(p.substr(0, p.find(",")));
+            p = p.substr(p.find(",")+1);
+        }
+        playersStrat.push_back(p);
+        if (playersStrat.size() < 2 || playersStrat.size() > 4 || p == "-G")
+            return false;
+        for (auto i:playersStrat) {
+            if (i != "Human" && i != "Aggressive" && i != "Benevolent" && i != "Neutral" && i != "Cheater")
+                return false;
+        }
+        
+        //Validating the number of games input
+        string g = c.substr(c.find("-G")+3);
+        g = g.substr(0, g.find(" "));
+        if (g.length() != 1 || g.at(0) < 48 || g.at(0) > 57)
+            return false;
+        numGames = stoi(g);
+        if (numGames < 1 || numGames > 5)
+            return false;
+        
+        //Validating the number of turns input
+        string d = c.substr(c.find("-D")+3);
+        if (d.length() != 2 || d.at(0) < 48 || d.at(0) > 57 || d.at(1) < 48 || d.at(1) > 57)
+            return false;
+        numMaxTurns = stoi(d);
+        if (numMaxTurns < 10 || numMaxTurns > 50)
+            return false;
+        
+        return true;
+    }
+    
     if (c.substr(0,8) == "loadmap " && (gameState == "start" || gameState == "mapLoaded")) {
         if (c.substr(c.length()-4) == ".map" && c.rfind(" ") == 7 && c.find(" .map") == c.npos)
             return true;

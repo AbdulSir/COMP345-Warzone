@@ -11,7 +11,7 @@ using namespace std;
 // Territory CLASS
 Territory::Territory ()
 {
-
+    
 }
 //Copy constructor
 Territory::Territory(const Territory& obj)
@@ -89,7 +89,7 @@ Player* Territory::getOwner() {
 
 Map::Map()
 {
-
+    
 }
 
 //Copy constructor
@@ -135,7 +135,7 @@ vector <Territory*> Map::adjacent_territory_vector(string terr1) {
 
 // Stream insertion operators
 ostream & operator << (ostream &out, Map &m1) {
-
+    
     for (int i=0; i< m1.territories.size(); i++)
     {
         cout << "Territory " << m1.territories[i]->territory_name << endl;
@@ -179,17 +179,17 @@ bool Map::validate()
         cout << "\nThe map is a connected graph" << endl;
     else
         cout << "\nThe map is NOT a connected graph" << endl;
-
+    
     if (Map::continents_are_connected())
         cout << "\nContinents are connected subgraphs" << endl;
     else
         cout << "\nContinents are NOT connected subgraphs" << endl;
-
+    
     if (Map::territory_belongs_to_one_continent())
         cout << "\nTerritories belong to only one continent" << endl;
     else
         cout << "\nTerritories DO NOT belong to only one continent" << endl;
-
+    
     if (Map::map_is_connected()==true && Map::continents_are_connected()==true && Map::territory_belongs_to_one_continent()==true)
         return true;
     else
@@ -392,28 +392,27 @@ MapLoader::MapLoader()
 {
     // Create a text string, which is used to output the text file
     string myText;
-
+    
     string file_name = "";
     cout << "Please enter the map file name: \n";
     cin >> file_name;
-
+    
     if (file_name.compare(".map") != 0)
     {
         cout << endl;
         // Read from the text file
-        ifstream MyReadFile("Resources/" + file_name);
-        //ifstream MyReadFile(file_name);
+        ifstream MyReadFile(file_name);
         if(MyReadFile.fail())
         {
             cout << "An error happened while attempting to read the file" << endl;
             return;
         }
-
+        
         // Use a while loop together with the getline() function to read the file line by line
         text_contents = "";
         while (getline (MyReadFile, myText)) {
-          // Output the text from the file
-          text_contents += myText + "\n";
+            // Output the text from the file
+            text_contents += myText + "\n";
         }
         //creating a map object
         map_object = new Map(text_contents);
@@ -458,7 +457,7 @@ MapLoader::MapLoader(string file_name)
     // Create a text string, which is used to output the text file
     string myText;
     // Read from the text file
-    ifstream MyReadFile("Resources/" + file_name);
+    ifstream MyReadFile(file_name);
     if(MyReadFile.fail())
     {
         cout << "An error happened while attempting to read the file" << endl;
@@ -467,8 +466,8 @@ MapLoader::MapLoader(string file_name)
     // Use a while loop together with the getline() function to read the file line by line
     text_contents = "";
     while (getline (MyReadFile, myText)) {
-      // Output the text from the file
-      text_contents += myText + "\n";
+        // Output the text from the file
+        text_contents += myText + "\n";
     }
     //creating a map object
     map_object = new Map(text_contents);

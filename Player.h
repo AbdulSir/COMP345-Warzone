@@ -16,11 +16,6 @@ class OrderList;
 class Hand;
 class Territory;
 class PlayerStrategy;
-class Neutral;
-class Human;
-class Cheater;
-class Aggressive;
-class Benevolent;
 
 //Player class declaration
 class Player{
@@ -50,7 +45,7 @@ public:
     void setReinforcementPool(int number);
     void setPeacefulTerritories(vector<Territory*> v);
     void setWillDrawCard(bool value);
-
+    
 private:
     string name;
     Hand * hand;

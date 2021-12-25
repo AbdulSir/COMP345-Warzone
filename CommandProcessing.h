@@ -47,6 +47,12 @@ public:
     //list of commands
     list<Command*> lc;
     
+    //Attributes related to Tournament mode
+    list<string> mapFiles;
+    list<string> playersStrat;
+    int numGames;
+    int numMaxTurns;
+    
     //Constructors + Destructor
     CommandProcessor();
     CommandProcessor(CommandProcessor& cp);
@@ -56,7 +62,7 @@ public:
     const CommandProcessor& operator= (const CommandProcessor& cp);
     
     //Method to get commands
-    void getCommand(string gameState);
+    string getCommand(string gameState);
     
     //Method to validate commands
     bool validate(string c, string gameState);

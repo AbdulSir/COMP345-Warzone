@@ -1,0 +1,2 @@
+tournament -M lotr.map,ameroki.map -P Cheater,Benevolent -G 4 -D 10
+tournament -M tube.map,geoscape.map,risk.map -P Cheater,Neutral,Aggressive -G 2 -D 21
